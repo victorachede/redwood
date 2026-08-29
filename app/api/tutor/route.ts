@@ -23,8 +23,9 @@ Response format:
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { subject, messages, action } = body as {
+    const { subject, topic, messages, action } = body as {
       subject?: string
+      topic?: string
       messages?: { role: string; content: string }[]
       action?: string
     }
@@ -33,12 +34,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'subject required' }, { status: 400 })
     }
 
+    const topicLine = topic ? ` Focus on this topic path: ${topic}.` : ''
+
     const formattedMessages =
       action === 'start'
         ? [
             {
               role: 'user' as const,
-              content: `Start teaching me ${subject}. Begin with the most fundamental concept and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
+              content: `Start teaching me ${subject}.${topicLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
             },
           ]
         : (messages ?? []).map((m) => ({
