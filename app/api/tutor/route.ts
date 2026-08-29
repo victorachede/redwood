@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { NextRequest, NextResponse } from 'next/server'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = new Anthropic()
 
-const SYSTEM = `You are Ewin, an expert AI tutor for Nigerian secondary school students preparing for WAEC, NECO, and JAMB exams.
+const SYSTEM = `You are Ewin, a patient and excellent AI tutor for Nigerian secondary school students preparing for WAEC and JAMB exams.
 
-Your teaching style:
+Teaching style:
 - Teach one concept at a time, clearly and simply
 - After explaining a concept, ALWAYS ask ONE question to test understanding
 - When the student answers, give specific feedback — tell them what's right, correct what's wrong, then explain why
@@ -21,27 +21,47 @@ Response format:
 - Never use markdown formatting like ** or ##`
 
 export async function POST(req: NextRequest) {
-  const { subject, messages, action } = await req.json()
+  try {
+    const body = await req.json()
+    const { subject, messages, action } = body as {
+      subject?: string
+      messages?: { role: string; content: string }[]
+      action?: string
+    }
 
-  const formattedMessages = action === 'start'
-    ? [{ role: 'user' as const, content: `Start teaching me ${subject}. Begin with the most fundamental concept and teach me step by step. After your first explanation, ask me a question to test if I understood.` }]
-    : messages.map((m: { role: string; content: string }) => ({
-        role: m.role === 'student' ? 'user' as const : 'assistant' as const,
-        content: m.content,
-      }))
+    if (!subject || typeof subject !== 'string') {
+      return NextResponse.json({ error: 'subject required' }, { status: 400 })
+    }
 
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 600,
-    system: SYSTEM,
-    messages: formattedMessages,
-  })
+    const formattedMessages =
+      action === 'start'
+        ? [
+            {
+              role: 'user' as const,
+              content: `Start teaching me ${subject}. Begin with the most fundamental concept and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
+            },
+          ]
+        : (messages ?? []).map((m) => ({
+            role: (m.role === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
+            content: m.content,
+          }))
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
-  const isQuestion = text.includes('Question:')
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      system: SYSTEM,
+      messages: formattedMessages,
+    })
 
-  return NextResponse.json({
-    response: text,
-    type: isQuestion ? 'question' : 'feedback',
-  })
+    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    const isQuestion = text.includes('Question:')
+
+    return NextResponse.json({
+      response: text,
+      type: isQuestion ? 'question' : 'feedback',
+    })
+  } catch (err) {
+    console.error('tutor error', err)
+    return NextResponse.json({ error: 'Tutor failed' }, { status: 500 })
+  }
 }
