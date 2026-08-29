@@ -1,35 +1,42 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+const geistSans = Geist({
+  variable: '--font-geist-sans',
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+})
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
+
+const sourceSerif = Source_Serif_4({
+  variable: '--font-source-serif',
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
 })
 
 export const metadata: Metadata = {
-  title: 'Ewin — AI tutor for WAEC & JAMB',
+  title: 'Ewin — Learn until it sticks | WAEC & JAMB',
   description:
-    'Learn Mathematics, Physics, Chemistry, Biology, English and Economics with an AI tutor that teaches, then checks you understand — built for Nigerian secondary students.',
-  openGraph: {
-    title: 'Ewin — AI tutor for WAEC & JAMB',
-    description: 'Concept by concept. Question by question. Free.',
-    type: 'website',
-  },
+    'An AI tutor that teaches one concept, then checks you understood — built for Nigerian secondary students preparing for WAEC and JAMB.',
 }
 
 export const viewport: Viewport = {
-  themeColor: '#070b09',
+  themeColor: '#faf7f0',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="antialiased">{children}</body>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable}`}
+    >
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }

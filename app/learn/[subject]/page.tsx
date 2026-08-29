@@ -2,17 +2,18 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
+import { ArrowLeft, ArrowRight, Send } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
 
 type Message = {
   role: 'tutor' | 'student'
   content: string
-  type?: 'lesson' | 'question' | 'feedback' | 'response'
+  type?: string
 }
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 w-fit">
+    <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3">
       <span className="typing-dot" />
       <span className="typing-dot" />
       <span className="typing-dot" />
@@ -23,7 +24,7 @@ function TypingIndicator() {
 function formatContent(text: string) {
   const parts = text.split(/(Question:\s*)/i)
   if (parts.length < 2) {
-    return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>
+    return <p className="whitespace-pre-wrap leading-relaxed text-ink">{text}</p>
   }
   const nodes: React.ReactNode[] = []
   for (let i = 0; i < parts.length; i++) {
@@ -33,20 +34,20 @@ function formatContent(text: string) {
       nodes.push(
         <span
           key={i}
-          className="mt-3 mb-1 inline-block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]"
+          className="mt-3 mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-accent"
         >
           Question
         </span>
       )
     } else if (i > 0 && /^Question:/i.test(parts[i - 1] || '')) {
       nodes.push(
-        <p key={i} className="mt-1 whitespace-pre-wrap font-medium leading-relaxed text-[var(--text)]">
+        <p key={i} className="whitespace-pre-wrap font-medium leading-relaxed text-ink">
           {part.trim()}
         </p>
       )
     } else {
       nodes.push(
-        <p key={i} className="whitespace-pre-wrap leading-relaxed text-[var(--text-secondary)]">
+        <p key={i} className="whitespace-pre-wrap leading-relaxed text-ink">
           {part.trim()}
         </p>
       )
@@ -58,9 +59,10 @@ function formatContent(text: string) {
 export default function LearnPage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject } = use(params)
   const meta = getSubject(subject)
-  const subjectLabel = meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
-  const accent = meta?.accent ?? '#3dd68c'
+  const subjectLabel =
+    meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
 
+  const [topic, setTopic] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -77,7 +79,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     if (started && !loading) inputRef.current?.focus()
   }, [started, loading, messages.length])
 
-  async function startSession() {
+  async function startSession(chosenTopic: string) {
+    setTopic(chosenTopic)
     setStarted(true)
     setLoading(true)
     setError(null)
@@ -85,14 +88,29 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       const res = await fetch('/api/tutor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, messages: [], action: 'start' }),
+        body: JSON.stringify({
+          subject: subjectLabel,
+          topic: chosenTopic,
+          messages: [],
+          action: 'start',
+        }),
       })
-      if (!res.ok) throw new Error('Tutor unavailable right now')
+      if (!res.ok) throw new Error('fail')
       const data = await res.json()
       setMessages([{ role: 'tutor', content: data.response, type: 'lesson' }])
+      try {
+        const key = `ewin-last-${subject}`
+        localStorage.setItem(
+          key,
+          JSON.stringify({ topic: chosenTopic, at: Date.now(), subject: subjectLabel })
+        )
+      } catch {
+        /* ignore */
+      }
     } catch {
       setError('Could not start the session. Check your connection and try again.')
       setStarted(false)
+      setTopic(null)
     } finally {
       setLoading(false)
     }
@@ -106,14 +124,18 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     setInput('')
     setLoading(true)
     setError(null)
-
     try {
       const res = await fetch('/api/tutor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, messages: updated, action: 'respond' }),
+        body: JSON.stringify({
+          subject: subjectLabel,
+          topic,
+          messages: updated,
+          action: 'respond',
+        }),
       })
-      if (!res.ok) throw new Error('failed')
+      if (!res.ok) throw new Error('fail')
       const data = await res.json()
       setMessages([...updated, { role: 'tutor', content: data.response, type: data.type }])
     } catch {
@@ -132,94 +154,89 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     }
   }
 
+  /* ── Topic picker ── */
   if (!started) {
     return (
-      <main className="relative flex min-h-dvh flex-col">
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10"
-          style={{
-            background: `radial-gradient(ellipse 70% 45% at 50% 0%, ${accent}22, transparent 55%)`,
-          }}
-        />
-        <header className="border-b border-[var(--border)]/80">
-          <div className="mx-auto flex h-14 max-w-lg items-center px-4">
+      <main className="min-h-dvh bg-paper text-ink">
+        <header className="border-b border-line bg-paper">
+          <div className="mx-auto flex h-14 max-w-lg items-center gap-3 px-4">
             <Link
-              href="/"
-              className="text-[13px] text-[var(--text-muted)] no-underline transition-colors hover:text-[var(--text)]"
+              href="/#subjects"
+              className="inline-flex items-center gap-1.5 text-[13px] text-ink-muted no-underline hover:text-ink"
             >
-              ← All subjects
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Subjects
             </Link>
           </div>
         </header>
 
-        <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-12">
-          <div className="animate-fade-up text-center">
-            <span
-              className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-              style={{
-                background: `${accent}18`,
-                border: `1px solid ${accent}40`,
-                color: accent,
-              }}
-            >
-              {meta?.icon ?? '📖'}
-            </span>
-            <h1 className="text-[1.75rem] font-semibold tracking-tight text-[var(--text)]">
-              {subjectLabel}
-            </h1>
-            <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-[var(--text-secondary)]">
-              {meta?.blurb ?? 'Learn step by step with Ewin.'} You will get one concept, then one
-              question — answer in your own words.
+        <div className="mx-auto max-w-lg px-4 py-10 sm:py-14">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+            {meta?.exam ?? 'WAEC · JAMB'}
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-ink">
+            {subjectLabel}
+          </h1>
+          <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+            {meta?.blurb} Choose a topic path — Ewin will start from the fundamentals of that area.
+          </p>
+
+          {error && (
+            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-danger">
+              {error}
             </p>
+          )}
 
-            {error && (
-              <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-[13px] text-red-300">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="button"
-              onClick={() => void startSession()}
-              disabled={loading}
-              className="mt-8 inline-flex h-12 items-center justify-center rounded-xl px-8 text-[15px] font-semibold transition-opacity disabled:opacity-60"
-              style={{ background: accent, color: '#0a0f0d' }}
-            >
-              {loading ? 'Starting…' : 'Begin session'}
-            </button>
-            <p className="mt-4 text-[12px] text-[var(--text-muted)]">Free · no account needed</p>
+          <div className="mt-8 space-y-2">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink-muted">
+              Topic paths
+            </p>
+            {(meta?.topics ?? ['General foundations']).map((t) => (
+              <button
+                key={t}
+                type="button"
+                disabled={loading}
+                onClick={() => void startSession(t)}
+                className="group flex w-full items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5 text-left transition-colors hover:border-accent disabled:opacity-60"
+              >
+                <span className="text-[14px] font-medium text-ink">{t}</span>
+                <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+              </button>
+            ))}
           </div>
+
+          <p className="mt-6 text-center text-xs text-ink-muted">
+            Free · no account · answer in your own words
+          </p>
         </div>
       </main>
     )
   }
 
+  /* ── Live session ── */
   return (
-    <main className="flex h-dvh flex-col overflow-hidden">
-      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-md">
+    <main className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
+      <header className="shrink-0 border-b border-line bg-paper/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
           <Link
-            href="/"
-            className="text-[13px] text-[var(--text-muted)] no-underline hover:text-[var(--text)]"
+            href={`/learn/${subject}`}
+            onClick={(e) => {
+              e.preventDefault()
+              setStarted(false)
+              setMessages([])
+              setTopic(null)
+            }}
+            className="text-ink-muted hover:text-ink"
+            aria-label="Back to topics"
           >
-            ←
+            <ArrowLeft className="h-4 w-4" />
           </Link>
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm"
-            style={{ background: `${accent}18`, color: accent }}
-          >
-            {meta?.icon ?? '📖'}
-          </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-semibold tracking-tight">{subjectLabel}</p>
-            <p className="text-[11px] text-[var(--text-muted)]">Session with Ewin</p>
+            <p className="truncate text-[14px] font-semibold text-ink">{subjectLabel}</p>
+            <p className="truncate text-[11px] text-ink-muted">{topic}</p>
           </div>
-          <span
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 text-[11px] text-[var(--text-secondary)]"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            Live
+          <span className="hidden rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-accent sm:inline">
+            Session
           </span>
         </div>
       </header>
@@ -234,40 +251,31 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               }`}
             >
               {m.role === 'tutor' && (
-                <span className="mb-1.5 ml-1 text-[11px] font-medium text-[var(--text-muted)]">
-                  Ewin
-                </span>
+                <span className="mb-1.5 ml-1 text-[11px] font-medium text-ink-muted">Ewin</span>
               )}
               <div
                 className={`max-w-[min(100%,28rem)] rounded-2xl px-4 py-3 text-[14px] sm:max-w-[85%] ${
                   m.role === 'student'
-                    ? 'rounded-tr-md text-[var(--accent-text)]'
-                    : 'rounded-tl-md border border-[var(--border)] bg-[var(--bg-card)]'
+                    ? 'rounded-tr-md bg-accent text-paper'
+                    : 'rounded-tl-md border border-line bg-white shadow-[0_1px_0_var(--line)]'
                 }`}
-                style={
-                  m.role === 'student'
-                    ? { background: accent }
-                    : undefined
-                }
               >
-                {m.role === 'tutor' ? formatContent(m.content) : (
+                {m.role === 'tutor' ? (
+                  formatContent(m.content)
+                ) : (
                   <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                 )}
               </div>
             </div>
           ))}
-
           {loading && (
             <div className="flex flex-col items-start">
-              <span className="mb-1.5 ml-1 text-[11px] font-medium text-[var(--text-muted)]">
-                Ewin
-              </span>
+              <span className="mb-1.5 ml-1 text-[11px] font-medium text-ink-muted">Ewin</span>
               <TypingIndicator />
             </div>
           )}
-
           {error && (
-            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-[13px] text-red-300">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-danger">
               {error}
             </p>
           )}
@@ -275,7 +283,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg-elevated)] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+      <div className="shrink-0 border-t border-line bg-white pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
         <div className="mx-auto flex max-w-2xl gap-2 px-4">
           <textarea
             ref={inputRef}
@@ -285,28 +293,19 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             rows={1}
             placeholder="Type your answer…"
             disabled={loading}
-            className="max-h-32 min-h-[48px] flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3.5 py-3 text-[14px] text-[var(--text)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--border-strong)] disabled:opacity-60"
+            className="max-h-32 min-h-[48px] flex-1 resize-none rounded-xl border border-line bg-paper px-3.5 py-3 text-[14px] text-ink outline-none placeholder:text-ink-muted focus:border-accent disabled:opacity-60"
           />
           <button
             type="button"
             onClick={() => void send()}
             disabled={loading || !input.trim()}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--accent-text)] transition-opacity disabled:opacity-40"
-            style={{ background: accent }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent text-paper transition-colors hover:bg-accent-hover disabled:opacity-40"
             aria-label="Send"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M5 12h14M13 6l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Send className="h-4 w-4" />
           </button>
         </div>
-        <p className="mx-auto mt-2 max-w-2xl px-4 text-center text-[11px] text-[var(--text-muted)]">
+        <p className="mx-auto mt-2 max-w-2xl px-4 text-center text-[11px] text-ink-muted">
           Enter to send · Shift+Enter for new line
         </p>
       </div>

@@ -9,53 +9,83 @@ export type SubjectId =
 export type Subject = {
   id: SubjectId
   name: string
+  exam: string
   blurb: string
-  accent: string
-  icon: string
+  topics: string[]
 }
 
 export const SUBJECTS: Subject[] = [
   {
     id: 'mathematics',
     name: 'Mathematics',
-    blurb: 'Algebra, geometry, numbers — step by step',
-    accent: '#3dd68c',
-    icon: '∑',
+    exam: 'WAEC · JAMB',
+    blurb: 'From number bases to calculus — one idea at a time.',
+    topics: [
+      'Number & numeration',
+      'Algebraic processes',
+      'Geometry & mensuration',
+      'Statistics & probability',
+      'Trigonometry',
+    ],
   },
   {
     id: 'physics',
     name: 'Physics',
-    blurb: 'Forces, energy, waves you can picture',
-    accent: '#60a5fa',
-    icon: '⚡',
+    exam: 'WAEC · JAMB',
+    blurb: 'Mechanics, waves, electricity — pictured, then tested.',
+    topics: ['Mechanics', 'Heat & temperature', 'Waves & sound', 'Electricity', 'Modern physics'],
   },
   {
     id: 'chemistry',
     name: 'Chemistry',
-    blurb: 'Atoms, reactions, equations that click',
-    accent: '#f472b6',
-    icon: '⚗',
+    exam: 'WAEC · JAMB',
+    blurb: 'Atoms, bonds, equations that finally make sense.',
+    topics: [
+      'Particulate nature of matter',
+      'Periodic table',
+      'Chemical reactions',
+      'Acids, bases & salts',
+      'Organic chemistry',
+    ],
   },
   {
     id: 'biology',
     name: 'Biology',
-    blurb: 'Cells, systems, life made simple',
-    accent: '#34d399',
-    icon: '🌿',
+    exam: 'WAEC · JAMB',
+    blurb: 'Cells to systems — clear language, real examples.',
+    topics: [
+      'Cell biology',
+      'Nutrition & digestion',
+      'Transport systems',
+      'Reproduction',
+      'Ecology',
+    ],
   },
   {
     id: 'english',
     name: 'English',
-    blurb: 'Grammar, comprehension, clear writing',
-    accent: '#a78bfa',
-    icon: '✎',
+    exam: 'WAEC · JAMB',
+    blurb: 'Grammar, comprehension, and writing that scores.',
+    topics: [
+      'Lexis & structure',
+      'Comprehension',
+      'Summary writing',
+      'Essay & letter',
+      'Oral English',
+    ],
   },
   {
     id: 'economics',
     name: 'Economics',
-    blurb: 'Markets, money, how the economy moves',
-    accent: '#fbbf24',
-    icon: '₦',
+    exam: 'WAEC · JAMB',
+    blurb: 'Demand, supply, national income — in plain English.',
+    topics: [
+      'Basic economic problems',
+      'Demand & supply',
+      'Production',
+      'Money & banking',
+      'National income',
+    ],
   },
 ]
 
