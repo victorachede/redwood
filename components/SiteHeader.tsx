@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Settings } from 'lucide-react'
 import { getSession, signOut, useAuthListener, type LocalUser } from '@/app/lib/auth'
 import { EwinAvatar } from '@/components/EwinAvatar'
 
@@ -24,15 +25,25 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
           <EwinAvatar size={28} className="rounded-md" />
           <span className="text-[15px] font-semibold tracking-tight text-ink">Ewin</span>
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-3 text-[13px] text-ink-muted">
-          <Link href="/dashboard" className="hidden sm:inline hover:text-ink no-underline">
+        <nav className="flex items-center gap-1.5 sm:gap-2 text-[13px] text-ink-muted">
+          <Link href="/dashboard" className="hidden px-2 hover:text-ink no-underline sm:inline">
             Dashboard
+          </Link>
+          <Link
+            href="/settings"
+            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-white hover:text-ink"
+            aria-label="Settings"
+          >
+            <Settings className="h-4 w-4" />
           </Link>
           {user ? (
             <>
-              <span className="hidden max-w-[8rem] truncate text-ink sm:inline">
+              <Link
+                href="/settings"
+                className="hidden max-w-[7rem] truncate px-1 text-ink no-underline hover:text-accent sm:inline"
+              >
                 {user.displayName}
-              </span>
+              </Link>
               <button
                 type="button"
                 onClick={() => {
@@ -46,7 +57,7 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
             </>
           ) : (
             <>
-              <Link href="/login" className="hover:text-ink no-underline px-2">
+              <Link href="/login" className="px-2 hover:text-ink no-underline">
                 Sign in
               </Link>
               <Link

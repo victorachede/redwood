@@ -42,14 +42,22 @@ export default function DashboardPage() {
               {user ? `Hi, ${user.displayName}` : 'Dashboard'}
             </h1>
           </div>
-          {streak > 0 && (
-            <div className="flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5">
-              <Flame className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-ink">
-                {streak}-day streak
-              </span>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {streak > 0 && (
+              <div className="flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5">
+                <Flame className="h-4 w-4 text-accent" />
+                <span className="text-sm font-medium text-ink">
+                  {streak}-day streak
+                </span>
+              </div>
+            )}
+            <Link
+              href="/settings"
+              className="rounded-full border border-line bg-white px-3 py-1.5 text-[12px] font-medium text-ink no-underline hover:border-accent"
+            >
+              Settings
+            </Link>
+          </div>
         </div>
 
         {/* Continue */}

@@ -5,6 +5,8 @@ export type LocalUser = {
   email: string
   displayName: string
   createdAt: number
+  school?: string
+  examFocus?: string
 }
 
 type Store = {
@@ -32,13 +34,17 @@ function uid() {
   return `local_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`
 }
 
+function toPublic(u: LocalUser & { password: string }): LocalUser {
+  const { password: _, ...user } = u
+  return user
+}
+
 export function getSession(): LocalUser | null {
   const s = read()
   if (!s.sessionUserId) return null
   const u = s.users.find((x) => x.id === s.sessionUserId)
   if (!u) return null
-  const { password: _, ...user } = u
-  return user
+  return toPublic(u)
 }
 
 export function signUp(input: {
@@ -64,12 +70,12 @@ export function signUp(input: {
     displayName,
     password,
     createdAt: Date.now(),
+    examFocus: 'WAEC & JAMB',
   }
   s.users.push(user)
   s.sessionUserId = user.id
   write(s)
-  const { password: _, ...safe } = user
-  return { ok: true, user: safe }
+  return { ok: true, user: toPublic(user) }
 }
 
 export function signIn(input: {
@@ -84,14 +90,65 @@ export function signIn(input: {
   }
   s.sessionUserId = u.id
   write(s)
-  const { password: _, ...safe } = u
-  return { ok: true, user: safe }
+  return { ok: true, user: toPublic(u) }
 }
 
 export function signOut() {
   const s = read()
   s.sessionUserId = null
   write(s)
+}
+
+export function updateProfile(input: {
+  displayName?: string
+  school?: string
+  examFocus?: string
+}): { ok: true; user: LocalUser } | { ok: false; error: string } {
+  const s = read()
+  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
+  const idx = s.users.findIndex((x) => x.id === s.sessionUserId)
+  if (idx < 0) return { ok: false, error: 'Account not found.' }
+  const u = s.users[idx]
+  if (input.displayName !== undefined) {
+    const name = input.displayName.trim()
+    if (!name) return { ok: false, error: 'Name cannot be empty.' }
+    u.displayName = name
+  }
+  if (input.school !== undefined) u.school = input.school.trim()
+  if (input.examFocus !== undefined) u.examFocus = input.examFocus.trim()
+  s.users[idx] = u
+  write(s)
+  return { ok: true, user: toPublic(u) }
+}
+
+export function changePassword(input: {
+  current: string
+  next: string
+}): { ok: true } | { ok: false; error: string } {
+  const s = read()
+  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
+  const idx = s.users.findIndex((x) => x.id === s.sessionUserId)
+  if (idx < 0) return { ok: false, error: 'Account not found.' }
+  if (s.users[idx].password !== input.current) {
+    return { ok: false, error: 'Current password is wrong.' }
+  }
+  if (input.next.length < 6) return { ok: false, error: 'New password must be at least 6 characters.' }
+  s.users[idx].password = input.next
+  write(s)
+  return { ok: true }
+}
+
+/** Deletes the signed-in account from local store. Does not clear study data unless asked. */
+export function deleteAccount(password: string): { ok: true } | { ok: false; error: string } {
+  const s = read()
+  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
+  const u = s.users.find((x) => x.id === s.sessionUserId)
+  if (!u) return { ok: false, error: 'Account not found.' }
+  if (u.password !== password) return { ok: false, error: 'Password is incorrect.' }
+  s.users = s.users.filter((x) => x.id !== u.id)
+  s.sessionUserId = null
+  write(s)
+  return { ok: true }
 }
 
 export function useAuthListener(cb: () => void) {

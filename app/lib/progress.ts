@@ -95,3 +95,55 @@ export function getStreak(): number {
     return 0
   }
 }
+
+export type UsageStats = {
+  streak: number
+  sessions: number
+  uniqueSubjects: number
+  practiceRuns: number
+  practiceCorrect: number
+  practiceTotal: number
+  accuracyPct: number | null
+  lastActiveAt: number | null
+  topicCount: number
+}
+
+export function getUsageStats(): UsageStats {
+  const sessions = loadSessions()
+  const practice = loadPractice()
+  const streak = getStreak()
+  const subjects = new Set(sessions.map((s) => s.subjectId))
+  practice.forEach((p) => subjects.add(p.subjectId))
+  const practiceCorrect = practice.reduce((a, p) => a + p.correct, 0)
+  const practiceTotal = practice.reduce((a, p) => a + p.total, 0)
+  const times = [
+    ...sessions.map((s) => s.at),
+    ...practice.map((p) => p.at),
+  ].filter(Boolean)
+  return {
+    streak,
+    sessions: sessions.length,
+    uniqueSubjects: subjects.size,
+    practiceRuns: practice.length,
+    practiceCorrect,
+    practiceTotal,
+    accuracyPct: practiceTotal > 0 ? Math.round((practiceCorrect / practiceTotal) * 100) : null,
+    lastActiveAt: times.length ? Math.max(...times) : null,
+    topicCount: sessions.length,
+  }
+}
+
+/** Clears local study progress (not the auth account). */
+export function clearStudyData() {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(SESSIONS_KEY)
+  localStorage.removeItem(PRACTICE_KEY)
+  localStorage.removeItem(STREAK_KEY)
+  // clear message caches
+  const keys: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (k?.startsWith('ewin-msgs-')) keys.push(k)
+  }
+  keys.forEach((k) => localStorage.removeItem(k))
+}
