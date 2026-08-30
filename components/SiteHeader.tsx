@@ -15,19 +15,28 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
           <span className="text-[15px] font-semibold tracking-tight text-ink">Ewin</span>
         </Link>
         <nav className="flex items-center gap-4 text-[13px] text-ink-muted">
-          <Link href="/#subjects" className="hidden sm:inline hover:text-ink no-underline">
+          <Link href="/#subjects" className="hidden hover:text-ink no-underline sm:inline">
             Subjects
           </Link>
-          <Link href="/#how" className="hidden sm:inline hover:text-ink no-underline">
+          <Link href="/#how" className="hidden hover:text-ink no-underline sm:inline">
             How it works
           </Link>
           <Link
             href="/#subjects"
-            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-paper no-underline hover:bg-accent-hover transition-colors"
+            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-paper no-underline transition-colors hover:bg-accent-hover"
           >
             Start free
           </Link>
         </nav>
+      </div>
+      {/* Mobile-only sub-links */}
+      <div className="flex items-center gap-5 border-t border-line bg-paper/80 px-4 py-2 sm:hidden">
+        <Link href="/#subjects" className="text-[12px] text-ink-muted no-underline hover:text-ink">
+          Subjects
+        </Link>
+        <Link href="/#how" className="text-[12px] text-ink-muted no-underline hover:text-ink">
+          How it works
+        </Link>
       </div>
     </header>
   )
