@@ -37,8 +37,7 @@ export default function SignupPage() {
         </Link>
         <h1 className="font-serif text-2xl font-semibold tracking-tight">Create your account</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          Stored in this browser for now. Schema for Supabase is in{' '}
-          <code className="text-[12px]">supabase/migrations</code>.
+          Free account. Your progress stays on this phone or computer for now.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">

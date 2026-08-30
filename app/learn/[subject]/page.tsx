@@ -224,7 +224,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             {subjectLabel}
           </h1>
           <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
-            {meta?.blurb} Choose a topic path — Ewin will start from the fundamentals of that area.
+            {meta?.blurb} Pick a topic below. Ewin will start from the basics.
           </p>
           {focus && (
             <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
@@ -240,7 +240,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
           <div className="mt-8 space-y-2">
             <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink-muted">
-              Topic paths
+              Pick a topic
             </p>
             {(meta?.topics ?? ['General foundations']).map((t) => {
               const hasSaved = !!savedTopics[t]
@@ -262,7 +262,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                       onClick={() => void startSession(t, { resume: true })}
                       className="w-full border-t border-line px-4 py-2 text-left text-[12px] font-medium text-accent hover:bg-accent-soft"
                     >
-                      Resume saved session
+                      Continue this topic
                     </button>
                   )}
                 </div>
@@ -271,7 +271,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           </div>
 
           <p className="mt-6 text-center text-xs text-ink-muted">
-            Free · no account · answer in your own words
+            Type your answers in your own words
           </p>
         </div>
       </main>
@@ -356,7 +356,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
             rows={1}
-            placeholder="Type your answer…"
+            placeholder="Write your answer here…"
             disabled={loading}
             className="max-h-32 min-h-[48px] flex-1 resize-none rounded-xl border border-line bg-paper px-3.5 py-3 text-[14px] text-ink outline-none placeholder:text-ink-muted focus:border-accent disabled:opacity-60"
           />
@@ -371,7 +371,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           </button>
         </div>
         <p className="mx-auto mt-2 max-w-2xl px-4 text-center text-[11px] text-ink-muted">
-          Enter to send · Shift+Enter for new line
+          Press Enter to send
         </p>
       </div>
     </main>

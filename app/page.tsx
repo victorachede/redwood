@@ -13,51 +13,51 @@ import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
 const FEATURES = [
   {
     icon: BookOpen,
-    title: 'One concept, not a chapter dump',
-    body: 'Ewin teaches a single idea in plain language — then stops and checks you. No walls of notes you will never finish.',
+    title: 'Small lessons',
+    body: 'Ewin teaches one idea at a time — short and clear — then asks if you understood. No long notes to scroll past.',
   },
   {
     icon: MessageCircle,
-    title: 'Answer in your own words',
-    body: 'Not multiple-choice guessing. You explain it back. Ewin tells you what was right, what was off, and why.',
+    title: 'You type the answer',
+    body: 'Write it in your own words. Ewin tells you what was right, what was wrong, and why.',
   },
   {
     icon: Target,
-    title: 'Built for WAEC & JAMB',
-    body: 'Nigerian syllabus language, local examples, and the kind of questions examiners actually set — not generic internet worksheets.',
+    title: 'For WAEC & JAMB',
+    body: 'Subjects and questions in the style of the exams you will actually sit — with Nigerian examples.',
   },
 ]
 
 const STEPS = [
   {
-    n: '01',
-    title: 'Pick a subject & topic',
-    body: 'Mathematics, Physics, Chemistry, Biology, English, or Economics — then choose where to start.',
+    n: '1',
+    title: 'Choose a subject',
+    body: 'Maths, Physics, Chemistry, Biology, English, or Economics.',
   },
   {
-    n: '02',
-    title: 'Learn, then prove it',
-    body: 'Ewin explains. You answer. Feedback is specific — not “good job” spam.',
+    n: '2',
+    title: 'Read, then answer',
+    body: 'Ewin explains. You reply in the box. You get clear feedback.',
   },
   {
-    n: '03',
-    title: 'Move only when it stuck',
-    body: 'The next concept waits until this one is clear. That is how exam confidence is built.',
+    n: '3',
+    title: 'Or try practice questions',
+    body: 'Multiple-choice past-style questions — then see the explanation.',
   },
 ]
 
 const FAQS = [
   {
     q: 'Is Ewin free?',
-    a: 'Yes. You can start a full tutoring session with no account and no card. We may add optional Pro later for longer history and more subjects — the core loop stays free.',
+    a: 'Yes. You can learn and practice without paying. You can also create a free account to keep your progress on this device.',
   },
   {
-    q: 'How is this different from ChatGPT?',
-    a: 'ChatGPT will dump an essay if you ask. Ewin is constrained to teach one concept, ask one question, and give structured feedback — a tutor loop, not a search box.',
+    q: 'Do I need an account?',
+    a: 'No. Tap a subject and start. Sign up only if you want your name on the dashboard — still free.',
   },
   {
-    q: 'Will it give me the answer in the exam?',
-    a: 'No. Ewin is for learning. It uses a Socratic style so you reason, not copy. Use it to prepare — not to cheat.',
+    q: 'Is this for cheating in the exam?',
+    a: 'No. Use Ewin to prepare at home. In the exam hall you work on your own.',
   },
 ]
 
@@ -91,8 +91,8 @@ export default function Home() {
               Then prove you got it.
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-ink-muted">
-              Ewin is a patient tutor for Nigerian secondary students. Short explanations. Real
-              checks. Feedback that teaches — not another chatbot that writes your notes for you.
+              Free help for secondary school. Ewin teaches a little, asks you a question, and checks
+              your answer — so you understand before exam day.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -110,7 +110,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="mt-4 text-xs text-ink-muted">
-              Free to start · Guest mode works · Accounts are local until Supabase is connected
+              Free · No account needed to start
             </p>
           </div>
 
@@ -140,11 +140,10 @@ export default function Home() {
       {/* Features */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
         <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-          Built like a tutor. Not a search bar.
+          How Ewin helps you
         </h2>
         <p className="mt-2 max-w-lg text-sm text-ink-muted">
-          Most AI tools will write the essay for you. Ewin is deliberately slower — because that is
-          how understanding is built.
+          Not a site that dumps notes. A tutor that checks you understood.
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           {FEATURES.map(({ icon: Icon, title, body }) => (
@@ -170,7 +169,7 @@ export default function Home() {
               <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Subjects
               </h2>
-              <p className="mt-1 text-sm text-ink-muted">Pick one. Choose a topic. Begin.</p>
+              <p className="mt-1 text-sm text-ink-muted">Tap a subject to start learning.</p>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -189,7 +188,7 @@ export default function Home() {
                 <h3 className="text-[16px] font-semibold text-ink">{s.name}</h3>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">{s.blurb}</p>
                 <p className="mt-3 text-[11px] text-ink-muted">
-                  {s.topics.length} topic paths · tutor + practice
+                  Learn with tutor · or practice questions
                 </p>
               </Link>
             ))}
@@ -201,7 +200,7 @@ export default function Home() {
       <section id="how" className="scroll-mt-16 border-t border-line">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            How a session works
+            Three simple steps
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {STEPS.map((step) => (
@@ -235,10 +234,10 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
           <GraduationCap className="mx-auto h-8 w-8 text-accent" />
           <h2 className="mt-4 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Exam day rewards what you practiced.
+            Ready when you are
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
-            Ten focused minutes with Ewin beats three hours of passive rereading.
+            Even 10 minutes a day helps more than cramming the night before.
           </p>
           <Link
             href="#subjects"

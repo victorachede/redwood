@@ -36,7 +36,7 @@ export default function LoginPage() {
         </Link>
         <h1 className="font-serif text-2xl font-semibold tracking-tight">Welcome back</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          Local test accounts only — Supabase wiring comes later.
+          Sign in with the email you used to register on this device.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">

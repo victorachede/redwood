@@ -36,7 +36,7 @@ export default function DashboardPage() {
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
-              Your study home
+              Your home
             </p>
             <h1 className="mt-1 font-serif text-3xl font-semibold tracking-tight text-ink">
               {user ? `Hi, ${user.displayName}` : 'Dashboard'}
@@ -60,7 +60,7 @@ export default function DashboardPage() {
           >
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wide text-accent">
-                Continue learning
+                Continue where you stopped
               </p>
               <p className="mt-1 text-lg font-semibold text-ink">
                 {last.subjectName}
@@ -72,14 +72,13 @@ export default function DashboardPage() {
         ) : (
           <div className="mb-8 rounded-2xl border border-line bg-white p-5">
             <p className="text-sm text-ink-muted">
-              No sessions yet. Pick a subject, choose a topic, and learn with Ewin — or drill past
-              questions in Practice.
+              Nothing here yet. Pick a subject below — learn with the tutor, or try practice questions.
             </p>
             <Link
               href="/#subjects"
               className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent no-underline"
             >
-              Browse subjects <ArrowRight className="h-3.5 w-3.5" />
+              See subjects <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         )}
@@ -90,18 +89,18 @@ export default function DashboardPage() {
             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
               <BookOpen className="h-4 w-4 text-accent" />
             </div>
-            <h2 className="text-[15px] font-semibold text-ink">Tutor sessions</h2>
+            <h2 className="text-[15px] font-semibold text-ink">Learn with tutor</h2>
             <p className="mt-1 text-[13px] text-ink-muted leading-relaxed">
-              One concept, then a question you answer in your own words. Socratic feedback.
+              Ewin explains, then you type an answer. You get clear feedback.
             </p>
           </div>
           <div className="rounded-2xl border border-line bg-white p-5">
             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
               <Target className="h-4 w-4 text-accent" />
             </div>
-            <h2 className="text-[15px] font-semibold text-ink">Practice (CBT-style)</h2>
+            <h2 className="text-[15px] font-semibold text-ink">Practice questions</h2>
             <p className="mt-1 text-[13px] text-ink-muted leading-relaxed">
-              Timed-feel past questions with explanations — same pressure pattern as exam day.
+              Choose A, B, C or D. Then see if you were right and read why.
             </p>
           </div>
         </div>
@@ -149,7 +148,7 @@ export default function DashboardPage() {
         {sessions.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              Recent sessions
+              Recently opened
             </h2>
             <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
               {sessions.slice(0, 8).map((s, i) => (

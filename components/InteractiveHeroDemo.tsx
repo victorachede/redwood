@@ -132,7 +132,7 @@ export function InteractiveHeroDemo() {
             onClick={() => setAuto((a) => !a)}
             className="ml-auto text-[11px] text-ink-muted hover:text-ink"
           >
-            {auto ? 'Pause auto' : 'Play auto'}
+            {auto ? 'Pause' : 'Play'}
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function InteractiveHeroDemo() {
         aria-hidden
         className="pointer-events-none absolute -left-1 bottom-16 hidden -rotate-2 rounded-xl border border-accent/20 bg-accent-soft px-3 py-2 text-[11px] font-medium text-accent shadow-sm sm:block"
       >
-        One idea at a time
+        Step by step
       </div>
     </div>
   )

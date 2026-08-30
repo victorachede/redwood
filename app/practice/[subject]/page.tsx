@@ -100,15 +100,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
           </p>
           <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight">{subjectLabel}</h1>
           <p className="mt-3 text-[15px] text-ink-muted leading-relaxed">
-            {total} past-style questions with explanations. Answer, then learn why — same loop as a
-            light mock CBT.
+            {total} questions. Tap an option (A–D). Then read the explanation.
           </p>
           <button
             type="button"
             onClick={start}
             className="mt-8 rounded-full bg-accent px-8 py-3 text-sm font-medium text-paper hover:bg-accent-hover"
           >
-            Start practice
+            Start
           </button>
         </div>
       </main>
@@ -119,14 +118,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     return (
       <main className="min-h-dvh bg-paper text-ink">
         <div className="mx-auto max-w-lg px-4 py-16 text-center">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">Session complete</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">Finished</p>
           <h1 className="mt-2 font-serif text-3xl font-semibold">
             {correctCount}/{total} correct
           </h1>
           <p className="mt-3 text-sm text-ink-muted">
             {correctCount === total
-              ? 'Clean run. Reinforce with a tutor session on any weak topic.'
-              : 'Review the misses with Ewin — explain the idea in your own words.'}
+              ? 'All correct — nice work. You can still learn more with the tutor.'
+              : 'Some were wrong. Use “Explain a wrong one with Ewin” to understand them.'}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
@@ -140,14 +139,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               href={`/learn/${subject}`}
               className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
             >
-              Open tutor
+              Learn with tutor
             </Link>
             {misses[0] && (
               <Link
                 href={`/learn/${subject}?focus=${encodeURIComponent(misses[0].question.slice(0, 100))}`}
                 className="rounded-full border border-accent bg-accent-soft px-5 py-2.5 text-sm font-medium text-accent no-underline"
               >
-                Explain a miss with Ewin
+                Explain a wrong one with Ewin
               </Link>
             )}
             <Link
@@ -245,7 +244,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               onClick={next}
               className="mt-4 w-full rounded-full bg-accent py-2.5 text-sm font-medium text-paper hover:bg-accent-hover"
             >
-              {index + 1 >= total ? 'See results' : 'Next question'}
+              {index + 1 >= total ? 'See score' : 'Next'}
             </button>
           </div>
         )}
