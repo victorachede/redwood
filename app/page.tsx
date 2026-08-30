@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
+import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
 
 const FEATURES = [
   {
@@ -66,8 +67,20 @@ export default function Home() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="mx-auto max-w-5xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="relative mx-auto max-w-5xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        >
+          <div
+            className="absolute left-1/2 top-0 h-[420px] w-[min(100%,720px)] -translate-x-1/2 rounded-full opacity-70"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(232,239,233,0.85) 0%, transparent 68%)',
+            }}
+          />
+        </div>
+        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="animate-fade-up">
             <p className="mb-4 text-xs font-medium uppercase tracking-[0.16em] text-ink-muted">
               AI tutor · WAEC & JAMB
@@ -79,8 +92,7 @@ export default function Home() {
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-ink-muted">
               Ewin is a patient tutor for Nigerian secondary students. Short explanations. Real
-              questions. Feedback that actually teaches — not another chatbot that writes your notes
-              for you.
+              checks. Feedback that teaches — not another chatbot that writes your notes for you.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -91,53 +103,19 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/dashboard"
+                href="/signup"
                 className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
               >
-                Dashboard
+                Create account
               </Link>
             </div>
-            <p className="mt-4 text-xs text-ink-muted">No signup required · Free to start</p>
+            <p className="mt-4 text-xs text-ink-muted">
+              Free to start · Guest mode works · Accounts are local until Supabase is connected
+            </p>
           </div>
 
-          {/* Hero card — session preview */}
-          <div
-            className="animate-fade-up rounded-2xl border border-line bg-white p-6 shadow-[0_1px_0_var(--line),0_20px_40px_-24px_rgba(22,21,19,0.25)]"
-            style={{ animationDelay: '80ms' }}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
-                Mathematics · Algebra
-              </span>
-              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent">
-                Live session
-              </span>
-            </div>
-            <div className="space-y-3">
-              <div className="rounded-xl border border-line bg-paper/80 p-3.5">
-                <p className="text-[11px] font-medium text-ink-muted mb-1">Ewin</p>
-                <p className="text-sm leading-relaxed text-ink">
-                  A linear equation is like a balanced scale. Whatever you do to one side, you must
-                  do to the other — so the equality stays true.
-                </p>
-                <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-accent">
-                  Question
-                </p>
-                <p className="text-sm font-medium text-ink">
-                  If 2x + 3 = 11, what is x? Explain your steps.
-                </p>
-              </div>
-              <div className="ml-8 rounded-xl bg-accent p-3.5 text-sm text-paper">
-                I subtract 3 from both sides, get 2x = 8, then divide by 2. So x = 4.
-              </div>
-              <div className="rounded-xl border border-line bg-paper/80 p-3.5">
-                <p className="text-[11px] font-medium text-ink-muted mb-1">Ewin</p>
-                <p className="text-sm leading-relaxed text-ink">
-                  Exactly — order of operations on the equation is correct. Next we will try one with
-                  a negative coefficient…
-                </p>
-              </div>
-            </div>
+          <div className="animate-fade-up" style={{ animationDelay: '90ms' }}>
+            <InteractiveHeroDemo />
           </div>
         </div>
       </section>

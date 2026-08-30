@@ -12,16 +12,19 @@ import {
   type PracticeRecord,
   type SessionRecord,
 } from '@/app/lib/progress'
+import { getSession, type LocalUser } from '@/app/lib/auth'
 
 export default function DashboardPage() {
   const [sessions, setSessions] = useState<SessionRecord[]>([])
   const [practice, setPractice] = useState<PracticeRecord[]>([])
   const [streak, setStreak] = useState(0)
+  const [user, setUser] = useState<LocalUser | null>(null)
 
   useEffect(() => {
     setSessions(loadSessions())
     setPractice(loadPractice())
     setStreak(getStreak())
+    setUser(getSession())
   }, [])
 
   const last = sessions[0]
@@ -36,7 +39,7 @@ export default function DashboardPage() {
               Your study home
             </p>
             <h1 className="mt-1 font-serif text-3xl font-semibold tracking-tight text-ink">
-              Dashboard
+              {user ? `Hi, ${user.displayName}` : 'Dashboard'}
             </h1>
           </div>
           {streak > 0 && (
