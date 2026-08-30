@@ -34,12 +34,13 @@ function demoRespond(lastStudent: string): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { subject, topic, messages, action, focus } = body as {
+    const { subject, topic, messages, action, focus, documents } = body as {
       subject?: string
       topic?: string
       messages?: { role: string; content: string }[]
       action?: string
       focus?: string
+      documents?: { name: string; text: string }[]
     }
 
     if (!subject || typeof subject !== 'string') {
@@ -71,6 +72,19 @@ export async function POST(req: NextRequest) {
       typeof focus === 'string' && focus.trim()
         ? ` The student got this practice question wrong and needs it explained clearly: "${focus.trim()}". Start by helping them understand that question, then teach the underlying idea and ask one check question.`
         : ''
+    const docs =
+      Array.isArray(documents) && documents.length
+        ? documents
+            .slice(0, 3)
+            .map(
+              (d) =>
+                `--- Document: ${d.name} ---\n${(d.text || '').slice(0, 6000)}`
+            )
+            .join('\n\n')
+        : ''
+    const docsLine = docs
+      ? ` The student attached study notes. Use them when helpful:\n${docs}`
+      : ''
 
     const formattedMessages =
       action === 'start'
@@ -78,14 +92,23 @@ export async function POST(req: NextRequest) {
             {
               role: 'user' as const,
               content: focusLine
-                ? `I am studying ${subject}.${topicLine}${focusLine}`
-                : `Start teaching me ${subject}.${topicLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
+                ? `I am studying ${subject}.${topicLine}${focusLine}${docsLine}`
+                : `Start teaching me ${subject}.${topicLine}${docsLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
             },
           ]
-        : (messages ?? []).map((m) => ({
-            role: (m.role === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
-            content: m.content,
-          }))
+        : (() => {
+            const mapped = (messages ?? []).map((m) => ({
+              role: (m.role === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
+              content: m.content,
+            }))
+            if (docsLine && mapped.length) {
+              const last = mapped[mapped.length - 1]
+              if (last.role === 'user') {
+                last.content = `${last.content}\n\n${docsLine}`
+              }
+            }
+            return mapped
+          })()
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',

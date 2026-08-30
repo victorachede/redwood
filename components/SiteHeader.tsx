@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getSession, signOut, useAuthListener, type LocalUser } from '@/app/lib/auth'
+import { EwinAvatar } from '@/components/EwinAvatar'
 
 export function SiteHeader({ solid = false }: { solid?: boolean }) {
   const [user, setUser] = useState<LocalUser | null>(null)
@@ -20,9 +21,7 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
     >
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 no-underline">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-[13px] font-bold text-paper">
-            E
-          </span>
+          <EwinAvatar size={28} className="rounded-md" />
           <span className="text-[15px] font-semibold tracking-tight text-ink">Ewin</span>
         </Link>
         <nav className="flex items-center gap-2 sm:gap-3 text-[13px] text-ink-muted">
