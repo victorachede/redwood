@@ -12,6 +12,27 @@ type Message = {
   type?: string
 }
 
+function storageKey(subjectId: string, topic: string) {
+  return `ewin-msgs-${subjectId}-${topic}`
+}
+
+function loadMessages(subjectId: string, topic: string): Message[] {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(subjectId, topic)) || '[]') as Message[]
+  } catch {
+    return []
+  }
+}
+
+function persistMessages(subjectId: string, topic: string, msgs: Message[]) {
+  try {
+    localStorage.setItem(storageKey(subjectId, topic), JSON.stringify(msgs.slice(-40)))
+  } catch {
+    /* ignore */
+  }
+}
+
+
 function TypingIndicator() {
   return (
     <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3">
@@ -59,6 +80,7 @@ function formatContent(text: string) {
 
 export default function LearnPage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject } = use(params)
+  const [focus, setFocus] = useState<string | null>(null)
   const meta = getSubject(subject)
   const subjectLabel =
     meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
@@ -69,6 +91,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [loading, setLoading] = useState(false)
   const [started, setStarted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -77,14 +100,35 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   }, [messages, loading])
 
   useEffect(() => {
+    const topics = meta?.topics ?? ['General foundations']
+    const map: Record<string, boolean> = {}
+    for (const tpc of topics) {
+      map[tpc] = loadMessages(subject, tpc).length > 0
+    }
+    setSavedTopics(map)
+    try {
+      const q = new URLSearchParams(window.location.search).get('focus')
+      if (q) setFocus(q)
+    } catch {
+      /* ignore */
+    }
+  }, [subject, meta?.topics])
+
+  useEffect(() => {
     if (started && !loading) inputRef.current?.focus()
   }, [started, loading, messages.length])
 
-  async function startSession(chosenTopic: string) {
+  async function startSession(chosenTopic: string, opts?: { resume?: boolean }) {
     setTopic(chosenTopic)
     setStarted(true)
-    setLoading(true)
     setError(null)
+    const existing = loadMessages(subject, chosenTopic)
+    if (opts?.resume && existing.length > 0) {
+      setMessages(existing)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
     try {
       const res = await fetch('/api/tutor', {
         method: 'POST',
@@ -98,7 +142,9 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       })
       if (!res.ok) throw new Error('fail')
       const data = await res.json()
-      setMessages([{ role: 'tutor', content: data.response, type: 'lesson' }])
+      const initial: Message[] = [{ role: 'tutor', content: data.response, type: 'lesson' }]
+      setMessages(initial)
+      persistMessages(subject, chosenTopic, initial)
       saveSession({
         subjectId: subject,
         subjectName: subjectLabel,
@@ -135,7 +181,9 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       })
       if (!res.ok) throw new Error('fail')
       const data = await res.json()
-      setMessages([...updated, { role: 'tutor', content: data.response, type: data.type }])
+      const next: Message[] = [...updated, { role: 'tutor', content: data.response as string, type: data.type as string }]
+      setMessages(next)
+      if (topic) persistMessages(subject, topic, next)
     } catch {
       setError('Message failed to send. Try again.')
       setMessages(messages)
@@ -178,6 +226,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
             {meta?.blurb} Choose a topic path — Ewin will start from the fundamentals of that area.
           </p>
+          {focus && (
+            <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
+              From practice — ask Ewin about: <span className="font-medium">{focus}</span>
+            </p>
+          )}
 
           {error && (
             <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-danger">
@@ -189,18 +242,32 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink-muted">
               Topic paths
             </p>
-            {(meta?.topics ?? ['General foundations']).map((t) => (
-              <button
-                key={t}
-                type="button"
-                disabled={loading}
-                onClick={() => void startSession(t)}
-                className="group flex w-full items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5 text-left transition-colors hover:border-accent disabled:opacity-60"
-              >
-                <span className="text-[14px] font-medium text-ink">{t}</span>
-                <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
-              </button>
-            ))}
+            {(meta?.topics ?? ['General foundations']).map((t) => {
+              const hasSaved = !!savedTopics[t]
+              return (
+                <div key={t} className="rounded-2xl border border-line bg-white overflow-hidden">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => void startSession(t)}
+                    className="group flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-paper/80 disabled:opacity-60"
+                  >
+                    <span className="text-[14px] font-medium text-ink">{t}</span>
+                    <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+                  </button>
+                  {hasSaved && (
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={() => void startSession(t, { resume: true })}
+                      className="w-full border-t border-line px-4 py-2 text-left text-[12px] font-medium text-accent hover:bg-accent-soft"
+                    >
+                      Resume saved session
+                    </button>
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           <p className="mt-6 text-center text-xs text-ink-muted">
