@@ -81,6 +81,8 @@ function formatContent(text: string) {
 export default function LearnPage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject } = use(params)
   const [focus, setFocus] = useState<string | null>(null)
+  const [topicFromUrl, setTopicFromUrl] = useState<string | null>(null)
+  const autoStarted = useRef(false)
   const meta = getSubject(subject)
   const subjectLabel =
     meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
@@ -107,23 +109,39 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     }
     setSavedTopics(map)
     try {
-      const q = new URLSearchParams(window.location.search).get('focus')
+      const sp = new URLSearchParams(window.location.search)
+      const q = sp.get('focus')
+      const tp = sp.get('topic')
       if (q) setFocus(q)
+      if (tp) setTopicFromUrl(tp)
     } catch {
       /* ignore */
     }
   }, [subject, meta?.topics])
 
+  // Practice → tutor: auto-start on the right topic with the missed question
+  useEffect(() => {
+    if (autoStarted.current || started) return
+    if (!focus) return
+    const chosen =
+      topicFromUrl ||
+      meta?.topics?.[0] ||
+      'General foundations'
+    autoStarted.current = true
+    void startSession(chosen, { focus })
+  }, [focus, topicFromUrl, meta?.topics, started])
+
   useEffect(() => {
     if (started && !loading) inputRef.current?.focus()
   }, [started, loading, messages.length])
 
-  async function startSession(chosenTopic: string, opts?: { resume?: boolean }) {
+  async function startSession(chosenTopic: string, opts?: { resume?: boolean; focus?: string }) {
     setTopic(chosenTopic)
     setStarted(true)
     setError(null)
+    const focusHint = opts?.focus ?? focus ?? undefined
     const existing = loadMessages(subject, chosenTopic)
-    if (opts?.resume && existing.length > 0) {
+    if (opts?.resume && !focusHint && existing.length > 0) {
       setMessages(existing)
       setLoading(false)
       return
@@ -138,6 +156,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           topic: chosenTopic,
           messages: [],
           action: 'start',
+          focus: focusHint,
         }),
       })
       if (!res.ok) throw new Error('fail')
@@ -226,9 +245,9 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
             {meta?.blurb} Pick a topic below. Ewin will start from the basics.
           </p>
-          {focus && (
+          {focus && !started && (
             <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
-              From practice — ask Ewin about: <span className="font-medium">{focus}</span>
+              Starting a lesson on the question you missed…
             </p>
           )}
 

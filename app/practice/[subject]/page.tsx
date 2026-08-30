@@ -143,7 +143,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
             </Link>
             {misses[0] && (
               <Link
-                href={`/learn/${subject}?focus=${encodeURIComponent(misses[0].question.slice(0, 100))}`}
+                href={`/learn/${subject}?topic=${encodeURIComponent((meta?.topics && meta.topics[0]) || 'General foundations')}&focus=${encodeURIComponent(misses[0].question.slice(0, 160))}&from=practice`}
                 className="rounded-full border border-accent bg-accent-soft px-5 py-2.5 text-sm font-medium text-accent no-underline"
               >
                 Explain a wrong one with Ewin

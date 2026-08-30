@@ -23,11 +23,12 @@ Response format:
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { subject, topic, messages, action } = body as {
+    const { subject, topic, messages, action, focus } = body as {
       subject?: string
       topic?: string
       messages?: { role: string; content: string }[]
       action?: string
+      focus?: string
     }
 
     if (!subject || typeof subject !== 'string') {
@@ -35,13 +36,19 @@ export async function POST(req: NextRequest) {
     }
 
     const topicLine = topic ? ` Focus on this topic path: ${topic}.` : ''
+    const focusLine =
+      typeof focus === 'string' && focus.trim()
+        ? ` The student got this practice question wrong and needs it explained clearly: "${focus.trim()}". Start by helping them understand that question, then teach the underlying idea and ask one check question.`
+        : ''
 
     const formattedMessages =
       action === 'start'
         ? [
             {
               role: 'user' as const,
-              content: `Start teaching me ${subject}.${topicLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
+              content: focusLine
+                ? `I am studying ${subject}.${topicLine}${focusLine}`
+                : `Start teaching me ${subject}.${topicLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
             },
           ]
         : (messages ?? []).map((m) => ({

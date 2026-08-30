@@ -70,16 +70,30 @@ export default function DashboardPage() {
             <ArrowRight className="h-5 w-5 shrink-0 text-accent" />
           </Link>
         ) : (
-          <div className="mb-8 rounded-2xl border border-line bg-white p-5">
-            <p className="text-sm text-ink-muted">
-              Nothing here yet. Pick a subject below — learn with the tutor, or try practice questions.
+          <div className="mb-8 rounded-2xl border border-accent bg-accent-soft p-6">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-accent">
+              New here?
             </p>
-            <Link
-              href="/#subjects"
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent no-underline"
-            >
-              See subjects <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            <h2 className="mt-1 font-serif text-xl font-semibold text-ink">
+              Start with Mathematics
+            </h2>
+            <p className="mt-2 text-sm text-ink-muted leading-relaxed">
+              Most students begin here. Ewin will teach one idea, then ask you a question.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href="/learn/mathematics"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+              >
+                Start learning <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/practice/mathematics"
+                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+              >
+                Try practice questions
+              </Link>
+            </div>
           </div>
         )}
 
@@ -131,7 +145,7 @@ export default function DashboardPage() {
                     href={`/learn/${s.id}`}
                     className="flex-1 rounded-full bg-accent py-2 text-center text-[12px] font-medium text-paper no-underline hover:bg-accent-hover"
                   >
-                    Tutor
+                    Learn
                   </Link>
                   <Link
                     href={`/practice/${s.id}`}
