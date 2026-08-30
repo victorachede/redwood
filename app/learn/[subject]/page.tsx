@@ -156,10 +156,6 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus, topicFromUrl, meta?.topics, started])
 
-  useEffect(() => {
-    if (started && !loading) inputRef.current?.focus()
-  }, [started, loading, messages.length])
-
   async function onPickFiles(files: FileList | null) {
     if (!files?.length) return
     const next: DocAttach[] = [...docs]
@@ -263,6 +259,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       ]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
+      inputRef.current?.blur()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Message failed. Try again.')
       setMessages(messages)
