@@ -1,8 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 
-const client = new Anthropic()
-
 const SYSTEM = `You are Ewin, a patient and excellent AI tutor for Nigerian secondary school students preparing for WAEC and JAMB exams.
 
 Teaching style:
@@ -20,6 +18,19 @@ Response format:
 - Mark questions clearly with "Question:" prefix
 - Never use markdown formatting like ** or ##`
 
+function demoStart(subject: string, topic?: string, focus?: string): string {
+  if (focus?.trim()) {
+    return `Let's look at the question you missed:\n\n"${focus.trim()}"\n\nThe key is to break it into smaller steps and name what the question is really asking. Once that is clear, the options become easier to judge.\n\nQuestion: In your own words, what was this question testing — a definition, a calculation, or a process?`
+  }
+  const area = topic || subject
+  return `Welcome. We will take ${area} one small idea at a time.\n\nStart with the foundation: know the basic terms and what they mean in a simple situation (for example, something you see at home or in class). Do not rush to hard exam questions yet.\n\nQuestion: What is one thing you already know about ${area}, even if it feels basic?`
+}
+
+function demoRespond(lastStudent: string): string {
+  const snippet = lastStudent.slice(0, 80)
+  return `Thanks for explaining that. You wrote: "${snippet}${lastStudent.length > 80 ? '…' : ''}"\n\nThat shows you are thinking in your own words — keep that habit. Next we will tighten one detail so it matches how WAEC/JAMB word the idea.\n\nQuestion: Can you give a short example from everyday life that matches what you just said?`
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -32,8 +43,28 @@ export async function POST(req: NextRequest) {
     }
 
     if (!subject || typeof subject !== 'string') {
-      return NextResponse.json({ error: 'subject required' }, { status: 400 })
+      return NextResponse.json({ error: 'Subject is required.' }, { status: 400 })
     }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      // Demo path so the chat UI works on Vercel before the key is set
+      if (action === 'start') {
+        return NextResponse.json({
+          response: demoStart(subject, topic, focus),
+          type: 'question',
+          demo: true,
+        })
+      }
+      const lastStudent = [...(messages ?? [])].reverse().find((m) => m.role === 'student')
+      return NextResponse.json({
+        response: demoRespond(lastStudent?.content || 'your answer'),
+        type: 'question',
+        demo: true,
+      })
+    }
+
+    const client = new Anthropic({ apiKey })
 
     const topicLine = topic ? ` Focus on this topic path: ${topic}.` : ''
     const focusLine =
@@ -72,6 +103,17 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error('tutor error', err)
-    return NextResponse.json({ error: 'Tutor failed' }, { status: 500 })
+    const message =
+      err instanceof Error ? err.message : 'Tutor failed'
+    const isAuth =
+      /api.?key|authentication|401|403/i.test(message)
+    return NextResponse.json(
+      {
+        error: isAuth
+          ? 'Tutor API key is missing or invalid. Add ANTHROPIC_API_KEY in Vercel.'
+          : 'Tutor could not reply right now. Try again in a moment.',
+      },
+      { status: isAuth ? 503 : 500 }
+    )
   }
 }

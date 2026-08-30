@@ -32,13 +32,29 @@ function persistMessages(subjectId: string, topic: string, msgs: Message[]) {
   }
 }
 
+async function readTutorError(res: Response): Promise<string> {
+  try {
+    const data = (await res.json()) as { error?: string }
+    if (data?.error) return data.error
+  } catch {
+    /* ignore */
+  }
+  if (res.status === 503) return 'Tutor is not set up yet. Add ANTHROPIC_API_KEY in Vercel.'
+  if (res.status >= 500) return 'Tutor could not reply right now. Try again in a moment.'
+  return 'Something went wrong. Try again.'
+}
 
 function TypingIndicator() {
   return (
-    <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3">
-      <span className="typing-dot" />
-      <span className="typing-dot" />
-      <span className="typing-dot" />
+    <div className="flex items-start gap-2.5">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-paper">
+        E
+      </div>
+      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3 shadow-[0_1px_0_var(--line)]">
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+      </div>
     </div>
   )
 }
@@ -46,7 +62,9 @@ function TypingIndicator() {
 function formatContent(text: string) {
   const parts = text.split(/(Question:\s*)/i)
   if (parts.length < 2) {
-    return <p className="whitespace-pre-wrap leading-relaxed text-ink">{text}</p>
+    return (
+      <p className="whitespace-pre-wrap text-[14.5px] leading-[1.55] text-ink">{text}</p>
+    )
   }
   const nodes: React.ReactNode[] = []
   for (let i = 0; i < parts.length; i++) {
@@ -54,22 +72,27 @@ function formatContent(text: string) {
     if (!part) continue
     if (/^Question:\s*$/i.test(part)) {
       nodes.push(
-        <span
+        <div
           key={i}
-          className="mt-3 mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-accent"
+          className="mt-3 rounded-xl border border-accent/25 bg-accent-soft/80 px-3.5 py-3"
         >
-          Question
-        </span>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+            Your turn — answer this
+          </p>
+        </div>
       )
     } else if (i > 0 && /^Question:/i.test(parts[i - 1] || '')) {
       nodes.push(
-        <p key={i} className="whitespace-pre-wrap font-medium leading-relaxed text-ink">
+        <p
+          key={i}
+          className="-mt-1 rounded-b-xl border border-t-0 border-accent/25 bg-accent-soft/80 px-3.5 pb-3 text-[14.5px] font-medium leading-[1.5] text-ink"
+        >
           {part.trim()}
         </p>
       )
     } else {
       nodes.push(
-        <p key={i} className="whitespace-pre-wrap leading-relaxed text-ink">
+        <p key={i} className="whitespace-pre-wrap text-[14.5px] leading-[1.55] text-ink">
           {part.trim()}
         </p>
       )
@@ -93,6 +116,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [loading, setLoading] = useState(false)
   const [started, setStarted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [demoMode, setDemoMode] = useState(false)
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -119,16 +143,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     }
   }, [subject, meta?.topics])
 
-  // Practice → tutor: auto-start on the right topic with the missed question
   useEffect(() => {
     if (autoStarted.current || started) return
     if (!focus) return
-    const chosen =
-      topicFromUrl ||
-      meta?.topics?.[0] ||
-      'General foundations'
+    const chosen = topicFromUrl || meta?.topics?.[0] || 'General foundations'
     autoStarted.current = true
     void startSession(chosen, { focus })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus, topicFromUrl, meta?.topics, started])
 
   useEffect(() => {
@@ -159,8 +180,9 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           focus: focusHint,
         }),
       })
-      if (!res.ok) throw new Error('fail')
+      if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
+      if (data.demo) setDemoMode(true)
       const initial: Message[] = [{ role: 'tutor', content: data.response, type: 'lesson' }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
@@ -170,8 +192,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         topic: chosenTopic,
         at: Date.now(),
       })
-    } catch {
-      setError('Could not start the session. Check your connection and try again.')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not start the session. Try again.')
       setStarted(false)
       setTopic(null)
     } finally {
@@ -198,13 +220,17 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           action: 'respond',
         }),
       })
-      if (!res.ok) throw new Error('fail')
+      if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
-      const next: Message[] = [...updated, { role: 'tutor', content: data.response as string, type: data.type as string }]
+      if (data.demo) setDemoMode(true)
+      const next: Message[] = [
+        ...updated,
+        { role: 'tutor', content: data.response as string, type: data.type as string },
+      ]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
-    } catch {
-      setError('Message failed to send. Try again.')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Message failed. Try again.')
       setMessages(messages)
       setInput(userMsg.content)
     } finally {
@@ -226,11 +252,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         <header className="border-b border-line bg-paper">
           <div className="mx-auto flex h-14 max-w-lg items-center gap-3 px-4">
             <Link
-              href="/#subjects"
+              href="/dashboard"
               className="inline-flex items-center gap-1.5 text-[13px] text-ink-muted no-underline hover:text-ink"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Subjects
+              Home
             </Link>
           </div>
         </header>
@@ -245,14 +271,14 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
             {meta?.blurb} Pick a topic below. Ewin will start from the basics.
           </p>
-          {focus && !started && (
+          {focus && (
             <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
               Starting a lesson on the question you missed…
             </p>
           )}
 
           {error && (
-            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-danger">
+            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
               {error}
             </p>
           )}
@@ -264,7 +290,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             {(meta?.topics ?? ['General foundations']).map((t) => {
               const hasSaved = !!savedTopics[t]
               return (
-                <div key={t} className="rounded-2xl border border-line bg-white overflow-hidden">
+                <div key={t} className="overflow-hidden rounded-2xl border border-line bg-white">
                   <button
                     type="button"
                     disabled={loading}
@@ -288,78 +314,82 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               )
             })}
           </div>
-
-          <p className="mt-6 text-center text-xs text-ink-muted">
-            Type your answers in your own words
-          </p>
         </div>
       </main>
     )
   }
 
-  /* ── Live session ── */
+  /* ── Live session — sharp chat UI ── */
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <header className="shrink-0 border-b border-line bg-paper/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
-          <Link
-            href={`/learn/${subject}`}
-            onClick={(e) => {
-              e.preventDefault()
+          <button
+            type="button"
+            onClick={() => {
               setStarted(false)
               setMessages([])
               setTopic(null)
+              setError(null)
             }}
             className="text-ink-muted hover:text-ink"
             aria-label="Back to topics"
           >
             <ArrowLeft className="h-4 w-4" />
-          </Link>
+          </button>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-[12px] font-bold text-paper">
+            E
+          </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[14px] font-semibold text-ink">{subjectLabel}</p>
             <p className="truncate text-[11px] text-ink-muted">{topic}</p>
           </div>
-          <span className="hidden rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-accent sm:inline">
-            Session
-          </span>
+          {demoMode && (
+            <span className="rounded-full border border-line bg-white px-2 py-0.5 text-[10px] font-medium text-ink-muted">
+              Demo
+            </span>
+          )}
         </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-5">
+        <div className="mx-auto flex max-w-2xl flex-col gap-5 px-4 py-6">
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`animate-fade-up flex flex-col ${
-                m.role === 'student' ? 'items-end' : 'items-start'
+              className={`animate-fade-up flex gap-2.5 ${
+                m.role === 'student' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
-              {m.role === 'tutor' && (
-                <span className="mb-1.5 ml-1 text-[11px] font-medium text-ink-muted">Ewin</span>
+              {m.role === 'tutor' ? (
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-paper">
+                  E
+                </div>
+              ) : (
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-white text-[10px] font-semibold text-ink-muted">
+                  You
+                </div>
               )}
               <div
-                className={`max-w-[min(100%,28rem)] rounded-2xl px-4 py-3 text-[14px] sm:max-w-[85%] ${
+                className={`max-w-[min(100%,26rem)] sm:max-w-[80%] ${
                   m.role === 'student'
-                    ? 'rounded-tr-md bg-accent text-paper'
-                    : 'rounded-tl-md border border-line bg-white shadow-[0_1px_0_var(--line)]'
+                    ? 'rounded-2xl rounded-tr-md bg-accent px-4 py-3 text-paper shadow-[0_8px_24px_-12px_rgba(27,67,50,0.45)]'
+                    : 'rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3 shadow-[0_1px_0_var(--line),0_8px_24px_-16px_rgba(22,21,19,0.12)]'
                 }`}
               >
                 {m.role === 'tutor' ? (
                   formatContent(m.content)
                 ) : (
-                  <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                  <p className="whitespace-pre-wrap text-[14.5px] leading-[1.5]">{m.content}</p>
                 )}
               </div>
             </div>
           ))}
-          {loading && (
-            <div className="flex flex-col items-start">
-              <span className="mb-1.5 ml-1 text-[11px] font-medium text-ink-muted">Ewin</span>
-              <TypingIndicator />
-            </div>
-          )}
+
+          {loading && <TypingIndicator />}
+
           {error && (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-danger">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
               {error}
             </p>
           )}
@@ -367,31 +397,31 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-line bg-white pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
-        <div className="mx-auto flex max-w-2xl gap-2 px-4">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-            rows={1}
-            placeholder="Write your answer here…"
-            disabled={loading}
-            className="max-h-32 min-h-[48px] flex-1 resize-none rounded-xl border border-line bg-paper px-3.5 py-3 text-[14px] text-ink outline-none placeholder:text-ink-muted focus:border-accent disabled:opacity-60"
-          />
-          <button
-            type="button"
-            onClick={() => void send()}
-            disabled={loading || !input.trim()}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent text-paper transition-colors hover:bg-accent-hover disabled:opacity-40"
-            aria-label="Send"
-          >
-            <Send className="h-4 w-4" />
-          </button>
+      <div className="shrink-0 border-t border-line bg-white/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
+        <div className="mx-auto max-w-2xl px-4">
+          <div className="flex items-end gap-2 rounded-2xl border border-line bg-paper p-1.5 shadow-[0_1px_0_var(--line)] focus-within:border-accent">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              rows={1}
+              placeholder="Write your answer…"
+              disabled={loading}
+              className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[14.5px] text-ink outline-none placeholder:text-ink-muted disabled:opacity-60"
+            />
+            <button
+              type="button"
+              onClick={() => void send()}
+              disabled={loading || !input.trim()}
+              className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-paper transition-colors hover:bg-accent-hover disabled:opacity-40"
+              aria-label="Send"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-2 text-center text-[11px] text-ink-muted">Enter to send</p>
         </div>
-        <p className="mx-auto mt-2 max-w-2xl px-4 text-center text-[11px] text-ink-muted">
-          Press Enter to send
-        </p>
       </div>
     </main>
   )
