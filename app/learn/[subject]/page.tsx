@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
+import { saveSession } from '../../lib/progress'
 
 type Message = {
   role: 'tutor' | 'student'
@@ -98,15 +99,12 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error('fail')
       const data = await res.json()
       setMessages([{ role: 'tutor', content: data.response, type: 'lesson' }])
-      try {
-        const key = `ewin-last-${subject}`
-        localStorage.setItem(
-          key,
-          JSON.stringify({ topic: chosenTopic, at: Date.now(), subject: subjectLabel })
-        )
-      } catch {
-        /* ignore */
-      }
+      saveSession({
+        subjectId: subject,
+        subjectName: subjectLabel,
+        topic: chosenTopic,
+        at: Date.now(),
+      })
     } catch {
       setError('Could not start the session. Check your connection and try again.')
       setStarted(false)
