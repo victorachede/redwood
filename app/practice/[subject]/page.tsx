@@ -20,6 +20,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   const [picked, setPicked] = useState<string | null>(null)
   const [correctCount, setCorrectCount] = useState(0)
   const [revealed, setRevealed] = useState(false)
+  const [misses, setMisses] = useState<PastQuestion[]>([])
 
   const q: PastQuestion | undefined = bank[index]
   const total = bank.length
@@ -30,6 +31,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     setPicked(null)
     setCorrectCount(0)
     setRevealed(false)
+    setMisses([])
   }
 
   function choose(opt: string) {
@@ -37,6 +39,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     setPicked(opt)
     setRevealed(true)
     if (opt === q.answer) setCorrectCount((c) => c + 1)
+    else setMisses((m) => [...m, q])
   }
 
   function next() {
@@ -139,6 +142,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
             >
               Open tutor
             </Link>
+            {misses[0] && (
+              <Link
+                href={`/learn/${subject}?focus=${encodeURIComponent(misses[0].question.slice(0, 100))}`}
+                className="rounded-full border border-accent bg-accent-soft px-5 py-2.5 text-sm font-medium text-accent no-underline"
+              >
+                Explain a miss with Ewin
+              </Link>
+            )}
             <Link
               href="/dashboard"
               className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline"
