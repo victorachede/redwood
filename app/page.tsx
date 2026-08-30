@@ -9,6 +9,7 @@ import {
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
+import { HomeHeroCTAs, HomeBottomCTA } from '@/components/HomeCTAs'
 
 const FEATURES = [
   {
@@ -94,24 +95,7 @@ export default function Home() {
               Free help for secondary school. Ewin teaches a little, asks you a question, and checks
               your answer — so you understand before exam day.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="#subjects"
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline transition-colors hover:bg-accent-hover"
-              >
-                Choose a subject
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
-              >
-                Create account
-              </Link>
-            </div>
-            <p className="mt-4 text-xs text-ink-muted">
-              Free · No account needed to start
-            </p>
+            <HomeHeroCTAs />
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: '90ms' }}>
@@ -239,13 +223,7 @@ export default function Home() {
           <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
             Even 10 minutes a day helps more than cramming the night before.
           </p>
-          <Link
-            href="#subjects"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
-          >
-            Start with a subject
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <HomeBottomCTA />
         </div>
       </section>
 
