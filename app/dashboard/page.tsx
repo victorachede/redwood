@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight, BookOpen, Flame, Target } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SUBJECTS } from '@/app/lib/subjects'
+import { ShareStreakCard } from '@/components/ShareStreakCard'
 import {
   getStreak,
   loadPractice,
@@ -106,6 +107,33 @@ export default function DashboardPage() {
         )}
 
         {/* Two modes */}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+          <ShareStreakCard />
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/cards"
+              className="flex-1 rounded-2xl border border-line bg-white p-5 no-underline shadow-[0_1px_0_var(--line)] hover:border-accent"
+            >
+              <p className="text-[15px] font-semibold text-ink">Study cards</p>
+              <p className="mt-1 text-[13px] text-ink-muted">Flip cards from lessons and homework.</p>
+            </Link>
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/work/homework"
+                className="rounded-2xl border border-line bg-white px-4 py-3 text-center text-[13px] font-medium text-ink no-underline hover:border-accent"
+              >
+                Homework
+              </Link>
+              <Link
+                href="/work/classwork"
+                className="rounded-2xl border border-line bg-white px-4 py-3 text-center text-[13px] font-medium text-ink no-underline hover:border-accent"
+              >
+                Classwork
+              </Link>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-10 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-line bg-white p-5">
             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">

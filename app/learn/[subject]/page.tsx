@@ -5,6 +5,7 @@ import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, FileText, Plus, X } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
 import { saveSession } from '../../lib/progress'
+import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
 import { EwinAvatar } from '@/components/EwinAvatar'
 
 type Message = {
@@ -119,6 +120,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [started, setStarted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [demoMode, setDemoMode] = useState(false)
+  const [suggestedCards, setSuggestedCards] = useState<{ front: string; back: string }[]>([])
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const [docs, setDocs] = useState<DocAttach[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -203,7 +205,9 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
       if (data.demo) setDemoMode(true)
-      const initial: Message[] = [{ role: 'tutor', content: data.response, type: 'lesson' }]
+      const rawStart = data.response as string
+      setSuggestedCards(parseTutorCards(rawStart))
+      const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(rawStart), type: 'lesson' }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
       saveSession({
@@ -253,9 +257,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
       if (data.demo) setDemoMode(true)
+      const rawNext = data.response as string
+      setSuggestedCards(parseTutorCards(rawNext))
       const next: Message[] = [
         ...updated,
-        { role: 'tutor', content: data.response as string, type: data.type as string },
+        { role: 'tutor', content: stripStudyCardsBlock(rawNext), type: data.type as string },
       ]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
@@ -429,6 +435,33 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             </div>
           ))}
           {loading && <TypingIndicator />}
+          {suggestedCards.length > 0 && (
+            <div className="rounded-2xl border border-accent/25 bg-accent-soft/90 p-4">
+              <p className="text-[12px] font-semibold text-accent">Ewin suggests study cards</p>
+              <ul className="mt-2 space-y-2">
+                {suggestedCards.map((c) => (
+                  <li key={c.front} className="flex items-start justify-between gap-2 text-[13px]">
+                    <span className="text-ink">{c.front}</span>
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-paper"
+                      onClick={() => {
+                        addCard({
+                          front: c.front,
+                          back: c.back,
+                          subject: subjectLabel,
+                          source: 'tutor',
+                        })
+                        setSuggestedCards((s) => s.filter((x) => x.front !== c.front))
+                      }}
+                    >
+                      Save
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {error && (
             <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
               {error}
