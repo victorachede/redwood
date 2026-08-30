@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import {
   ArrowLeft,
   BookOpen,
+  Check,
   Flame,
   Target,
   Trash2,
@@ -13,6 +14,7 @@ import {
   Shield,
   LogOut,
   Sparkles,
+  ChevronRight,
 } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { EwinAvatar } from '@/components/EwinAvatar'
@@ -28,7 +30,7 @@ import {
 import { clearStudyData, getUsageStats, type UsageStats } from '@/app/lib/progress'
 
 function formatDate(ts: number | null) {
-  if (!ts) return '—'
+  if (!ts) return 'Not yet'
   try {
     return new Date(ts).toLocaleDateString(undefined, {
       day: 'numeric',
@@ -40,26 +42,43 @@ function formatDate(ts: number | null) {
   }
 }
 
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2800)
+    return () => clearTimeout(t)
+  }, [onDone])
+  return (
+    <div
+      role="status"
+      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-ink px-4 py-2.5 text-[13px] font-medium text-paper shadow-lg animate-fade-up"
+    >
+      <Check className="h-3.5 w-3.5 text-accent" />
+      {message}
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const router = useRouter()
   const [user, setUser] = useState<LocalUser | null>(null)
   const [stats, setStats] = useState<UsageStats | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
 
   const [displayName, setDisplayName] = useState('')
   const [school, setSchool] = useState('')
   const [examFocus, setExamFocus] = useState('WAEC & JAMB')
-  const [profileMsg, setProfileMsg] = useState<string | null>(null)
   const [profileErr, setProfileErr] = useState<string | null>(null)
   const [savingProfile, setSavingProfile] = useState(false)
 
   const [curPass, setCurPass] = useState('')
   const [newPass, setNewPass] = useState('')
-  const [passMsg, setPassMsg] = useState<string | null>(null)
   const [passErr, setPassErr] = useState<string | null>(null)
 
   const [delPass, setDelPass] = useState('')
-  const [delConfirm, setDelConfirm] = useState(false)
+  const [delStep, setDelStep] = useState(0)
   const [delErr, setDelErr] = useState<string | null>(null)
+
+  const [clearStep, setClearStep] = useState(0)
 
   function refresh() {
     const u = getSession()
@@ -80,7 +99,6 @@ export default function SettingsPage() {
   function onSaveProfile(e: React.FormEvent) {
     e.preventDefault()
     setSavingProfile(true)
-    setProfileMsg(null)
     setProfileErr(null)
     const res = updateProfile({ displayName, school, examFocus })
     setSavingProfile(false)
@@ -89,12 +107,11 @@ export default function SettingsPage() {
       return
     }
     setUser(res.user)
-    setProfileMsg('Profile saved.')
+    setToast('Profile saved')
   }
 
   function onChangePassword(e: React.FormEvent) {
     e.preventDefault()
-    setPassMsg(null)
     setPassErr(null)
     const res = changePassword({ current: curPass, next: newPass })
     if (!res.ok) {
@@ -103,35 +120,50 @@ export default function SettingsPage() {
     }
     setCurPass('')
     setNewPass('')
-    setPassMsg('Password updated.')
+    setToast('Password updated')
+  }
+
+  function onClearData() {
+    if (clearStep === 0) {
+      setClearStep(1)
+      return
+    }
+    clearStudyData()
+    setStats(getUsageStats())
+    setClearStep(0)
+    setToast('Study history cleared')
   }
 
   function onDeleteAccount() {
     setDelErr(null)
-    if (!delConfirm) {
-      setDelConfirm(true)
+    if (delStep === 0) {
+      setDelStep(1)
+      return
+    }
+    if (delStep === 1) {
+      if (!delPass) {
+        setDelErr('Enter your password to continue.')
+        return
+      }
+      setDelStep(2)
       return
     }
     const res = deleteAccount(delPass)
     if (!res.ok) {
       setDelErr(res.error)
+      setDelStep(1)
       return
     }
     clearStudyData()
     router.push('/')
   }
 
-  function onClearData() {
-    if (!window.confirm('Clear all lessons and practice history on this device?')) return
-    clearStudyData()
-    setStats(getUsageStats())
-  }
-
   return (
     <main className="min-h-dvh bg-paper text-ink">
       <SiteHeader solid />
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
         <Link
           href="/dashboard"
           className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-ink-muted no-underline hover:text-ink"
@@ -140,48 +172,45 @@ export default function SettingsPage() {
           Dashboard
         </Link>
 
-        <div className="mb-8">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
-            Account
+        <header className="mb-8">
+          <h1 className="font-serif text-3xl font-semibold tracking-tight">Settings</h1>
+          <p className="mt-1.5 text-[15px] text-ink-muted">
+            Your profile, progress, and account — private on this device.
           </p>
-          <h1 className="mt-1 font-serif text-3xl font-semibold tracking-tight">Settings</h1>
-          <p className="mt-2 text-sm text-ink-muted">
-            Profile, study stats, and account controls — on this device until cloud sync is on.
-          </p>
-        </div>
+        </header>
 
-        {/* Profile hero */}
-        <section className="mb-6 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_1px_0_var(--line),0_20px_40px_-28px_rgba(22,21,19,0.2)]">
+        {/* Identity */}
+        <section className="mb-5 overflow-hidden rounded-[1.25rem] border border-line bg-white shadow-[0_1px_0_var(--line)]">
           <div
-            className="h-20 sm:h-24"
+            className="relative h-[4.5rem] sm:h-20"
             style={{
               background:
-                'linear-gradient(135deg, #1b4332 0%, #2d6a4f 45%, #e8efe9 100%)',
+                'linear-gradient(120deg, #143526 0%, #1b4332 40%, #40916c 78%, #d8f3dc 100%)',
             }}
           />
-          <div className="-mt-8 px-5 pb-5 sm:px-6">
-            <div className="flex items-end gap-3">
-              <EwinAvatar size={64} className="ring-4 ring-white" />
-              <div className="min-w-0 pb-1">
-                <p className="truncate text-lg font-semibold text-ink">
+          <div className="relative px-5 pb-5 pt-0 sm:px-6">
+            <div className="-mt-8 flex items-end gap-3.5">
+              <EwinAvatar size={60} className="ring-[3px] ring-white" />
+              <div className="min-w-0 flex-1 pb-1">
+                <p className="truncate text-[17px] font-semibold tracking-tight text-ink">
                   {user?.displayName || 'Guest'}
                 </p>
                 <p className="truncate text-[13px] text-ink-muted">
-                  {user?.email || 'Not signed in — stats still track on this phone'}
+                  {user?.email || 'Sign in to sync a name across sessions'}
                 </p>
               </div>
             </div>
             {!user && (
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex gap-2">
                 <Link
                   href="/signup"
-                  className="rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper no-underline hover:bg-accent-hover"
+                  className="flex-1 rounded-full bg-accent py-2.5 text-center text-[13px] font-medium text-paper no-underline hover:bg-accent-hover"
                 >
-                  Create account
+                  Create free account
                 </Link>
                 <Link
                   href="/login"
-                  className="rounded-full border border-line bg-paper px-4 py-2 text-[13px] font-medium text-ink no-underline hover:border-accent"
+                  className="flex-1 rounded-full border border-line bg-paper py-2.5 text-center text-[13px] font-medium text-ink no-underline hover:border-accent"
                 >
                   Sign in
                 </Link>
@@ -190,212 +219,262 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* Usage metrics */}
-        <section className="mb-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              Your study pulse
-            </h2>
+        {/* Metrics */}
+        <section className="mb-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5 text-accent" />
+              <h2 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                Study pulse
+              </h2>
+            </div>
+            <span className="text-[11px] text-ink-muted">
+              Active {formatDate(stats?.lastActiveAt ?? null)}
+            </span>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {[
-              {
-                icon: Flame,
-                label: 'Streak',
-                value: stats ? `${stats.streak}d` : '—',
-                hint: 'Days in a row',
-              },
-              {
-                icon: BookOpen,
-                label: 'Topics',
-                value: stats?.topicCount ?? '—',
-                hint: 'Tutor sessions',
-              },
+              { icon: Flame, label: 'Streak', value: stats ? `${stats.streak}` : '—', unit: 'days' },
+              { icon: BookOpen, label: 'Topics', value: stats?.topicCount ?? '—', unit: 'opened' },
               {
                 icon: Target,
-                label: 'Practice',
-                value:
-                  stats && stats.accuracyPct != null
-                    ? `${stats.accuracyPct}%`
-                    : stats?.practiceRuns
-                      ? `${stats.practiceCorrect}/${stats.practiceTotal}`
-                      : '—',
-                hint: 'Accuracy',
+                label: 'Accuracy',
+                value: stats?.accuracyPct != null ? `${stats.accuracyPct}` : '—',
+                unit: stats?.accuracyPct != null ? '%' : 'practice',
               },
               {
                 icon: User,
                 label: 'Subjects',
                 value: stats?.uniqueSubjects ?? '—',
-                hint: 'Touched',
+                unit: 'touched',
               },
-            ].map(({ icon: Icon, label, value, hint }) => (
+            ].map(({ icon: Icon, label, value, unit }) => (
               <div
                 key={label}
-                className="rounded-2xl border border-line bg-white p-4 shadow-[0_1px_0_var(--line)]"
+                className="rounded-[1.1rem] border border-line bg-white p-3.5 shadow-[0_1px_0_var(--line)]"
               >
-                <Icon className="mb-2 h-4 w-4 text-accent" />
-                <p className="font-serif text-2xl font-semibold tracking-tight text-ink">{value}</p>
-                <p className="text-[12px] font-medium text-ink">{label}</p>
-                <p className="text-[11px] text-ink-muted">{hint}</p>
+                <Icon className="mb-2 h-3.5 w-3.5 text-accent" />
+                <p className="font-serif text-[1.65rem] font-semibold leading-none tracking-tight text-ink">
+                  {value}
+                </p>
+                <p className="mt-1.5 text-[12px] font-medium text-ink">{label}</p>
+                <p className="text-[11px] text-ink-muted">{unit}</p>
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-ink-muted">
-            Last active {formatDate(stats?.lastActiveAt ?? null)}
-            {stats && stats.practiceRuns > 0
-              ? ` · ${stats.practiceRuns} practice run${stats.practiceRuns === 1 ? '' : 's'}`
-              : ''}
-          </p>
         </section>
 
         {user && (
           <>
-            {/* Edit profile */}
-            <section className="mb-6 rounded-2xl border border-line bg-white p-5 shadow-[0_1px_0_var(--line)] sm:p-6">
+            <section className="mb-5 rounded-[1.25rem] border border-line bg-white p-5 shadow-[0_1px_0_var(--line)] sm:p-6">
               <div className="mb-4 flex items-center gap-2">
-                <User className="h-4 w-4 text-accent" />
-                <h2 className="text-[15px] font-semibold text-ink">Edit profile</h2>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft">
+                  <User className="h-3.5 w-3.5 text-accent" />
+                </div>
+                <div>
+                  <h2 className="text-[15px] font-semibold text-ink">Profile</h2>
+                  <p className="text-[12px] text-ink-muted">How you show up in Ewin</p>
+                </div>
               </div>
               <form onSubmit={onSaveProfile} className="space-y-3">
                 <label className="block">
-                  <span className="text-xs font-medium text-ink-muted">Display name</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                    Name
+                  </span>
                   <input
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+                    className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-accent"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-medium text-ink-muted">School (optional)</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                    School
+                  </span>
                   <input
                     value={school}
                     onChange={(e) => setSchool(e.target.value)}
-                    placeholder="e.g. Government College Makurdi"
-                    className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+                    placeholder="Optional"
+                    className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-accent"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-medium text-ink-muted">Exam focus</span>
-                  <select
-                    value={examFocus}
-                    onChange={(e) => setExamFocus(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
-                  >
-                    <option>WAEC & JAMB</option>
-                    <option>WAEC only</option>
-                    <option>JAMB only</option>
-                    <option>NECO</option>
-                  </select>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                    Exam focus
+                  </span>
+                  <div className="relative mt-1">
+                    <select
+                      value={examFocus}
+                      onChange={(e) => setExamFocus(e.target.value)}
+                      className="w-full appearance-none rounded-xl border border-line bg-paper px-3.5 py-2.5 pr-9 text-sm outline-none transition-colors focus:border-accent"
+                    >
+                      <option>WAEC & JAMB</option>
+                      <option>WAEC only</option>
+                      <option>JAMB only</option>
+                      <option>NECO</option>
+                    </select>
+                    <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-ink-muted" />
+                  </div>
                 </label>
                 {profileErr && (
                   <p className="text-[13px] text-red-700">{profileErr}</p>
                 )}
-                {profileMsg && (
-                  <p className="text-[13px] text-accent">{profileMsg}</p>
-                )}
                 <button
                   type="submit"
                   disabled={savingProfile}
-                  className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper hover:bg-accent-hover disabled:opacity-60"
+                  className="mt-1 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-accent-hover disabled:opacity-60"
                 >
-                  {savingProfile ? 'Saving…' : 'Save profile'}
+                  {savingProfile ? 'Saving…' : 'Save changes'}
                 </button>
               </form>
             </section>
 
-            {/* Password */}
-            <section className="mb-6 rounded-2xl border border-line bg-white p-5 shadow-[0_1px_0_var(--line)] sm:p-6">
+            <section className="mb-5 rounded-[1.25rem] border border-line bg-white p-5 shadow-[0_1px_0_var(--line)] sm:p-6">
               <div className="mb-4 flex items-center gap-2">
-                <Shield className="h-4 w-4 text-accent" />
-                <h2 className="text-[15px] font-semibold text-ink">Password</h2>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft">
+                  <Shield className="h-3.5 w-3.5 text-accent" />
+                </div>
+                <div>
+                  <h2 className="text-[15px] font-semibold text-ink">Security</h2>
+                  <p className="text-[12px] text-ink-muted">Password for this device account</p>
+                </div>
               </div>
               <form onSubmit={onChangePassword} className="space-y-3">
                 <label className="block">
-                  <span className="text-xs font-medium text-ink-muted">Current password</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                    Current
+                  </span>
                   <input
                     type="password"
                     value={curPass}
                     onChange={(e) => setCurPass(e.target.value)}
+                    autoComplete="current-password"
                     className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-medium text-ink-muted">New password</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                    New password
+                  </span>
                   <input
                     type="password"
                     value={newPass}
                     onChange={(e) => setNewPass(e.target.value)}
                     minLength={6}
+                    autoComplete="new-password"
                     className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
                   />
                 </label>
                 {passErr && <p className="text-[13px] text-red-700">{passErr}</p>}
-                {passMsg && <p className="text-[13px] text-accent">{passMsg}</p>}
                 <button
                   type="submit"
-                  className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium text-ink hover:border-accent"
+                  className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-accent"
                 >
                   Update password
                 </button>
               </form>
             </section>
 
-            <section className="mb-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
-              <button
-                type="button"
-                onClick={() => {
-                  signOut()
-                  router.push('/')
-                }}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-line py-2.5 text-sm font-medium text-ink hover:border-accent"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign out
-              </button>
-            </section>
+            <button
+              type="button"
+              onClick={() => {
+                signOut()
+                router.push('/')
+              }}
+              className="mb-5 flex w-full items-center justify-center gap-2 rounded-[1.25rem] border border-line bg-white py-3.5 text-sm font-medium text-ink transition-colors hover:border-accent"
+            >
+              <LogOut className="h-4 w-4 text-ink-muted" />
+              Sign out
+            </button>
           </>
         )}
 
-        {/* Data + danger */}
-        <section className="mb-10 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <div className="mb-3 flex items-center gap-2">
+        {/* Danger — no window.confirm */}
+        <section className="mb-12 rounded-[1.25rem] border border-red-200/70 bg-gradient-to-b from-red-50/80 to-white p-5 sm:p-6">
+          <div className="mb-1 flex items-center gap-2">
             <Trash2 className="h-4 w-4 text-red-700" />
-            <h2 className="text-[15px] font-semibold text-ink">Danger zone</h2>
+            <h2 className="text-[15px] font-semibold text-ink">Data & account</h2>
           </div>
           <p className="mb-4 text-[13px] leading-relaxed text-ink-muted">
-            Clear study history on this device, or delete your local account. This cannot be undone
-            here.
+            These actions stay on this device. Nothing is sent to a server yet.
           </p>
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={onClearData}
-              className="rounded-full border border-line bg-white px-4 py-2.5 text-left text-sm font-medium text-ink hover:border-red-300"
-            >
-              Clear lessons & practice on this device
-            </button>
+
+          <div className="space-y-3">
+            <div className="rounded-xl border border-line bg-white p-4">
+              <p className="text-[13px] font-medium text-ink">Clear study history</p>
+              <p className="mt-0.5 text-[12px] text-ink-muted">
+                Removes lessons, practice scores, and streak on this device.
+              </p>
+              {clearStep === 0 ? (
+                <button
+                  type="button"
+                  onClick={onClearData}
+                  className="mt-3 rounded-full border border-line px-4 py-2 text-[13px] font-medium text-ink hover:border-red-300"
+                >
+                  Clear history
+                </button>
+              ) : (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={onClearData}
+                    className="rounded-full bg-red-700 px-4 py-2 text-[13px] font-medium text-white hover:bg-red-800"
+                  >
+                    Yes, clear everything
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setClearStep(0)}
+                    className="rounded-full border border-line px-4 py-2 text-[13px] font-medium text-ink-muted hover:text-ink"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+
             {user && (
               <div className="rounded-xl border border-red-200 bg-white p-4">
                 <p className="text-[13px] font-medium text-ink">Delete account</p>
-                <p className="mt-1 text-[12px] text-ink-muted">
-                  Removes your sign-in from this browser and clears study data.
+                <p className="mt-0.5 text-[12px] text-ink-muted">
+                  Removes your sign-in and clears study data on this browser.
                 </p>
-                <input
-                  type="password"
-                  placeholder="Confirm with password"
-                  value={delPass}
-                  onChange={(e) => setDelPass(e.target.value)}
-                  className="mt-3 w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-red-400"
-                />
+                {delStep >= 1 && (
+                  <input
+                    type="password"
+                    placeholder="Your password"
+                    value={delPass}
+                    onChange={(e) => setDelPass(e.target.value)}
+                    className="mt-3 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none focus:border-red-400"
+                  />
+                )}
                 {delErr && <p className="mt-2 text-[13px] text-red-700">{delErr}</p>}
-                <button
-                  type="button"
-                  onClick={onDeleteAccount}
-                  className="mt-3 rounded-full bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
-                >
-                  {delConfirm ? 'Tap again to confirm delete' : 'Delete my account'}
-                </button>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={onDeleteAccount}
+                    className="rounded-full bg-red-700 px-4 py-2 text-[13px] font-medium text-white hover:bg-red-800"
+                  >
+                    {delStep === 0
+                      ? 'Delete account'
+                      : delStep === 1
+                        ? 'Continue'
+                        : 'Permanently delete'}
+                  </button>
+                  {delStep > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDelStep(0)
+                        setDelPass('')
+                        setDelErr(null)
+                      }}
+                      className="rounded-full border border-line px-4 py-2 text-[13px] font-medium text-ink-muted hover:text-ink"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
