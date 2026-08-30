@@ -474,15 +474,15 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             onChange={(e) => void onPickFiles(e.target.files)}
           />
 
-          <div className="flex items-end gap-2 rounded-[1.75rem] border border-[#3a3a3e] bg-[#2a2a2e] px-2 py-2 shadow-[0_8px_32px_-12px_rgba(22,21,19,0.35)]">
+          <div className="ewin-composer flex items-end gap-1.5 rounded-full bg-[#303036] px-1.5 py-1.5 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)]">
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={loading || docs.length >= 3}
-              className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/90 transition-colors hover:bg-white/15 disabled:opacity-40"
+              className="mb-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 focus:outline-none"
               aria-label="Add document"
             >
-              <Plus className="h-5 w-5" strokeWidth={2.2} />
+              <Plus className="h-5 w-5" strokeWidth={2} />
             </button>
 
             <textarea
@@ -491,16 +491,21 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               rows={1}
-              placeholder="Message Ewin…"
+              placeholder="Message Ewin"
               disabled={loading}
-              className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-1 py-2.5 text-[15px] text-white outline-none placeholder:text-white/40 disabled:opacity-60"
+              className="max-h-28 min-h-[44px] flex-1 resize-none bg-transparent py-3 pr-1 text-[15px] leading-snug text-white/95 outline-none ring-0 border-0 focus:outline-none focus:ring-0 focus-visible:outline-none placeholder:text-white/35 disabled:opacity-60"
+              style={{ boxShadow: 'none' }}
             />
 
             <button
               type="button"
               onClick={() => void send()}
               disabled={!canSend}
-              className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8b8b92] text-white transition-opacity hover:bg-[#9a9aa0] disabled:opacity-35"
+              className={`mb-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors focus:outline-none ${
+                canSend
+                  ? 'bg-white text-[#1a1a1e] hover:bg-white/90'
+                  : 'bg-white/15 text-white/40'
+              }`}
               aria-label="Send"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -514,9 +519,6 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               </svg>
             </button>
           </div>
-          <p className="mt-1.5 text-center text-[10px] text-ink-muted">
-            + attach notes (.txt / .md) · Enter to send
-          </p>
         </div>
       </div>
     </main>
