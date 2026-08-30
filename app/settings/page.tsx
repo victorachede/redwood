@@ -95,6 +95,7 @@ export default function SettingsPage() {
   const [user, setUser] = useState<LocalUser | null>(null)
   const [stats, setStats] = useState<UsageStats | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+  const [hydrated, setHydrated] = useState(false)
 
   const [displayName, setDisplayName] = useState('')
   const [school, setSchool] = useState('')
@@ -124,6 +125,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     refresh()
+    setHydrated(true)
     return useAuthListener(refresh)
   }, [])
 
@@ -198,6 +200,39 @@ export default function SettingsPage() {
       value: stats?.accuracyPct != null ? `${stats.accuracyPct}%` : '—',
     },
   ]
+
+
+  if (hydrated && !user) {
+    return (
+      <main className="min-h-dvh bg-paper text-ink">
+        <SiteHeader solid />
+        <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center">
+          <EwinAvatar size={56} />
+          <h1 className="mt-6 font-serif text-2xl font-semibold tracking-tight">Sign in for settings</h1>
+          <p className="mt-2 text-[15px] text-ink-muted">
+            Profile, password, and account controls need an account. You can still learn without one.
+          </p>
+          <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+            <Link
+              href="/login"
+              className="rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/signup"
+              className="rounded-full border border-line bg-white px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+            >
+              Create account
+            </Link>
+          </div>
+          <Link href="/dashboard" className="mt-6 text-[13px] text-ink-muted no-underline hover:text-ink">
+            Back to dashboard
+          </Link>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-dvh bg-paper text-ink">

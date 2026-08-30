@@ -29,15 +29,15 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
           <Link href="/dashboard" className="hidden px-2 hover:text-ink no-underline sm:inline">
             Dashboard
           </Link>
-          <Link
-            href="/settings"
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-white hover:text-ink"
-            aria-label="Settings"
-          >
-            <Settings className="h-4 w-4" />
-          </Link>
           {user ? (
             <>
+              <Link
+                href="/settings"
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-white hover:text-ink"
+                aria-label="Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
               <Link
                 href="/settings"
                 className="hidden max-w-[7rem] truncate px-1 text-ink no-underline hover:text-accent sm:inline"
