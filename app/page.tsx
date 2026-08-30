@@ -91,10 +91,10 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="#how"
+                href="/dashboard"
                 className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
               >
-                How it works
+                Dashboard
               </Link>
             </div>
             <p className="mt-4 text-xs text-ink-muted">No signup required · Free to start</p>
@@ -211,7 +211,7 @@ export default function Home() {
                 <h3 className="text-[16px] font-semibold text-ink">{s.name}</h3>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">{s.blurb}</p>
                 <p className="mt-3 text-[11px] text-ink-muted">
-                  {s.topics.length} topic paths
+                  {s.topics.length} topic paths · tutor + practice
                 </p>
               </Link>
             ))}
