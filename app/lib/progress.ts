@@ -1,4 +1,7 @@
-/** Client-side progress — no account required */
+/** Progress: localStorage cache + Supabase sync when signed in */
+
+import { getSession } from '@/app/lib/auth'
+import { createBrowserClient, isSupabaseConfigured } from '@/app/lib/supabase'
 
 export type SessionRecord = {
   subjectId: string
@@ -13,6 +16,8 @@ export type PracticeRecord = {
   correct: number
   total: number
   at: number
+  exam?: string
+  timed?: boolean
 }
 
 const SESSIONS_KEY = 'ewin-sessions'
@@ -21,6 +26,10 @@ const STREAK_KEY = 'ewin-streak'
 
 function dayKey(d = new Date()) {
   return d.toISOString().slice(0, 10)
+}
+
+function userId(): string | null {
+  return getSession()?.id ?? null
 }
 
 export function loadSessions(): SessionRecord[] {
@@ -34,11 +43,39 @@ export function loadSessions(): SessionRecord[] {
 
 export function saveSession(rec: SessionRecord) {
   const prev = loadSessions().filter(
-    (s) => !(s.subjectId === rec.subjectId && s.topic === rec.topic)
+    (s) => !(s.subjectId === rec.subjectId && s.topic === rec.topic),
   )
   const next = [rec, ...prev].slice(0, 20)
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
   touchStreak()
+
+  const uid = userId()
+  if (uid && isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (sb) {
+      void sb.from('tutor_sessions').upsert(
+        {
+          user_id: uid,
+          subject_id: rec.subjectId,
+          subject_name: rec.subjectName,
+          topic: rec.topic,
+          updated_at: new Date(rec.at).toISOString(),
+        },
+        { onConflict: 'id' },
+      ).then(({ error }) => {
+        // If no unique constraint on subject/topic, plain insert is fine
+        if (error) {
+          void sb.from('tutor_sessions').insert({
+            user_id: uid,
+            subject_id: rec.subjectId,
+            subject_name: rec.subjectName,
+            topic: rec.topic,
+            messages: [],
+          })
+        }
+      })
+    }
+  }
 }
 
 export function loadPractice(): PracticeRecord[] {
@@ -54,6 +91,22 @@ export function savePractice(rec: PracticeRecord) {
   const prev = loadPractice().filter((p) => p.subjectId !== rec.subjectId)
   localStorage.setItem(PRACTICE_KEY, JSON.stringify([rec, ...prev].slice(0, 20)))
   touchStreak()
+
+  const uid = userId()
+  if (uid && isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (sb) {
+      void sb.from('practice_attempts').insert({
+        user_id: uid,
+        subject_id: rec.subjectId,
+        exam: rec.exam || 'ALL',
+        correct: rec.correct,
+        total: rec.total,
+        timed: rec.timed ?? false,
+        at: new Date(rec.at).toISOString(),
+      })
+    }
+  }
 }
 
 export function touchStreak(): number {
@@ -89,23 +142,20 @@ export function getStreak(): number {
     }
     const today = dayKey()
     const yesterday = dayKey(new Date(Date.now() - 86400000))
-    if (raw.last !== today && raw.last !== yesterday) return 0
-    return raw.count || 0
+    if (raw.last === today || raw.last === yesterday) return raw.count || 0
+    return 0
   } catch {
     return 0
   }
 }
 
 export type UsageStats = {
-  streak: number
   sessions: number
-  uniqueSubjects: number
-  practiceRuns: number
+  subjects: number
   practiceCorrect: number
   practiceTotal: number
-  accuracyPct: number | null
-  lastActiveAt: number | null
-  topicCount: number
+  streak: number
+  lastActive: number | null
 }
 
 export function getUsageStats(): UsageStats {
@@ -119,31 +169,73 @@ export function getUsageStats(): UsageStats {
   const times = [
     ...sessions.map((s) => s.at),
     ...practice.map((p) => p.at),
-  ].filter(Boolean)
+  ]
   return {
-    streak,
     sessions: sessions.length,
-    uniqueSubjects: subjects.size,
-    practiceRuns: practice.length,
+    subjects: subjects.size,
     practiceCorrect,
     practiceTotal,
-    accuracyPct: practiceTotal > 0 ? Math.round((practiceCorrect / practiceTotal) * 100) : null,
-    lastActiveAt: times.length ? Math.max(...times) : null,
-    topicCount: sessions.length,
+    streak,
+    lastActive: times.length ? Math.max(...times) : null,
   }
 }
 
-/** Clears local study progress (not the auth account). */
 export function clearStudyData() {
   if (typeof window === 'undefined') return
   localStorage.removeItem(SESSIONS_KEY)
   localStorage.removeItem(PRACTICE_KEY)
   localStorage.removeItem(STREAK_KEY)
-  // clear message caches
-  const keys: string[] = []
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i)
-    if (k?.startsWith('ewin-msgs-')) keys.push(k)
+}
+
+/** Pull remote practice/sessions into local cache (best-effort). */
+export async function hydrateProgressFromCloud(): Promise<void> {
+  const uid = userId()
+  if (!uid || !isSupabaseConfigured) return
+  const sb = createBrowserClient()
+  if (!sb) return
+
+  const { data: attempts } = await sb
+    .from('practice_attempts')
+    .select('subject_id, correct, total, at, exam, timed')
+    .eq('user_id', uid)
+    .order('at', { ascending: false })
+    .limit(40)
+
+  if (attempts?.length) {
+    const bySubject = new Map<string, PracticeRecord>()
+    for (const a of attempts) {
+      if (bySubject.has(a.subject_id)) continue
+      bySubject.set(a.subject_id, {
+        subjectId: a.subject_id,
+        correct: a.correct,
+        total: a.total,
+        at: new Date(a.at).getTime(),
+        exam: a.exam,
+        timed: a.timed,
+      })
+    }
+    const local = loadPractice()
+    const merged = [...bySubject.values()]
+    for (const p of local) {
+      if (!bySubject.has(p.subjectId)) merged.push(p)
+    }
+    localStorage.setItem(PRACTICE_KEY, JSON.stringify(merged.slice(0, 20)))
   }
-  keys.forEach((k) => localStorage.removeItem(k))
+
+  const { data: sessions } = await sb
+    .from('tutor_sessions')
+    .select('subject_id, subject_name, topic, updated_at')
+    .eq('user_id', uid)
+    .order('updated_at', { ascending: false })
+    .limit(20)
+
+  if (sessions?.length) {
+    const remote: SessionRecord[] = sessions.map((s) => ({
+      subjectId: s.subject_id,
+      subjectName: s.subject_name || s.subject_id,
+      topic: s.topic || '',
+      at: new Date(s.updated_at).getTime(),
+    }))
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(remote))
+  }
 }
