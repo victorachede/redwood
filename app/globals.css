@@ -1,14 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #faf7f0;
-  --ink: #161513;
-  --ink-muted: #6b6559;
-  --line: #e5e0d3;
-  --accent: #1b4332;
-  --accent-hover: #143526;
-  --accent-soft: #e8efe9;
-  --danger: #b42318;
+  /* Brand: deep navy + gold from Ewin Academy crest */
+  --paper: #0a1628;
+  --ink: #f5f0e6;
+  --ink-muted: #a8a090;
+  --line: #1e2d45;
+  --accent: #c9a227;
+  --accent-hover: #d4af37;
+  --accent-soft: #1a2438;
+  --danger: #e85d4c;
+  /* keep paper-light for cards that need contrast */
+  --paper-card: #0f1c32;
+  --paper-elevated: #132038;
 }
 
 @theme inline {
