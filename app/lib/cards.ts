@@ -66,7 +66,6 @@ export function addCard(input: {
     const sb = createBrowserClient()
     if (sb) {
       void sb.from('study_cards').insert({
-        id: undefined as unknown as string, // let DB generate uuid; keep local id separate
         user_id: uid,
         front: card.front,
         back: card.back,
