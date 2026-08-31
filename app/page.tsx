@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import {ArrowRight,
+import {
+  ArrowRight,
   BookOpen,
   MessageCircle,
   Target,
   GraduationCap,
-  Check, from 'lucide-react'
-// Check used in pricing
+  Check,
+} from 'lucide-react'
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
