@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   title: 'Ewin — Learn until it sticks | WAEC & JAMB',
   description:
     'An AI tutor that teaches one concept, then checks you understood — built for Nigerian secondary students preparing for WAEC and JAMB.',
+  icons: {
+    icon: [
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo-mark.png', sizes: '256x256', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export const viewport: Viewport = {
