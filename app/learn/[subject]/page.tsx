@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, FileText, Plus, X } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
-import { saveSession } from '../../lib/progress'
+import { saveSession, saveTutorMessages } from '../../lib/progress'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
 import { openWorkFromTutor } from '@/app/lib/workGate'
 import { EwinAvatar } from '@/components/EwinAvatar'
@@ -36,6 +36,11 @@ function persistMessages(subjectId: string, topic: string, msgs: Message[]) {
   } catch {
     /* ignore */
   }
+  void saveTutorMessages({
+    subjectId,
+    topic,
+    messages: msgs.slice(-40),
+  })
 }
 
 async function readTutorError(res: Response): Promise<string> {
