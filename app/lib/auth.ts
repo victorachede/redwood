@@ -1,4 +1,9 @@
-/** Local auth for testing — swap to Supabase Auth later without changing page UX. */
+/**
+ * Auth: Supabase when env is configured, else localStorage fallback.
+ * Pages use async signUp/signIn/signOut; getSession remains sync-friendly via cache.
+ */
+
+import { createBrowserClient, isSupabaseConfigured } from '@/app/lib/supabase'
 
 export type LocalUser = {
   id: string
@@ -7,6 +12,7 @@ export type LocalUser = {
   createdAt: number
   school?: string
   examFocus?: string
+  plan?: 'free' | 'pro'
 }
 
 type Store = {
@@ -15,6 +21,7 @@ type Store = {
 }
 
 const KEY = 'ewin-auth-v1'
+const CACHE_KEY = 'ewin-session-cache'
 
 function read(): Store {
   if (typeof window === 'undefined') return { users: [], sessionUserId: null }
@@ -39,7 +46,28 @@ function toPublic(u: LocalUser & { password: string }): LocalUser {
   return user
 }
 
+function cacheSession(user: LocalUser | null) {
+  if (typeof window === 'undefined') return
+  if (user) localStorage.setItem(CACHE_KEY, JSON.stringify(user))
+  else localStorage.removeItem(CACHE_KEY)
+  window.dispatchEvent(new Event('ewin-auth'))
+}
+
+function readCache(): LocalUser | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    return raw ? (JSON.parse(raw) as LocalUser) : null
+  } catch {
+    return null
+  }
+}
+
+/** Sync session read for UI (uses cache; call refreshSession on mount for accuracy). */
 export function getSession(): LocalUser | null {
+  if (isSupabaseConfigured) {
+    return readCache()
+  }
   const s = read()
   if (!s.sessionUserId) return null
   const u = s.users.find((x) => x.id === s.sessionUserId)
@@ -47,11 +75,63 @@ export function getSession(): LocalUser | null {
   return toPublic(u)
 }
 
-export function signUp(input: {
+/** Pull latest session from Supabase into local cache. */
+export async function refreshSession(): Promise<LocalUser | null> {
+  if (!isSupabaseConfigured) return getSession()
+  const sb = createBrowserClient()
+  if (!sb) return null
+  const { data } = await sb.auth.getSession()
+  const session = data.session
+  if (!session?.user) {
+    cacheSession(null)
+    return null
+  }
+  const user = await profileFromAuthUser(session.user.id, session.user.email, session.user.user_metadata)
+  cacheSession(user)
+  return user
+}
+
+async function profileFromAuthUser(
+  id: string,
+  email: string | undefined,
+  meta: Record<string, unknown> | undefined,
+): Promise<LocalUser> {
+  const sb = createBrowserClient()
+  let displayName =
+    (typeof meta?.display_name === 'string' && meta.display_name) ||
+    (email ? email.split('@')[0] : 'Student')
+  let plan: 'free' | 'pro' = 'free'
+  let examFocus = 'WAEC & JAMB'
+  let school: string | undefined
+  let createdAt = Date.now()
+
+  if (sb) {
+    const { data } = await sb.from('profiles').select('*').eq('id', id).maybeSingle()
+    if (data) {
+      displayName = data.display_name || displayName
+      plan = data.plan === 'pro' ? 'pro' : 'free'
+      examFocus = data.exam_focus || examFocus
+      school = data.school || undefined
+      createdAt = data.created_at ? new Date(data.created_at).getTime() : createdAt
+    }
+  }
+
+  return {
+    id,
+    email: email || '',
+    displayName,
+    createdAt,
+    examFocus,
+    school,
+    plan,
+  }
+}
+
+export async function signUp(input: {
   email: string
   password: string
   displayName: string
-}): { ok: true; user: LocalUser } | { ok: false; error: string } {
+}): Promise<{ ok: true; user: LocalUser } | { ok: false; error: string }> {
   const email = input.email.trim().toLowerCase()
   const password = input.password
   const displayName = input.displayName.trim() || email.split('@')[0]
@@ -59,11 +139,34 @@ export function signUp(input: {
   if (!email.includes('@')) return { ok: false, error: 'Enter a valid email.' }
   if (password.length < 6) return { ok: false, error: 'Password must be at least 6 characters.' }
 
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (!sb) return { ok: false, error: 'Auth is not configured.' }
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName } },
+    })
+    if (error) return { ok: false, error: error.message }
+    if (!data.user) return { ok: false, error: 'Could not create account.' }
+
+    // Ensure profile row (trigger should do this; upsert as backup)
+    await sb.from('profiles').upsert({
+      id: data.user.id,
+      email,
+      display_name: displayName,
+    })
+
+    const user = await profileFromAuthUser(data.user.id, email, { display_name: displayName })
+    cacheSession(user)
+    return { ok: true, user }
+  }
+
+  // Local fallback
   const s = read()
   if (s.users.some((u) => u.email === email)) {
     return { ok: false, error: 'An account with this email already exists.' }
   }
-
   const user: LocalUser & { password: string } = {
     id: uid(),
     email,
@@ -71,93 +174,90 @@ export function signUp(input: {
     password,
     createdAt: Date.now(),
     examFocus: 'WAEC & JAMB',
+    plan: 'free',
   }
   s.users.push(user)
   s.sessionUserId = user.id
   write(s)
+  cacheSession(toPublic(user))
   return { ok: true, user: toPublic(user) }
 }
 
-export function signIn(input: {
+export async function signIn(input: {
   email: string
   password: string
-}): { ok: true; user: LocalUser } | { ok: false; error: string } {
+}): Promise<{ ok: true; user: LocalUser } | { ok: false; error: string }> {
   const email = input.email.trim().toLowerCase()
+  const password = input.password
+
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (!sb) return { ok: false, error: 'Auth is not configured.' }
+    const { data, error } = await sb.auth.signInWithPassword({ email, password })
+    if (error) return { ok: false, error: error.message }
+    if (!data.user) return { ok: false, error: 'Sign in failed.' }
+    const user = await profileFromAuthUser(data.user.id, data.user.email, data.user.user_metadata)
+    cacheSession(user)
+    return { ok: true, user }
+  }
+
   const s = read()
   const u = s.users.find((x) => x.email === email)
-  if (!u || u.password !== input.password) {
-    return { ok: false, error: 'Email or password is incorrect.' }
+  if (!u || u.password !== password) {
+    return { ok: false, error: 'Wrong email or password.' }
   }
   s.sessionUserId = u.id
   write(s)
+  cacheSession(toPublic(u))
   return { ok: true, user: toPublic(u) }
 }
 
-export function signOut() {
+export async function signOut(): Promise<void> {
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    await sb?.auth.signOut()
+  }
   const s = read()
   s.sessionUserId = null
   write(s)
+  cacheSession(null)
 }
 
-export function updateProfile(input: {
-  displayName?: string
-  school?: string
-  examFocus?: string
-}): { ok: true; user: LocalUser } | { ok: false; error: string } {
-  const s = read()
-  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
-  const idx = s.users.findIndex((x) => x.id === s.sessionUserId)
-  if (idx < 0) return { ok: false, error: 'Account not found.' }
-  const u = s.users[idx]
-  if (input.displayName !== undefined) {
-    const name = input.displayName.trim()
-    if (!name) return { ok: false, error: 'Name cannot be empty.' }
-    u.displayName = name
+export function updateProfile(
+  patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus'>>,
+): LocalUser | null {
+  const current = getSession()
+  if (!current) return null
+
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (sb) {
+      void sb
+        .from('profiles')
+        .update({
+          display_name: patch.displayName ?? current.displayName,
+          school: patch.school ?? current.school ?? null,
+          exam_focus: patch.examFocus ?? current.examFocus ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', current.id)
+    }
+    const next = { ...current, ...patch }
+    cacheSession(next)
+    return next
   }
-  if (input.school !== undefined) u.school = input.school.trim()
-  if (input.examFocus !== undefined) u.examFocus = input.examFocus.trim()
-  s.users[idx] = u
-  write(s)
-  return { ok: true, user: toPublic(u) }
-}
 
-export function changePassword(input: {
-  current: string
-  next: string
-}): { ok: true } | { ok: false; error: string } {
   const s = read()
-  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
-  const idx = s.users.findIndex((x) => x.id === s.sessionUserId)
-  if (idx < 0) return { ok: false, error: 'Account not found.' }
-  if (s.users[idx].password !== input.current) {
-    return { ok: false, error: 'Current password is wrong.' }
+  const idx = s.users.findIndex((x) => x.id === current.id)
+  if (idx < 0) return null
+  s.users[idx] = {
+    ...s.users[idx],
+    displayName: patch.displayName ?? s.users[idx].displayName,
+    school: patch.school ?? s.users[idx].school,
+    examFocus: patch.examFocus ?? s.users[idx].examFocus,
   }
-  if (input.next.length < 6) return { ok: false, error: 'New password must be at least 6 characters.' }
-  s.users[idx].password = input.next
   write(s)
-  return { ok: true }
-}
-
-/** Deletes the signed-in account from local store. Does not clear study data unless asked. */
-export function deleteAccount(password: string): { ok: true } | { ok: false; error: string } {
-  const s = read()
-  if (!s.sessionUserId) return { ok: false, error: 'Sign in first.' }
-  const u = s.users.find((x) => x.id === s.sessionUserId)
-  if (!u) return { ok: false, error: 'Account not found.' }
-  if (u.password !== password) return { ok: false, error: 'Password is incorrect.' }
-  s.users = s.users.filter((x) => x.id !== u.id)
-  s.sessionUserId = null
-  write(s)
-  return { ok: true }
-}
-
-export function useAuthListener(cb: () => void) {
-  if (typeof window === 'undefined') return () => {}
-  const handler = () => cb()
-  window.addEventListener('ewin-auth', handler)
-  window.addEventListener('storage', handler)
-  return () => {
-    window.removeEventListener('ewin-auth', handler)
-    window.removeEventListener('storage', handler)
-  }
+  const pub = toPublic(s.users[idx])
+  cacheSession(pub)
+  return pub
 }
