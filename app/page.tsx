@@ -3,7 +3,8 @@ import {ArrowRight,
   BookOpen,
   MessageCircle,
   Target,
-  GraduationCap,, Check} from 'lucide-react'
+  GraduationCap,
+  Check, from 'lucide-react'
 // Check used in pricing
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
