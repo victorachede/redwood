@@ -36,6 +36,9 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
           <Link href="/dashboard" className="hidden px-2 hover:text-ink no-underline sm:inline">
             Dashboard
           </Link>
+          <Link href="/pricing" className="hidden px-2 hover:text-ink no-underline sm:inline">
+            Pricing
+          </Link>
           {user ? (
             <>
               <Link
