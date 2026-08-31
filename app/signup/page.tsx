@@ -13,11 +13,11 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const res = signUp({ email, password, displayName })
+    const res = await signUp({ email, password, displayName })
     setLoading(false)
     if (!res.ok) {
       setError(res.error)
@@ -35,7 +35,7 @@ export default function SignupPage() {
         </Link>
         <h1 className="font-serif text-2xl font-semibold tracking-tight">Create your account</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          Free account. Your progress stays on this phone or computer for now.
+          Free account. Progress syncs when you are signed in.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
