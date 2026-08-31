@@ -313,3 +313,32 @@ export const PAST_QUESTIONS: PastQuestion[] = [
 export function questionsForSubject(subjectId: string): PastQuestion[] {
   return PAST_QUESTIONS.filter((q) => q.subjectId === subjectId)
 }
+
+export type ExamBoard = 'JAMB' | 'WAEC' | 'NECO' | 'ALL'
+
+export function questionsForExam(
+  subjectId: string,
+  exam: ExamBoard = 'ALL'
+): PastQuestion[] {
+  const all = PAST_QUESTIONS.filter((q) => q.subjectId === subjectId)
+  if (exam === 'ALL') return all
+  return all.filter((q) => q.exam === exam)
+}
+
+export function countByExam(subjectId: string): Record<ExamBoard, number> {
+  const all = PAST_QUESTIONS.filter((q) => q.subjectId === subjectId)
+  return {
+    ALL: all.length,
+    JAMB: all.filter((q) => q.exam === 'JAMB').length,
+    WAEC: all.filter((q) => q.exam === 'WAEC').length,
+    NECO: all.filter((q) => q.exam === 'NECO').length,
+  }
+}
+
+/** Suggested seconds per question by board (for timed practice). */
+export function secondsPerQuestion(exam: ExamBoard): number {
+  if (exam === 'JAMB') return 50
+  if (exam === 'WAEC') return 75
+  if (exam === 'NECO') return 70
+  return 60
+}
