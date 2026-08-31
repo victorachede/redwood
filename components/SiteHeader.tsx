@@ -1,10 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Settings } from 'lucide-react'
 import { getSession, signOut, useAuthListener, type LocalUser } from '@/app/lib/auth'
-import { EwinAvatar } from '@/components/EwinAvatar'
 
 export function SiteHeader({ solid = false }: { solid?: boolean }) {
   const [user, setUser] = useState<LocalUser | null>(null)
@@ -21,8 +21,15 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
       }`}
     >
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 no-underline">
-          <EwinAvatar size={28} className="rounded-md" />
+        <Link href="/" className="flex items-center gap-2.5 no-underline">
+          <Image
+            src="/logo-mark.png"
+            alt="Ewin"
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain"
+            priority
+          />
           <span className="text-[15px] font-semibold tracking-tight text-ink">Ewin</span>
         </Link>
         <nav className="flex items-center gap-1.5 sm:gap-2 text-[13px] text-ink-muted">
