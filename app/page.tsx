@@ -77,7 +77,7 @@ export default function Home() {
             className="absolute left-1/2 top-0 h-[420px] w-[min(100%,720px)] -translate-x-1/2 rounded-full opacity-70"
             style={{
               background:
-                'radial-gradient(ellipse at center, rgba(232,239,233,0.85) 0%, transparent 68%)',
+                'radial-gradient(ellipse at center, rgba(201,162,39,0.12) 0%, transparent 68%)',
             }}
           />
         </div>
