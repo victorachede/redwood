@@ -5,6 +5,7 @@ import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Send } from 'lucide-react'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '@/app/lib/cards'
+import { consumeWorkTicket, type WorkKind } from '@/app/lib/workGate'
 
 type Msg = { role: 'tutor' | 'student'; content: string }
 
@@ -25,6 +26,24 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
     title: slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
     blurb: 'Paste the assignment. Ewin reviews it with you in chat — grades, fixes, and next steps.',
   }
+
+  const [allowed, setAllowed] = useState<boolean | null>(null)
+  const [ticketBrief, setTicketBrief] = useState<string | undefined>()
+
+  useEffect(() => {
+    const kind = (slug === 'classwork' || slug === 'homework' ? slug : null) as WorkKind | null
+    if (!kind) {
+      setAllowed(false)
+      return
+    }
+    const ticket = consumeWorkTicket(kind)
+    if (!ticket) {
+      setAllowed(false)
+      return
+    }
+    setTicketBrief(ticket.brief)
+    setAllowed(true)
+  }, [slug])
 
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
@@ -74,6 +93,40 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
     } finally {
       setLoading(false)
     }
+  }
+
+  if (allowed === null) {
+    return (
+      <main className="min-h-dvh bg-paper text-ink flex items-center justify-center">
+        <p className="text-sm text-ink-muted">Checking access…</p>
+      </main>
+    )
+  }
+
+  if (allowed === false) {
+    return (
+      <main className="min-h-dvh bg-paper text-ink">
+        <div className="mx-auto max-w-md px-4 py-20 text-center">
+          <p className="font-serif text-xl font-semibold">Ewin opens this when you are ready</p>
+          <p className="mt-3 text-sm text-ink-muted leading-relaxed">
+            Classwork and homework are not open menus. During a lesson, when Ewin decides you should
+            practise or submit work, it will open this screen for you.
+          </p>
+          <Link
+            href="/dashboard"
+            className="mt-8 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+          >
+            Back to dashboard
+          </Link>
+          <p className="mt-4 text-[12px] text-ink-muted">
+            Or continue learning —{' '}
+            <Link href="/learn/mathematics" className="text-accent no-underline">
+              start a tutor session
+            </Link>
+          </p>
+        </div>
+      </main>
+    )
   }
 
   return (
