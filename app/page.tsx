@@ -1,16 +1,17 @@
 import Link from 'next/link'
-import {
-  ArrowRight,
+import {ArrowRight,
   BookOpen,
   MessageCircle,
   Target,
-  GraduationCap,
-} from 'lucide-react'
+  GraduationCap,, Check} from 'lucide-react'
+// Check used in pricing
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
 import { HomeHeroCTAs, HomeBottomCTA } from '@/components/HomeCTAs'
 import { ExamBadgeRow } from '@/components/ExamBadges'
+import { SiteFooter } from '@/components/SiteFooter'
+import { formatNgn, PLANS } from '@/app/lib/billing'
 
 const FEATURES = [
   {
@@ -207,21 +208,69 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing teaser */}
-      <section id="pricing" className="border-t border-line">
-        <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Free to start. Pro when you need mocks.
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
-            Timed JAMB / WAEC / NECO practice and unlimited drills are on Pro. Checkout via Paystack when you are ready.
+      {/* Pricing */}
+      <section id="pricing" className="border-t border-line scroll-mt-16">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+          <div className="text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">Pricing</p>
+            <h2 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              Free to start. Pro when you need mocks.
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
+              Timed JAMB / WAEC / NECO practice via Paystack. No card required for Free.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-[var(--paper-elevated)] p-6 text-left">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Free</p>
+              <p className="mt-2 font-serif text-3xl font-semibold text-ink">{formatNgn(0)}</p>
+              <p className="mt-1 text-sm text-ink-muted">{PLANS.free.blurb}</p>
+              <ul className="mt-5 space-y-2">
+                {PLANS.free.features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex gap-2 text-[13px] text-ink">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/signup"
+                className="mt-6 inline-flex w-full justify-center rounded-full border border-line py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+              >
+                Start free
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-accent/60 bg-[var(--paper-elevated)] p-6 text-left relative">
+              <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-semibold uppercase text-paper">
+                Pro
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-wide text-accent">Pro</p>
+              <p className="mt-2 font-serif text-3xl font-semibold text-ink">
+                {formatNgn(PLANS.pro.priceMonthlyNgn)}
+                <span className="text-base font-normal text-ink-muted">/mo</span>
+              </p>
+              <p className="mt-1 text-sm text-ink-muted">{PLANS.pro.blurb}</p>
+              <ul className="mt-5 space-y-2">
+                {PLANS.pro.features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex gap-2 text-[13px] text-ink">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="mt-6 inline-flex w-full justify-center rounded-full bg-accent py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+              >
+                Upgrade with Paystack
+              </Link>
+            </div>
+          </div>
+          <p className="mt-6 text-center text-[12px] text-ink-muted">
+            <Link href="/pricing" className="text-accent no-underline hover:underline">
+              Full plan comparison →
+            </Link>
           </p>
-          <Link
-            href="/pricing"
-            className="mt-6 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
-          >
-            See pricing
-          </Link>
         </div>
       </section>
 
@@ -254,10 +303,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-line py-8 text-center text-xs text-ink-muted">
-        <p>Ewin · not affiliated with WAEC, JAMB, or NECO</p>
-        <p className="mt-1">Built for students who want understanding, not shortcuts.</p>
-      </footer>
+      <SiteFooter />
     </main>
   )
 }
