@@ -99,3 +99,16 @@ textarea:focus-visible {
     opacity: 1;
   }
 }
+
+/* Map legacy bg-white / light surfaces to elevated navy in brand dark theme */
+@layer utilities {
+  .bg-white {
+    background-color: var(--paper-elevated);
+  }
+  .hover\:bg-white:hover {
+    background-color: var(--paper-card);
+  }
+  .shadow-sm {
+    --tw-shadow-color: rgba(0, 0, 0, 0.35);
+  }
+}
