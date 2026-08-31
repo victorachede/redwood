@@ -193,6 +193,46 @@ export function clearStudyData() {
 }
 
 /** Pull remote practice/sessions into local cache (best-effort). */
+
+
+/** Upsert full chat transcript for a topic into tutor_sessions.messages */
+export async function saveTutorMessages(input: {
+  subjectId: string
+  subjectName?: string
+  topic: string
+  messages: unknown[]
+}) {
+  const uid = userId()
+  if (!uid || !isSupabaseConfigured) return
+  const sb = createBrowserClient()
+  if (!sb) return
+
+  const payload = {
+    user_id: uid,
+    subject_id: input.subjectId,
+    subject_name: input.subjectName || input.subjectId,
+    topic: input.topic,
+    messages: input.messages.slice(-80),
+    updated_at: new Date().toISOString(),
+  }
+
+  const { data: existing } = await sb
+    .from('tutor_sessions')
+    .select('id')
+    .eq('user_id', uid)
+    .eq('subject_id', input.subjectId)
+    .eq('topic', input.topic)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (existing?.id) {
+    await sb.from('tutor_sessions').update(payload).eq('id', existing.id)
+  } else {
+    await sb.from('tutor_sessions').insert(payload)
+  }
+}
+
 export async function hydrateProgressFromCloud(): Promise<void> {
   const uid = userId()
   if (!uid || !isSupabaseConfigured) return
@@ -243,4 +283,22 @@ export async function hydrateProgressFromCloud(): Promise<void> {
     }))
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(remote))
   }
+}
+
+
+export async function loadTutorMessages(subjectId: string, topic: string): Promise<unknown[] | null> {
+  const uid = userId()
+  if (!uid || !isSupabaseConfigured) return null
+  const sb = createBrowserClient()
+  if (!sb) return null
+  const { data } = await sb
+    .from('tutor_sessions')
+    .select('messages')
+    .eq('user_id', uid)
+    .eq('subject_id', subjectId)
+    .eq('topic', topic)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (data?.messages as unknown[]) || null
 }
