@@ -13,6 +13,7 @@ import {
   type PlanId,
 } from '@/app/lib/billing'
 import { getSession } from '@/app/lib/auth'
+import { SiteFooter } from '@/components/SiteFooter'
 
 export default function PricingPage() {
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly')
@@ -251,6 +252,7 @@ export default function PricingPage() {
           </Link>
         </p>
       </div>
+      <SiteFooter />
     </main>
   )
 }
