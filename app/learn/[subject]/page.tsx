@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, FileText, Plus, X } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
 import { saveSession } from '../../lib/progress'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
+import { openWorkFromTutor } from '@/app/lib/workGate'
 import { EwinAvatar } from '@/components/EwinAvatar'
 
 type Message = {
@@ -102,6 +103,24 @@ function formatContent(text: string) {
     }
   }
   return <div className="space-y-1">{nodes}</div>
+}
+
+
+/** Strip tutor ACTION lines and open classwork/homework when Ewin decides. */
+function applyTutorSideEffects(raw: string, subjectId: string): string {
+  const actionMatch = raw.match(/ACTION:\s*(CLASSWORK|HOMEWORK)/i)
+  if (actionMatch) {
+    const kind = actionMatch[1].toUpperCase() === 'CLASSWORK' ? 'classwork' : 'homework'
+    const briefMatch = raw.match(/BRIEF:\s*(.+)/i)
+    const brief = briefMatch?.[1]?.trim()
+    setTimeout(() => {
+      openWorkFromTutor(kind as 'classwork' | 'homework', { subjectId, brief })
+    }, 1600)
+  }
+  return raw
+    .replace(/ACTION:\s*(CLASSWORK|HOMEWORK)\s*/gi, '')
+    .replace(/BRIEF:\s*.+/gi, '')
+    .trim()
 }
 
 export default function LearnPage({ params }: { params: Promise<{ subject: string }> }) {
@@ -205,7 +224,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
       if (data.demo) setDemoMode(true)
-      const rawStart = data.response as string
+      const rawStart = applyTutorSideEffects(data.response as string, subject)
       setSuggestedCards(parseTutorCards(rawStart))
       const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(rawStart), type: 'lesson' }]
       setMessages(initial)
@@ -257,7 +276,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
       const data = await res.json()
       if (data.demo) setDemoMode(true)
-      const rawNext = data.response as string
+      const rawNext = applyTutorSideEffects(data.response as string, subject)
       setSuggestedCards(parseTutorCards(rawNext))
       const next: Message[] = [
         ...updated,
