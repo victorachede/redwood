@@ -5,9 +5,23 @@ const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export const isSupabaseConfigured = Boolean(url && anon)
 
-/** Browser / server client with anon key (RLS applies). */
+let browserClient: SupabaseClient | null = null
+
+/** Browser client with anon key (RLS applies). Singleton for auth session. */
 export function createBrowserClient(): SupabaseClient | null {
   if (!url || !anon) return null
+  if (typeof window !== 'undefined') {
+    if (!browserClient) {
+      browserClient = createClient(url, anon, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+      })
+    }
+    return browserClient
+  }
   return createClient(url, anon)
 }
 
