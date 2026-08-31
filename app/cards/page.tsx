@@ -8,10 +8,10 @@ import {
   dueCards,
   gradeCard,
   listCards,
-  type StudyCard,
-} from '@/app/lib/cards'
+  type StudyCard,, hydrateCardsFromCloud } from '@/app/lib/cards'
 import { SiteHeader } from '@/components/SiteHeader'
 
+// cloud hydrate mounted below
 export default function CardsPage() {
   const [queue, setQueue] = useState<StudyCard[]>([])
   const [allCount, setAllCount] = useState(0)
@@ -25,6 +25,12 @@ export default function CardsPage() {
     setRevealed(false)
   }
 
+  useEffect(() => {
+    void hydrateCardsFromCloud().then(() => {
+      try { setCards?.(listCards()) } catch { /* page may use different state */ }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   useEffect(() => {
     refresh()
   }, [])
