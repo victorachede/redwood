@@ -102,7 +102,7 @@ export function parseTutorCards(text: string): { front: string; back: string }[]
   const block = text.match(/STUDY_CARDS:\s*([\s\S]*)$/i)
   if (!block) return []
   const pairs: { front: string; back: string }[] = []
-  const re = /Q:\s*(.+?)\s*A:\s*(.+?)(?=\s*Q:|$)/gis
+  const re = /Q:\s*([\s\S]+?)\s*A:\s*([\s\S]+?)(?=\s*Q:|$)/gi
   let m: RegExpExecArray | null
   while ((m = re.exec(block[1])) !== null) {
     pairs.push({ front: m[1].trim(), back: m[2].trim() })
