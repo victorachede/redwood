@@ -43,7 +43,10 @@ export default function PricingPage() {
       return
     }
     try {
-      const res = await fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`)
+      const payEmail = email.trim() || getSession()?.email || ''
+      const q = new URLSearchParams({ reference })
+      if (payEmail) q.set('email', payEmail)
+      const res = await fetch(`/api/paystack/verify?${q.toString()}`)
       const data = await res.json()
       if (data.ok || data.status === 'success') {
         setLocalPlan({
@@ -101,6 +104,11 @@ export default function PricingPage() {
           updatedAt: Date.now(),
         })
         setPlan('pro')
+        if (userEmail) {
+          void fetch(
+            `/api/paystack/verify?reference=${encodeURIComponent(data.reference)}&email=${encodeURIComponent(userEmail)}`,
+          )
+        }
         setMsg(
           'Pro unlocked in demo mode (Paystack keys not set yet). When your keys land, real charges will go through.'
         )
