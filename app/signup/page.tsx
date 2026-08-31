@@ -29,11 +29,9 @@ export default function SignupPage() {
   return (
     <main className="min-h-dvh bg-paper text-ink">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-12">
-        <Link href="/" className="mb-8 flex items-center gap-2 no-underline">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-paper">
-            E
-          </span>
-          <span className="text-[15px] font-semibold">Ewin</span>
+        <Link href="/" className="mb-8 flex items-center gap-2.5 no-underline">
+          <img src="/logo-mark.png" alt="Ewin" width={32} height={32} className="h-8 w-8 object-contain" />
+          <span className="text-[15px] font-semibold text-ink">Ewin</span>
         </Link>
         <h1 className="font-serif text-2xl font-semibold tracking-tight">Create your account</h1>
         <p className="mt-1 text-sm text-ink-muted">
@@ -75,7 +73,7 @@ export default function SignupPage() {
             />
           </label>
           {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700">
+            <p className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-[13px] text-danger">
               {error}
             </p>
           )}
