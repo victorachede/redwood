@@ -109,19 +109,8 @@ export default function DashboardPage() {
               <p className="text-[15px] font-semibold text-ink">Study cards</p>
               <p className="mt-1 text-[13px] text-ink-muted">Flip cards from lessons and homework.</p>
             </Link>
-            <div className="grid grid-cols-2 gap-2">
-              <Link
-                href="/work/homework"
-                className="rounded-2xl border border-line bg-white px-4 py-3 text-center text-[13px] font-medium text-ink no-underline hover:border-accent"
-              >
-                Homework
-              </Link>
-              <Link
-                href="/work/classwork"
-                className="rounded-2xl border border-line bg-white px-4 py-3 text-center text-[13px] font-medium text-ink no-underline hover:border-accent"
-              >
-                Classwork
-              </Link>
+            <div className="rounded-2xl border border-dashed border-line bg-[var(--paper-elevated)] px-4 py-3 text-[12px] text-ink-muted leading-relaxed">
+              Classwork & homework open when Ewin assigns them in a lesson — not from here.
             </div>
           </div>
         </div>
