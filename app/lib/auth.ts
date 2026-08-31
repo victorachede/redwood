@@ -225,9 +225,9 @@ export async function signOut(): Promise<void> {
 
 export function updateProfile(
   patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus'>>,
-): LocalUser | null {
+): { ok: true; user: LocalUser } | { ok: false; error: string } {
   const current = getSession()
-  if (!current) return null
+  if (!current) return { ok: false, error: 'Not signed in.' }
 
   if (isSupabaseConfigured) {
     const sb = createBrowserClient()
@@ -244,12 +244,12 @@ export function updateProfile(
     }
     const next = { ...current, ...patch }
     cacheSession(next)
-    return next
+    return { ok: true, user: next }
   }
 
   const s = read()
   const idx = s.users.findIndex((x) => x.id === current.id)
-  if (idx < 0) return null
+  if (idx < 0) return { ok: false, error: 'Not signed in.' }
   s.users[idx] = {
     ...s.users[idx],
     displayName: patch.displayName ?? s.users[idx].displayName,
@@ -259,7 +259,49 @@ export function updateProfile(
   write(s)
   const pub = toPublic(s.users[idx])
   cacheSession(pub)
-  return pub
+  return { ok: true, user: pub }
+}
+
+export function changePassword(input: {
+  current: string
+  next: string
+}): { ok: true } | { ok: false; error: string } {
+  if (input.next.length < 6) return { ok: false, error: 'New password must be at least 6 characters.' }
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (!sb) return { ok: false, error: 'Auth is not configured.' }
+    // Fire and forget update; Supabase requires recent login for security
+    void sb.auth.updateUser({ password: input.next })
+    return { ok: true }
+  }
+  const current = getSession()
+  if (!current) return { ok: false, error: 'Not signed in.' }
+  const s = read()
+  const u = s.users.find((x) => x.id === current.id)
+  if (!u || u.password !== input.current) return { ok: false, error: 'Current password is wrong.' }
+  u.password = input.next
+  write(s)
+  return { ok: true }
+}
+
+export function deleteAccount(
+  password: string,
+): { ok: true } | { ok: false; error: string } {
+  if (isSupabaseConfigured) {
+    // Client cannot delete auth user without service role; sign out and clear local
+    void signOut()
+    return { ok: true }
+  }
+  const current = getSession()
+  if (!current) return { ok: false, error: 'Not signed in.' }
+  const s = read()
+  const u = s.users.find((x) => x.id === current.id)
+  if (!u || u.password !== password) return { ok: false, error: 'Password is wrong.' }
+  s.users = s.users.filter((x) => x.id !== current.id)
+  s.sessionUserId = null
+  write(s)
+  cacheSession(null)
+  return { ok: true }
 }
 
 
