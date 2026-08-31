@@ -308,7 +308,6 @@ export const PAST_QUESTIONS: PastQuestion[] = [
     answer: 'B',
     explanation: 'Scarcity — limited resources vs unlimited wants — is the core problem of economics.',
   },
-,
   {
     id: 'mth-neco-001',
     subjectId: 'mathematics',
