@@ -10,6 +10,7 @@ import {
   getStreak,
   loadPractice,
   loadSessions,
+  hydrateProgressFromCloud,
   type PracticeRecord,
   type SessionRecord,
 } from '@/app/lib/progress'
@@ -26,6 +27,11 @@ export default function DashboardPage() {
     setPractice(loadPractice())
     setStreak(getStreak())
     setUser(getSession())
+    void hydrateProgressFromCloud().then(() => {
+      setSessions(loadSessions())
+      setPractice(loadPractice())
+      setStreak(getStreak())
+    })
   }, [])
 
   const last = sessions[0]
