@@ -12,11 +12,11 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const res = signIn({ email, password })
+    const res = await signIn({ email, password })
     setLoading(false)
     if (!res.ok) {
       setError(res.error)
