@@ -152,8 +152,10 @@ export function getStreak(): number {
 export type UsageStats = {
   sessions: number
   subjects: number
+  topicCount: number
   practiceCorrect: number
   practiceTotal: number
+  accuracyPct: number | null
   streak: number
   lastActive: number | null
 }
@@ -164,6 +166,7 @@ export function getUsageStats(): UsageStats {
   const streak = getStreak()
   const subjects = new Set(sessions.map((s) => s.subjectId))
   practice.forEach((p) => subjects.add(p.subjectId))
+  const topics = new Set(sessions.map((s) => `${s.subjectId}:${s.topic}`))
   const practiceCorrect = practice.reduce((a, p) => a + p.correct, 0)
   const practiceTotal = practice.reduce((a, p) => a + p.total, 0)
   const times = [
@@ -173,8 +176,10 @@ export function getUsageStats(): UsageStats {
   return {
     sessions: sessions.length,
     subjects: subjects.size,
+    topicCount: topics.size,
     practiceCorrect,
     practiceTotal,
+    accuracyPct: practiceTotal > 0 ? Math.round((practiceCorrect / practiceTotal) * 100) : null,
     streak,
     lastActive: times.length ? Math.max(...times) : null,
   }
