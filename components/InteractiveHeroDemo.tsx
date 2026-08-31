@@ -53,18 +53,18 @@ export function InteractiveHeroDemo() {
         className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] opacity-90"
         style={{
           background:
-            'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(232,239,233,0.95) 0%, rgba(250,247,240,0) 70%)',
+            'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(201,162,39,0.14) 0%, rgba(10,22,40,0) 70%)',
         }}
       />
       <div
-        className="relative overflow-hidden rounded-[1.35rem] border border-line bg-white/90 shadow-[0_1px_0_var(--line),0_24px_48px_-28px_rgba(22,21,19,0.28)] backdrop-blur-sm"
+        className="relative overflow-hidden rounded-[1.35rem] border border-line bg-[var(--paper-elevated)] shadow-[0_1px_0_var(--line),0_24px_48px_-28px_rgba(0,0,0,0.45)] backdrop-blur-sm"
       >
         {/* Window chrome */}
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#e5e0d3]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#e5e0d3]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#e5e0d3]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#2a3a55]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#2a3a55]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#2a3a55]" />
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted">
             Mathematics · Algebra
@@ -123,7 +123,7 @@ export function InteractiveHeroDemo() {
               setAuto(false)
               setStep(0)
             }}
-            className="rounded-full border border-line bg-white px-3.5 py-1.5 text-[12px] font-medium text-ink hover:border-accent"
+            className="rounded-full border border-line bg-[var(--paper-card)] px-3.5 py-1.5 text-[12px] font-medium text-ink hover:border-accent"
           >
             Replay
           </button>
@@ -140,7 +140,7 @@ export function InteractiveHeroDemo() {
       {/* Floating accent chips — illustration layer */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-2 top-8 hidden rotate-3 rounded-xl border border-line bg-white px-3 py-2 text-[11px] text-ink-muted shadow-sm sm:block"
+        className="pointer-events-none absolute -right-2 top-8 hidden rotate-3 rounded-xl border border-line bg-[var(--paper-elevated)] px-3 py-2 text-[11px] text-ink-muted shadow-sm sm:block"
       >
         WAEC · JAMB
       </div>
