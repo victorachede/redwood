@@ -10,6 +10,7 @@ import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
 import { HomeHeroCTAs, HomeBottomCTA } from '@/components/HomeCTAs'
+import { ExamBadgeRow } from '@/components/ExamBadges'
 
 const FEATURES = [
   {
@@ -50,11 +51,15 @@ const STEPS = [
 const FAQS = [
   {
     q: 'Is Ewin free?',
-    a: 'Yes. You can learn and practice without paying. You can also create a free account to keep your progress on this device.',
+    a: 'Yes. Free covers tutor sessions, study cards, and practice across JAMB, WAEC and NECO style questions. Pro adds timed mocks and unlimited drills — paid via Paystack.',
   },
   {
     q: 'Do I need an account?',
     a: 'No. Tap a subject and start. Sign up only if you want your name on the dashboard — still free.',
+  },
+  {
+    q: 'JAMB, WAEC or NECO — which does it cover?',
+    a: 'All three. In practice you pick a board filter. Questions are written in that exam’s style. Ewin is not affiliated with the boards; materials are for learning only.',
   },
   {
     q: 'Is this for cheating in the exam?',
@@ -96,6 +101,10 @@ export default function Home() {
               your answer — so you understand before exam day.
             </p>
             <HomeHeroCTAs />
+            <div className="mt-6">
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-ink-muted">Practice for</p>
+              <ExamBadgeRow />
+            </div>
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: '90ms' }}>
@@ -195,6 +204,24 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Pricing teaser */}
+      <section id="pricing" className="border-t border-line">
+        <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+            Free to start. Pro when you need mocks.
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
+            Timed JAMB / WAEC / NECO practice and unlimited drills are on Pro. Checkout via Paystack when you are ready.
+          </p>
+          <Link
+            href="/pricing"
+            className="mt-6 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+          >
+            See pricing
+          </Link>
         </div>
       </section>
 
