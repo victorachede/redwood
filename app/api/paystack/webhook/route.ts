@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import { grantProByEmail } from '@/app/lib/grantPro'
 
-/**
- * Paystack webhook. Set PAYSTACK_SECRET_KEY for signature check.
- * Wire to Supabase when ready to persist subscriptions server-side.
- */
+/** Paystack webhook — charge.success → Pro on profiles. */
 export async function POST(req: NextRequest) {
   const raw = await req.text()
   const signature = req.headers.get('x-paystack-signature') || ''
@@ -19,8 +17,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const event = JSON.parse(raw)
-    // event.event === 'charge.success' → grant pro
-    console.log('paystack webhook', event.event, event.data?.reference)
+    if (event.event === 'charge.success') {
+      const email = event.data?.customer?.email as string | undefined
+      const interval = (event.data?.metadata?.interval as string) || 'monthly'
+      const reference = event.data?.reference as string | undefined
+      if (email) {
+        await grantProByEmail(email, { interval, reference })
+      }
+    }
   } catch {
     return NextResponse.json({ error: 'Bad payload' }, { status: 400 })
   }
