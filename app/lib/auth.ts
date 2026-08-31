@@ -261,3 +261,26 @@ export function updateProfile(
   cacheSession(pub)
   return pub
 }
+
+
+/** Subscribe to auth changes (local + Supabase). */
+export function useAuthListener(onChange: () => void): () => void {
+  if (typeof window === 'undefined') return () => {}
+  const handler = () => onChange()
+  window.addEventListener('ewin-auth', handler)
+  // Supabase auth state
+  let unsub: (() => void) | undefined
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (sb) {
+      const { data } = sb.auth.onAuthStateChange(() => {
+        void refreshSession().then(() => onChange())
+      })
+      unsub = () => data.subscription.unsubscribe()
+    }
+  }
+  return () => {
+    window.removeEventListener('ewin-auth', handler)
+    unsub?.()
+  }
+}
