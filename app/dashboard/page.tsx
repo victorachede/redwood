@@ -218,7 +218,7 @@ export default function DashboardPage() {
 
         {streak > 0 && (
           <div className="mb-10">
-            <ShareStreakCard streak={streak} />
+            <ShareStreakCard />
           </div>
         )}
 
