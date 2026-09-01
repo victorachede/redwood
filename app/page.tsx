@@ -1,15 +1,5 @@
 import Link from 'next/link'
-import {
-  ArrowRight,
-  BookOpen,
-  MessageCircle,
-  Target,
-  GraduationCap,
-  Check,
-  Sparkles,
-  Zap,
-  Shield,
-} from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 import { SUBJECTS } from './lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { InteractiveHeroDemo } from '@/components/InteractiveHeroDemo'
@@ -20,189 +10,133 @@ import { formatNgn, PLANS } from '@/app/lib/billing'
 
 const FEATURES = [
   {
-    icon: BookOpen,
-    title: 'Small lessons',
-    body: 'Ewin teaches one idea at a time — short and clear — then asks if you understood. No long notes to scroll past.',
+    title: 'One idea at a time',
+    body: 'Short explanations. No walls of notes. Ewin stops and checks you understood before moving on.',
   },
   {
-    icon: MessageCircle,
-    title: 'You type the answer',
-    body: 'Write it in your own words. Ewin tells you what was right, what was wrong, and why.',
+    title: 'You write the answer',
+    body: 'Type it in your own words. Feedback tells you what held up and what did not — and why.',
   },
   {
-    icon: Target,
-    title: 'For WAEC & JAMB',
-    body: 'Subjects and questions in the style of the exams you will actually sit — with Nigerian examples.',
+    title: 'Exam-shaped practice',
+    body: 'Questions in the style of WAEC, NECO and JAMB, with examples that feel familiar.',
   },
 ]
 
 const STEPS = [
-  {
-    n: '01',
-    title: 'Choose a subject',
-    body: 'Maths, Physics, Chemistry, Biology, English, or Economics.',
-  },
-  {
-    n: '02',
-    title: 'Read, then answer',
-    body: 'Ewin explains. You reply in the box. You get clear feedback.',
-  },
-  {
-    n: '03',
-    title: 'Or try practice',
-    body: 'Multiple-choice past-style questions — then see the explanation.',
-  },
+  { n: '1', title: 'Pick a subject', body: 'Maths, Physics, Chemistry, Biology, English, or Economics.' },
+  { n: '2', title: 'Learn, then answer', body: 'Ewin explains. You reply. You get clear feedback.' },
+  { n: '3', title: 'Drill when ready', body: 'Multiple-choice practice with explanations after each question.' },
 ]
 
 const FAQS = [
   {
     q: 'Is Ewin free?',
-    a: 'Yes. Free covers tutor sessions, study cards, and practice across JAMB, WAEC and NECO style questions. Pro adds timed mocks and unlimited drills — paid via Paystack.',
+    a: 'Yes. Free covers tutor sessions, study cards, and practice. Pro adds timed mocks and unlimited drills — paid via Paystack.',
   },
   {
     q: 'Do I need an account?',
-    a: 'No. Tap a subject and start. Sign up only if you want your name on the dashboard — still free.',
+    a: 'No. Open a subject and start. Sign up only if you want your progress named on the dashboard.',
   },
   {
-    q: 'JAMB, WAEC or NECO — which does it cover?',
-    a: 'All three. In practice you pick a board filter. Questions are written in that exam’s style. Ewin is not affiliated with the boards; materials are for learning only.',
+    q: 'Which exams?',
+    a: 'JAMB, WAEC and NECO style. Ewin is not affiliated with the boards; materials are for learning only.',
   },
   {
-    q: 'Is this for cheating in the exam?',
-    a: 'No. Use Ewin to prepare at home. In the exam hall you work on your own.',
+    q: 'Is this for cheating?',
+    a: 'No. Use it to prepare at home. In the exam hall you work on your own.',
   },
 ]
-
-const SUBJECT_ACCENTS: Record<string, string> = {
-  mathematics: 'from-amber-100',
-  physics: 'from-sky-100',
-  chemistry: 'from-violet-100',
-  biology: 'from-emerald-100',
-  english: 'from-rose-100',
-  economics: 'from-teal-100',
-}
 
 export default function Home() {
   return (
     <main className="min-h-dvh bg-paper text-ink">
       <SiteHeader />
 
-      <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-0 mesh-grid opacity-50" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[min(100%,720px)] -translate-x-1/2 rounded-full"
-          style={{
-            background:
-              'radial-gradient(ellipse at center, rgba(184,146,31,0.14) 0%, transparent 68%)',
-          }}
-        />
-
-        <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="animate-fade-up">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-[11px] font-medium text-ink-muted shadow-sm">
-                <Sparkles className="h-3.5 w-3.5 text-accent" />
-                AI tutor · Built for Nigerian secondary school
-              </div>
-              <h1 className="font-serif text-[clamp(2.35rem,5.2vw,3.5rem)] font-semibold leading-[1.1] tracking-tight text-ink">
-                Learn one idea.
-                <br />
-                <span className="gold-text">Then prove you got it.</span>
-              </h1>
-              <p className="mt-5 max-w-md text-[16px] leading-relaxed text-ink-muted">
-                Free help for secondary school. Ewin teaches a little, asks you a question, and
-                checks your answer — so you understand before exam day.
-              </p>
-              <HomeHeroCTAs />
-              <div className="mt-7">
-                <p className="mb-2.5 text-[11px] uppercase tracking-wider text-ink-muted">
-                  Practice for
-                </p>
-                <ExamBadgeRow />
-              </div>
+      {/* Hero */}
+      <section className="mx-auto max-w-5xl px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
+        <div className="grid items-center gap-14 lg:grid-cols-2">
+          <div>
+            <p className="text-[13px] text-ink-muted">AI tutor for secondary school</p>
+            <h1 className="mt-3 font-serif text-[clamp(2.25rem,4.5vw,3.25rem)] font-semibold leading-[1.15] tracking-tight text-ink">
+              Learn one idea.
+              <br />
+              Then prove you got it.
+            </h1>
+            <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-muted">
+              Ewin teaches a little, asks a question, and checks your answer — so you understand
+              before exam day.
+            </p>
+            <HomeHeroCTAs />
+            <div className="mt-8">
+              <p className="mb-2.5 text-[12px] text-ink-muted">Built around</p>
+              <ExamBadgeRow />
             </div>
-
-            <div className="animate-fade-up" style={{ animationDelay: '90ms' }}>
-              <InteractiveHeroDemo />
-            </div>
+          </div>
+          <div>
+            <InteractiveHeroDemo />
           </div>
         </div>
       </section>
 
-      <section className="border-y border-line bg-white">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-9 sm:grid-cols-4 sm:px-6">
+      {/* Quiet stats */}
+      <section className="border-y border-line">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-5 py-10 sm:grid-cols-4 sm:px-8">
           {[
             { v: '6', l: 'Core subjects' },
             { v: '1', l: 'Concept at a time' },
             { v: '₦0', l: 'To start' },
             { v: 'Socratic', l: 'Not answer keys' },
           ].map((s) => (
-            <div key={s.l} className="text-center sm:text-left">
-              <p className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-                {s.v}
-              </p>
-              <p className="mt-1 text-xs text-ink-muted">{s.l}</p>
+            <div key={s.l}>
+              <p className="text-xl font-semibold tracking-tight text-ink">{s.v}</p>
+              <p className="mt-1 text-[13px] text-ink-muted">{s.l}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-        <div className="max-w-xl">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">How it works</p>
-          <h2 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Study that actually sticks
-          </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
-            Not another PDF dump. A tutor that forces you to think — then shows you where you were
-            right or wrong.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      {/* Features */}
+      <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
+        <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">
+          Study that sticks
+        </h2>
+        <p className="mt-2 max-w-lg text-[15px] text-ink-muted">
+          Not another PDF dump. A tutor that makes you think, then shows where you were right or wrong.
+        </p>
+        <div className="mt-12 grid gap-10 sm:grid-cols-3">
           {FEATURES.map((f) => (
-            <div key={f.title} className="surface-card rounded-2xl p-5 transition">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
-                <f.icon className="h-5 w-5" />
-              </div>
+            <div key={f.title}>
               <h3 className="text-[15px] font-semibold text-ink">{f.title}</h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{f.body}</p>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{f.body}</p>
             </div>
           ))}
         </div>
       </section>
 
+      {/* Steps */}
       <section className="border-y border-line bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Three steps. No fluff.
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">How it works</h2>
+          <ol className="mt-10 grid gap-8 sm:grid-cols-3">
             {STEPS.map((s) => (
-              <div key={s.n}>
-                <p className="font-mono text-[11px] font-semibold tracking-widest text-accent">
-                  {s.n}
-                </p>
-                <h3 className="mt-2 text-[16px] font-semibold text-ink">{s.title}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{s.body}</p>
-              </div>
+              <li key={s.n}>
+                <span className="text-[12px] font-medium text-ink-muted">{s.n}</span>
+                <h3 className="mt-2 text-[15px] font-semibold text-ink">{s.title}</h3>
+                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">{s.body}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      <section id="subjects" className="scroll-mt-20 mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+      {/* Subjects */}
+      <section id="subjects" className="scroll-mt-20 mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">Subjects</p>
-            <h2 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-              Pick where to start
-            </h2>
+            <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">Subjects</h2>
+            <p className="mt-1 text-[14px] text-ink-muted">Tutor or practice — same subjects.</p>
           </div>
-          <p className="max-w-xs text-[13px] text-ink-muted">
-            Tutor mode or practice questions — same subjects, different muscle.
-          </p>
         </div>
 
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -210,145 +144,97 @@ export default function Home() {
             <Link
               key={s.id}
               href={`/learn/${s.id}`}
-              className="surface-card group relative overflow-hidden rounded-2xl p-5 no-underline transition hover:surface-glow"
+              className="group flex flex-col rounded-lg border border-line bg-white p-5 no-underline transition hover:border-neutral-400"
             >
-              <div
-                aria-hidden
-                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${SUBJECT_ACCENTS[s.id] ?? 'from-amber-50'} to-transparent opacity-70`}
-              />
-              <div className="relative">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-[16px] font-semibold text-ink group-hover:text-accent">
-                    {s.name}
-                  </h3>
-                  <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-hover:text-accent" />
-                </div>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-                  {s.exam}
-                </p>
-                <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">{s.blurb}</p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {s.topics.slice(0, 3).map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-md border border-line bg-paper px-2 py-0.5 text-[10px] text-ink-muted"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="text-[15px] font-semibold text-ink">{s.name}</h3>
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted opacity-0 transition group-hover:opacity-100" />
               </div>
+              <p className="mt-1 text-[11px] uppercase tracking-wide text-ink-muted">{s.exam}</p>
+              <p className="mt-3 flex-1 text-[13px] leading-relaxed text-ink-muted">{s.blurb}</p>
             </Link>
           ))}
         </div>
 
-        <div className="mt-6">
+        <p className="mt-6">
           <Link
             href="/practice/mathematics"
-            className="inline-flex items-center gap-2 text-[13px] font-medium text-accent no-underline hover:underline"
+            className="text-[13px] font-medium text-ink no-underline hover:underline"
           >
-            Jump to practice questions
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="border-y border-line bg-white">
-        <div className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-4 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-              <Shield className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[15px] font-semibold text-ink">Built for exam prep, not shortcuts</p>
-              <p className="mt-1 max-w-md text-[13px] text-ink-muted">
-                Ewin checks understanding. Use it at home. In the hall, you work alone.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 text-[12px] text-ink-muted">
-            <Zap className="h-4 w-4 text-accent" />
-            Paystack for Pro · No foreign card required
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="scroll-mt-16 mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-        <div className="text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">Pricing</p>
-          <h2 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Free to start. Pro when you need mocks.
-          </h2>
-        </div>
-
-        <div className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
-          <div className="surface-card rounded-2xl p-6">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-muted">
-              {PLANS.free.name}
-            </p>
-            <p className="mt-2 font-serif text-3xl font-semibold text-ink">
-              {formatNgn(PLANS.free.priceMonthlyNgn)}
-              <span className="text-base font-normal text-ink-muted">/mo</span>
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">{PLANS.free.blurb}</p>
-            <ul className="mt-5 space-y-2">
-              {PLANS.free.features.slice(0, 4).map((f) => (
-                <li key={f} className="flex gap-2 text-[13px] text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="#subjects"
-              className="mt-6 inline-flex w-full justify-center rounded-full border border-line bg-white py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
-            >
-              Start free
-            </Link>
-          </div>
-
-          <div className="surface-card surface-glow relative rounded-2xl p-6">
-            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--on-accent)]">
-              Popular
-            </span>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              {PLANS.pro.name}
-            </p>
-            <p className="mt-2 font-serif text-3xl font-semibold text-ink">
-              {formatNgn(PLANS.pro.priceMonthlyNgn)}
-              <span className="text-base font-normal text-ink-muted">/mo</span>
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">{PLANS.pro.blurb}</p>
-            <ul className="mt-5 space-y-2">
-              {PLANS.pro.features.slice(0, 4).map((f) => (
-                <li key={f} className="flex gap-2 text-[13px] text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/pricing"
-              className="mt-6 inline-flex w-full justify-center rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] no-underline hover:bg-accent-hover"
-            >
-              Upgrade with Paystack
-            </Link>
-          </div>
-        </div>
-        <p className="mt-6 text-center text-[12px] text-ink-muted">
-          <Link href="/pricing" className="text-accent no-underline hover:underline">
-            Full plan comparison →
+            Jump to practice questions →
           </Link>
         </p>
       </section>
 
-      <section className="border-t border-line bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
+      {/* Pricing */}
+      <section id="pricing" className="scroll-mt-16 border-t border-line bg-white">
+        <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">Pricing</h2>
+          <p className="mt-1 text-[14px] text-ink-muted">Free to start. Pro when you need mocks.</p>
+
+          <div className="mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-line p-6">
+              <p className="text-[13px] font-medium text-ink-muted">{PLANS.free.name}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-ink">
+                {formatNgn(PLANS.free.priceMonthlyNgn)}
+                <span className="text-sm font-normal text-ink-muted">/mo</span>
+              </p>
+              <p className="mt-1 text-[13px] text-ink-muted">{PLANS.free.blurb}</p>
+              <ul className="mt-5 space-y-2">
+                {PLANS.free.features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex gap-2 text-[13px] text-ink">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-muted" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="#subjects"
+                className="mt-6 inline-flex w-full justify-center rounded-md border border-line py-2.5 text-sm font-medium text-ink no-underline hover:bg-neutral-50"
+              >
+                Start free
+              </Link>
+            </div>
+
+            <div className="rounded-lg border border-ink p-6">
+              <p className="text-[13px] font-medium text-ink">{PLANS.pro.name}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-ink">
+                {formatNgn(PLANS.pro.priceMonthlyNgn)}
+                <span className="text-sm font-normal text-ink-muted">/mo</span>
+              </p>
+              <p className="mt-1 text-[13px] text-ink-muted">{PLANS.pro.blurb}</p>
+              <ul className="mt-5 space-y-2">
+                {PLANS.pro.features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex gap-2 text-[13px] text-ink">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="mt-6 inline-flex w-full justify-center rounded-md bg-ink py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
+              >
+                Upgrade with Paystack
+              </Link>
+            </div>
+          </div>
+          <p className="mt-6 text-[13px] text-ink-muted">
+            <Link href="/pricing" className="text-ink no-underline hover:underline">
+              Full plan comparison →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-2xl px-5 py-16 sm:px-8 sm:py-20">
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">Questions</h2>
           <div className="mt-8 divide-y divide-line">
             {FAQS.map((f) => (
               <div key={f.q} className="py-5">
-                <h3 className="text-[15px] font-semibold text-ink">{f.q}</h3>
+                <h3 className="text-[15px] font-medium text-ink">{f.q}</h3>
                 <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{f.a}</p>
               </div>
             ))}
@@ -356,14 +242,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <GraduationCap className="mx-auto h-9 w-9 text-accent" />
-          <h2 className="mt-4 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+      {/* Close */}
+      <section className="border-t border-line bg-white">
+        <div className="mx-auto max-w-5xl px-5 py-16 text-center sm:px-8 sm:py-20">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">
             Ready when you are
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
-            Even 10 minutes a day helps more than cramming the night before.
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-ink-muted">
+            Ten focused minutes beat a late-night cram.
           </p>
           <HomeBottomCTA />
         </div>

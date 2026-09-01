@@ -54,7 +54,7 @@ export default function SignupPage() {
               autoComplete="name"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-ink"
               placeholder="What should Ewin call you?"
             />
           </label>
@@ -66,7 +66,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-ink"
             />
           </label>
           <PasswordField
@@ -84,7 +84,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
+            className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60"
           >
             {loading ? 'Creating…' : 'Sign up'}
           </button>
@@ -92,7 +92,7 @@ export default function SignupPage() {
 
         <p className="mt-6 text-center text-sm text-ink-muted">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-accent no-underline hover:underline">
+          <Link href="/login" className="font-medium text-ink no-underline hover:underline">
             Sign in
           </Link>
         </p>

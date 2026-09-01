@@ -41,7 +41,7 @@ export function ExamBadge({
   const px = size === 'sm' ? 28 : size === 'lg' ? 48 : 36
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-lg border border-line bg-[var(--paper-elevated)] px-2 py-1"
+      className="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-2 py-1"
       title={a.alt}
     >
       <Image

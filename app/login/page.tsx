@@ -54,7 +54,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-ink"
             />
           </label>
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
             <div className="mt-1.5 flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-[12px] font-medium text-accent no-underline hover:underline"
+                className="text-[12px] font-medium text-ink no-underline hover:underline"
               >
                 Forgot password?
               </Link>
@@ -82,7 +82,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
+            className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60"
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
@@ -90,7 +90,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-ink-muted">
           No account?{' '}
-          <Link href="/signup" className="font-medium text-accent no-underline hover:underline">
+          <Link href="/signup" className="font-medium text-ink no-underline hover:underline">
             Sign up
           </Link>
         </p>

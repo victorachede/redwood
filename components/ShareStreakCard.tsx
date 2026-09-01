@@ -38,7 +38,7 @@ export function ShareStreakCard() {
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)] shadow-[0_1px_0_var(--line)]">
       <div
-        className="relative px-5 pb-5 pt-6 text-[var(--on-accent)]"
+        className="relative px-5 pb-5 pt-6 text-white"
         style={{
           background: 'linear-gradient(145deg, #143526 0%, #1b4332 50%, #2d6a4f 100%)',
         }}
@@ -64,7 +64,7 @@ export function ShareStreakCard() {
         <button
           type="button"
           onClick={() => void share()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-[13px] font-medium text-[var(--on-accent)] hover:bg-accent-hover"
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-ink py-2.5 text-[13px] font-medium text-white hover:bg-neutral-700"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
           {copied ? 'Copied' : 'Share streak'}

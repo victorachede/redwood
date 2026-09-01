@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-ink"
             />
           </label>
           {error && (
@@ -69,21 +69,21 @@ export default function ForgotPasswordPage() {
             </p>
           )}
           {message && (
-            <p className="rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
+            <p className="rounded-lg border border-ink/30 bg-neutral-100 px-3 py-2 text-[13px] text-ink">
               {message}
             </p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
+            className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60"
           >
             {loading ? 'Working…' : isSupabaseConfigured ? 'Send reset link' : 'Continue'}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-ink-muted">
-          <Link href="/login" className="font-medium text-accent no-underline hover:underline">
+          <Link href="/login" className="font-medium text-ink no-underline hover:underline">
             Back to sign in
           </Link>
         </p>

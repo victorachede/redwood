@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
 import { getSession, useAuthListener } from '@/app/lib/auth'
 
 export function HomeHeroCTAs() {
@@ -18,29 +17,28 @@ export function HomeHeroCTAs() {
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <Link
           href="#subjects"
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-[var(--on-accent)] no-underline shadow-sm transition hover:bg-accent-hover"
+          className="inline-flex items-center rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
         >
           Choose a subject
-          <ArrowRight className="h-4 w-4" />
         </Link>
         {signedIn ? (
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline transition hover:border-accent"
+            className="inline-flex items-center rounded-md border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:bg-neutral-50"
           >
             Dashboard
           </Link>
         ) : (
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline transition hover:border-accent"
+            className="inline-flex items-center rounded-md border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:bg-neutral-50"
           >
             Create account
           </Link>
         )}
       </div>
-      <p className="mt-4 text-xs text-ink-muted">
-        {signedIn ? 'Welcome back · Pick up where you left off' : 'Free · No account needed to start'}
+      <p className="mt-4 text-[13px] text-ink-muted">
+        {signedIn ? 'Welcome back' : 'Free to start · No account required'}
       </p>
     </>
   )
@@ -58,15 +56,14 @@ export function HomeBottomCTA() {
     <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
       <Link
         href="#subjects"
-        className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-[var(--on-accent)] no-underline hover:bg-accent-hover"
+        className="inline-flex items-center rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
       >
         {signedIn ? 'Continue learning' : 'Start learning'}
-        <ArrowRight className="h-4 w-4" />
       </Link>
       {!signedIn && (
         <Link
           href="/signup"
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
+          className="inline-flex items-center rounded-md border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:bg-neutral-50"
         >
           Create account
         </Link>
@@ -74,7 +71,7 @@ export function HomeBottomCTA() {
       {signedIn && (
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
+          className="inline-flex items-center rounded-md border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:bg-neutral-50"
         >
           Open dashboard
         </Link>

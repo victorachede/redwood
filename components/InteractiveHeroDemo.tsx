@@ -69,7 +69,7 @@ export function InteractiveHeroDemo() {
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted">
             Mathematics · Algebra
           </span>
-          <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent">
+          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-ink">
             Live
           </span>
         </div>
@@ -87,14 +87,14 @@ export function InteractiveHeroDemo() {
               <div
                 className={`max-w-[92%] rounded-2xl px-3.5 py-3 text-[13px] leading-relaxed sm:text-[14px] ${
                   m.kind === 'student'
-                    ? 'rounded-tr-md bg-accent text-[var(--on-accent)]'
+                    ? 'rounded-tr-md bg-ink text-white'
                     : 'rounded-tl-md border border-line bg-white text-ink'
                 }`}
               >
                 <p>{m.body}</p>
                 {m.question && i === step && (
                   <div className="mt-2.5 border-t border-line/80 pt-2.5">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink">
                       Question
                     </p>
                     <p className="mt-0.5 font-medium text-ink">{m.question}</p>
@@ -113,7 +113,7 @@ export function InteractiveHeroDemo() {
               setAuto(false)
               setStep((s) => (s + 1) % STEPS.length)
             }}
-            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-[var(--on-accent)] hover:bg-accent-hover"
+            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-[var(--on-accent)] hover:bg-neutral-700"
           >
             Next step
           </button>
@@ -123,7 +123,7 @@ export function InteractiveHeroDemo() {
               setAuto(false)
               setStep(0)
             }}
-            className="rounded-full border border-line bg-[var(--paper-card)] px-3.5 py-1.5 text-[12px] font-medium text-ink hover:border-accent"
+            className="rounded-full border border-line bg-[var(--paper-card)] px-3.5 py-1.5 text-[12px] font-medium text-ink hover:border-ink"
           >
             Replay
           </button>
@@ -146,7 +146,7 @@ export function InteractiveHeroDemo() {
       </div>
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-1 bottom-16 hidden -rotate-2 rounded-xl border border-accent/20 bg-accent-soft px-3 py-2 text-[11px] font-medium text-accent shadow-sm sm:block"
+        className="pointer-events-none absolute -left-1 bottom-16 hidden -rotate-2 rounded-xl border border-ink/20 bg-neutral-100 px-3 py-2 text-[11px] font-medium text-ink shadow-sm sm:block"
       >
         Step by step
       </div>

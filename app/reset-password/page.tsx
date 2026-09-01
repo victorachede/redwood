@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
         </p>
 
         {done ? (
-          <p className="mt-8 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-ink">
+          <p className="mt-8 rounded-xl border border-ink/30 bg-neutral-100 px-4 py-3 text-sm text-ink">
             Password updated. Redirecting to sign in…
           </p>
         ) : (
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+                  className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-ink"
                 />
               </label>
             )}
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
+              className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60"
             >
               {loading ? 'Saving…' : 'Update password'}
             </button>
@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
         )}
 
         <p className="mt-6 text-center text-sm text-ink-muted">
-          <Link href="/login" className="font-medium text-accent no-underline hover:underline">
+          <Link href="/login" className="font-medium text-ink no-underline hover:underline">
             Back to sign in
           </Link>
         </p>

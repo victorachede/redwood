@@ -34,7 +34,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   return (
     <div
       role="status"
-      className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-[var(--on-accent)] shadow-xl animate-fade-up"
+      className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white shadow-xl animate-fade-up"
     >
       <Check className="h-3.5 w-3.5 text-[#6ee7b7]" />
       {message}
@@ -216,7 +216,7 @@ export default function SettingsPage() {
           <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
             <Link
               href="/login"
-              className="rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
+              className="rounded-full bg-ink px-6 py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
             >
               Sign in
             </Link>
@@ -271,7 +271,7 @@ export default function SettingsPage() {
               <div className="flex gap-2 pt-0.5">
                 <Link
                   href="/signup"
-                  className="flex-1 rounded-full bg-accent py-2.5 text-center text-[13px] font-medium text-[var(--on-accent)] no-underline"
+                  className="flex-1 rounded-full bg-ink py-2.5 text-center text-[13px] font-medium text-white no-underline"
                 >
                   Create account
                 </Link>
@@ -350,7 +350,7 @@ export default function SettingsPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-[var(--on-accent)] disabled:opacity-60"
+                    className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-white disabled:opacity-60"
                   >
                     {saving ? 'Saving…' : 'Save'}
                   </button>
