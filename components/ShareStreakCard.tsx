@@ -64,7 +64,7 @@ export function ShareStreakCard() {
         <button
           type="button"
           onClick={() => void share()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-ink py-2.5 text-[13px] font-medium text-white hover:bg-neutral-700"
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-[13px] font-medium text-[var(--on-accent)] hover:opacity-90"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
           {copied ? 'Copied' : 'Share streak'}
