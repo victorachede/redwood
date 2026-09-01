@@ -408,6 +408,42 @@ html {
   font-feature-settings: "tnum" 1;
 }
 
+/* Long-form copy on the legal and support pages */
+.prose-ewin {
+  max-width: 68ch;
+  color: var(--ink-muted);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.prose-ewin h2 {
+  margin-top: 2.75rem;
+  margin-bottom: 0.6rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.prose-ewin p + p {
+  margin-top: 1.1rem;
+}
+
+.prose-ewin a {
+  color: var(--navy-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(201, 168, 76, 0.55);
+}
+
+.prose-ewin strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .surface-card {
   background: var(--paper-elevated);
   border: 1px solid var(--line);
