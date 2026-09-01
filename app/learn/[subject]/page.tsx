@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, FileText, Plus, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileText, Plus, X, BookOpen } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
 import { saveSession, saveTutorMessages } from '../../lib/progress'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
@@ -36,11 +36,7 @@ function persistMessages(subjectId: string, topic: string, msgs: Message[]) {
   } catch {
     /* ignore */
   }
-  void saveTutorMessages({
-    subjectId,
-    topic,
-    messages: msgs.slice(-40),
-  })
+  void saveTutorMessages({ subjectId, topic, messages: msgs.slice(-40) })
 }
 
 async function readTutorError(res: Response): Promise<string> {
@@ -58,8 +54,8 @@ async function readTutorError(res: Response): Promise<string> {
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-2.5">
-      <EwinAvatar size={28} />
-      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3 shadow-[0_1px_0_var(--line)]">
+      <EwinAvatar size={30} />
+      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-line bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <span className="typing-dot" />
         <span className="typing-dot" />
         <span className="typing-dot" />
@@ -68,50 +64,41 @@ function TypingIndicator() {
   )
 }
 
-function formatContent(text: string) {
-  const parts = text.split(/(Question:\s*)/i)
-  if (parts.length < 2) {
-    return (
-      <p className="whitespace-pre-wrap text-[14.5px] leading-[1.55] text-ink">{text}</p>
-    )
-  }
-  const nodes: React.ReactNode[] = []
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i]
-    if (!part) continue
-    if (/^Question:\s*$/i.test(part)) {
-      nodes.push(
-        <div
-          key={i}
-          className="mt-3 rounded-xl border border-accent/25 bg-accent-soft/80 px-3.5 py-3"
-        >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
-            Your turn — answer this
-          </p>
-        </div>
-      )
-    } else if (i > 0 && /^Question:/i.test(parts[i - 1] || '')) {
-      nodes.push(
-        <p
-          key={i}
-          className="-mt-1 rounded-b-xl border border-t-0 border-accent/25 bg-accent-soft/80 px-3.5 pb-3 text-[14.5px] font-medium leading-[1.5] text-ink"
-        >
-          {part.trim()}
-        </p>
-      )
-    } else {
-      nodes.push(
-        <p key={i} className="whitespace-pre-wrap text-[14.5px] leading-[1.55] text-ink">
-          {part.trim()}
-        </p>
-      )
-    }
-  }
-  return <div className="space-y-1">{nodes}</div>
+function YouAvatar() {
+  return (
+    <div className="mt-0.5 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-accent-soft">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <circle cx="12" cy="8" r="4" fill="var(--ink-muted)" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="var(--ink-muted)" />
+      </svg>
+    </div>
+  )
 }
 
+function formatContent(text: string) {
+  const qIdx = text.search(/Question:/i)
+  if (qIdx === -1) {
+    return (
+      <p className="whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink">{text.trim()}</p>
+    )
+  }
+  const body = text.slice(0, qIdx).trim()
+  const question = text.slice(qIdx).replace(/^Question:\s*/i, '').trim()
+  return (
+    <div className="space-y-2.5">
+      {body && (
+        <p className="whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink">{body}</p>
+      )}
+      <div className="rounded-xl border-l-[3px] border-accent bg-accent-soft/70 px-3.5 py-3">
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+          Your turn
+        </p>
+        <p className="text-[14.5px] font-medium leading-[1.5] text-ink">{question}</p>
+      </div>
+    </div>
+  )
+}
 
-/** Strip tutor ACTION lines and open classwork/homework when Ewin decides. */
 function applyTutorSideEffects(raw: string, subjectId: string): string {
   const actionMatch = raw.match(/ACTION:\s*(CLASSWORK|HOMEWORK)/i)
   if (actionMatch) {
@@ -187,7 +174,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     const next: DocAttach[] = [...docs]
     for (const file of Array.from(files).slice(0, 3 - docs.length)) {
       if (file.size > 400_000) {
-        setError('File is too large (max ~400KB for now). Try a shorter note.')
+        setError('File is too large (max ~400KB). Try a shorter note.')
         continue
       }
       const text = await file.text().catch(() => '')
@@ -234,12 +221,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(rawStart), type: 'lesson' }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
-      saveSession({
-        subjectId: subject,
-        subjectName: subjectLabel,
-        topic: chosenTopic,
-        at: Date.now(),
-      })
+      saveSession({ subjectId: subject, subjectName: subjectLabel, topic: chosenTopic, at: Date.now() })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not start the session. Try again.')
       setStarted(false)
@@ -264,6 +246,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     const docsSnapshot = [...docs]
     setInput('')
     setDocs([])
+    if (inputRef.current) inputRef.current.style.height = 'auto'
     setLoading(true)
     setError(null)
     try {
@@ -300,6 +283,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     }
   }
 
+  function onInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setInput(e.target.value)
+    const el = e.target
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px'
+  }
+
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -307,6 +297,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     }
   }
 
+  // ── Topic picker screen ────────────────────────────────────────────────────
   if (!started) {
     return (
       <main className="min-h-dvh bg-paper text-ink">
@@ -314,64 +305,91 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           <div className="mx-auto flex h-14 max-w-lg items-center gap-3 px-4">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 text-[13px] text-ink-muted no-underline hover:text-ink"
+              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] text-ink-muted no-underline transition-colors hover:bg-neutral-100 hover:text-ink"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Home
+              Back
             </Link>
           </div>
         </header>
 
         <div className="mx-auto max-w-lg px-4 py-10 sm:py-14">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
-            {meta?.exam ?? 'WAEC · JAMB'}
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-ink">
-            {subjectLabel}
-          </h1>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
-            {meta?.blurb} Pick a topic below. Ewin will start from the basics.
-          </p>
+          <div className="flex items-center gap-3">
+            <EwinAvatar size={40} />
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                {meta?.exam ?? 'WAEC · JAMB'}
+              </p>
+              <h1 className="font-serif text-2xl font-semibold tracking-tight text-ink">
+                {subjectLabel}
+              </h1>
+            </div>
+          </div>
+
+          {meta?.blurb && (
+            <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">{meta.blurb}</p>
+          )}
+
           {focus && (
-            <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-ink">
-              Starting a lesson on the question you missed…
-            </p>
+            <div className="mt-4 rounded-xl border-l-[3px] border-accent bg-accent-soft/70 px-3.5 py-3">
+              <p className="text-[13px] text-ink">
+                Starting a focused lesson on the question you missed…
+              </p>
+            </div>
           )}
+
           {error && (
-            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
-              {error}
-            </p>
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3">
+              <p className="text-[13px] text-red-800">{error}</p>
+            </div>
           )}
-          <div className="mt-8 space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink-muted">
-              Pick a topic
+
+          <div className="mt-8">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+              Choose a topic
             </p>
-            {(meta?.topics ?? ['General foundations']).map((t) => {
-              const hasSaved = !!savedTopics[t]
-              return (
-                <div key={t} className="overflow-hidden rounded-2xl border border-line bg-white">
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={() => void startSession(t)}
-                    className="group flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-paper/80 disabled:opacity-60"
+            <div className="space-y-2">
+              {(meta?.topics ?? ['General foundations']).map((t, idx) => {
+                const hasSaved = !!savedTopics[t]
+                return (
+                  <div
+                    key={t}
+                    className="group overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-sm"
                   >
-                    <span className="text-[14px] font-medium text-ink">{t}</span>
-                    <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
-                  </button>
-                  {hasSaved && (
                     <button
                       type="button"
                       disabled={loading}
-                      onClick={() => void startSession(t, { resume: true })}
-                      className="w-full border-t border-line px-4 py-2 text-left text-[12px] font-medium text-accent hover:bg-accent-soft"
+                      onClick={() => void startSession(t)}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-paper/60 disabled:opacity-60"
                     >
-                      Continue this topic
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[10px] font-semibold text-accent">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span className="flex-1 text-[14px] font-medium text-ink">{t}</span>
+                      <span className="flex items-center gap-1.5">
+                        {hasSaved && (
+                          <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                            In progress
+                          </span>
+                        )}
+                        <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+                      </span>
                     </button>
-                  )}
-                </div>
-              )
-            })}
+                    {hasSaved && (
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={() => void startSession(t, { resume: true })}
+                        className="flex w-full items-center gap-2 border-t border-line px-4 py-2 text-left text-[12px] font-medium text-accent transition-colors hover:bg-accent-soft disabled:opacity-60"
+                      >
+                        <BookOpen className="h-3.5 w-3.5" />
+                        Resume where I left off
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </main>
@@ -380,8 +398,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
   const canSend = Boolean(input.trim() || docs.length) && !loading
 
+  // ── Chat screen ────────────────────────────────────────────────────────────
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
+      {/* Header */}
       <header className="shrink-0 border-b border-line bg-paper/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
           <button
@@ -392,24 +412,32 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               setTopic(null)
               setError(null)
             }}
-            className="text-ink-muted hover:text-ink"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-neutral-100 hover:text-ink"
             aria-label="Back to topics"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <EwinAvatar size={32} />
+
+          <EwinAvatar size={30} />
+
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-semibold text-ink">{subjectLabel}</p>
-            <p className="truncate text-[11px] text-ink-muted">{topic}</p>
+            <p className="truncate text-[14px] font-semibold leading-tight text-ink">
+              {subjectLabel}
+            </p>
+            {topic && (
+              <p className="truncate text-[11px] leading-tight text-ink-muted">{topic}</p>
+            )}
           </div>
+
           {demoMode && (
-            <span className="rounded-full border border-line bg-white px-2 py-0.5 text-[10px] font-medium text-ink-muted">
+            <span className="rounded-full border border-line bg-white px-2.5 py-0.5 text-[10px] font-medium text-ink-muted">
               Demo
             </span>
           )}
         </div>
       </header>
 
+      {/* Message list */}
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-2xl flex-col gap-5 px-4 py-6 pb-4">
           {messages.map((m, i) => (
@@ -419,18 +447,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                 m.role === 'student' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
-              {m.role === 'tutor' ? (
-                <EwinAvatar size={28} className="mt-0.5" />
-              ) : (
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-white text-[10px] font-semibold text-ink-muted">
-                  You
-                </div>
-              )}
+              {m.role === 'tutor' ? <EwinAvatar size={30} className="mt-0.5" /> : <YouAvatar />}
+
               <div
-                className={`max-w-[min(100%,26rem)] sm:max-w-[80%] ${
+                className={`max-w-[min(100%,26rem)] sm:max-w-[82%] ${
                   m.role === 'student'
-                    ? 'rounded-2xl rounded-tr-md bg-accent px-4 py-3 text-[var(--on-accent)] shadow-[0_8px_24px_-12px_rgba(27,67,50,0.45)]'
-                    : 'rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3 shadow-[0_1px_0_var(--line),0_8px_24px_-16px_rgba(22,21,19,0.12)]'
+                    ? 'rounded-2xl rounded-tr-sm bg-accent px-4 py-3 text-[var(--on-accent)] shadow-[0_4px_16px_-6px_rgba(14,27,58,0.35)]'
+                    : 'rounded-2xl rounded-tl-sm border border-line bg-white px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.05),0_4px_20px_-8px_rgba(0,0,0,0.10)]'
                 }`}
               >
                 {m.attachments && m.attachments.length > 0 && (
@@ -453,29 +476,35 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                 {m.role === 'tutor' ? (
                   formatContent(m.content)
                 ) : (
-                  <p className="whitespace-pre-wrap text-[14.5px] leading-[1.5]">{m.content}</p>
+                  <p className="whitespace-pre-wrap text-[14.5px] leading-[1.55]">{m.content}</p>
                 )}
               </div>
             </div>
           ))}
+
           {loading && <TypingIndicator />}
+
+          {/* Study card suggestions */}
           {suggestedCards.length > 0 && (
-            <div className="rounded-2xl border border-accent/25 bg-accent-soft/90 p-4">
-              <p className="text-[12px] font-semibold text-accent">Ewin suggests study cards</p>
-              <ul className="mt-2 space-y-2">
+            <div className="animate-fade-up rounded-2xl border border-accent/20 bg-accent-soft/60 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">
+                Study cards
+              </p>
+              <p className="mt-0.5 mb-3 text-[12px] text-ink-muted">
+                Save these to review later
+              </p>
+              <ul className="space-y-2.5">
                 {suggestedCards.map((c) => (
-                  <li key={c.front} className="flex items-start justify-between gap-2 text-[13px]">
-                    <span className="text-ink">{c.front}</span>
+                  <li
+                    key={c.front}
+                    className="flex items-start justify-between gap-3 rounded-xl border border-accent/15 bg-white px-3.5 py-3"
+                  >
+                    <span className="text-[13px] leading-snug text-ink">{c.front}</span>
                     <button
                       type="button"
-                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-[var(--on-accent)]"
+                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-[var(--on-accent)] transition-opacity hover:opacity-80"
                       onClick={() => {
-                        addCard({
-                          front: c.front,
-                          back: c.back,
-                          subject: subjectLabel,
-                          source: 'tutor',
-                        })
+                        addCard({ front: c.front, back: c.back, subject: subjectLabel, source: 'tutor' })
                         setSuggestedCards((s) => s.filter((x) => x.front !== c.front))
                       }}
                     >
@@ -486,17 +515,21 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               </ul>
             </div>
           )}
+
           {error && (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
-              {error}
-            </p>
+            <div className="animate-fade-up rounded-xl border border-red-100 bg-red-50 px-3.5 py-3">
+              <p className="text-[13px] text-red-700">{error}</p>
+            </div>
           )}
+
           <div ref={bottomRef} />
         </div>
       </div>
 
-      <div className="shrink-0 bg-gradient-to-t from-paper via-paper to-transparent pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2">
+      {/* Composer */}
+      <div className="shrink-0 bg-gradient-to-t from-paper via-paper/95 to-transparent pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
         <div className="mx-auto max-w-2xl px-3">
+          {/* Attached files */}
           {docs.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-1.5 px-1">
               {docs.map((d) => (
@@ -510,7 +543,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                     type="button"
                     aria-label={`Remove ${d.name}`}
                     onClick={() => setDocs((prev) => prev.filter((x) => x.name !== d.name))}
-                    className="flex h-6 w-6 items-center justify-center rounded-full text-ink-muted hover:bg-paper hover:text-ink"
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-ink-muted hover:bg-neutral-100 hover:text-ink"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -528,26 +561,26 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             onChange={(e) => void onPickFiles(e.target.files)}
           />
 
-          <div className="ewin-composer flex items-end gap-1.5 rounded-full bg-[#303036] px-1.5 py-1.5 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)]">
+          <div className="ewin-composer flex items-end gap-1 rounded-[1.25rem] bg-[#28282e] px-1.5 py-1.5 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.28),0_0_0_1px_rgba(255,255,255,0.06)] transition-shadow focus-within:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.28),0_0_0_1px_rgba(255,255,255,0.16)]">
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={loading || docs.length >= 3}
-              className="mb-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 focus:outline-none"
-              aria-label="Add document"
+              className="mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white/55 transition-colors hover:bg-white/8 hover:text-white/85 disabled:opacity-30 focus:outline-none"
+              aria-label="Attach document"
             >
-              <Plus className="h-5 w-5" strokeWidth={2} />
+              <Plus className="h-[18px] w-[18px]" strokeWidth={2.2} />
             </button>
 
             <textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={onInputChange}
               onKeyDown={onKeyDown}
               rows={1}
-              placeholder="Message Ewin"
+              placeholder="Message Ewin…"
               disabled={loading}
-              className="max-h-28 min-h-[44px] flex-1 resize-none bg-transparent py-3 pr-1 text-[15px] leading-snug text-white/95 outline-none ring-0 border-0 focus:outline-none focus:ring-0 focus-visible:outline-none placeholder:text-white/35 disabled:opacity-60"
+              className="max-h-[120px] min-h-[40px] flex-1 resize-none bg-transparent py-2.5 pr-1 text-[15px] leading-snug text-white/95 outline-none ring-0 border-0 focus:outline-none focus:ring-0 focus-visible:outline-none placeholder:text-white/30 disabled:opacity-50"
               style={{ boxShadow: 'none' }}
             />
 
@@ -555,24 +588,28 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               type="button"
               onClick={() => void send()}
               disabled={!canSend}
-              className={`mb-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors focus:outline-none ${
+              className={`mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all focus:outline-none ${
                 canSend
-                  ? 'bg-white text-[#1a1a1e] hover:bg-white/90'
-                  : 'bg-white/15 text-white/40'
+                  ? 'bg-white text-[#1c1c22] shadow-[0_1px_3px_rgba(0,0,0,0.25)] hover:bg-white/92 active:scale-95'
+                  : 'bg-white/12 text-white/35'
               }`}
               aria-label="Send"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
-                  d="M12 19V5M12 5l-6 6M12 5l6 6"
+                  d="M12 20V4M12 4L5 11M12 4l7 7"
                   stroke="currentColor"
-                  strokeWidth="2.4"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             </button>
           </div>
+
+          <p className="mt-1.5 text-center text-[11px] text-white/0 select-none" aria-hidden>
+            {/* spacer */}
+          </p>
         </div>
       </div>
     </main>
