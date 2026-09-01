@@ -14,6 +14,7 @@ import {
 } from '@/app/lib/billing'
 import { getSession } from '@/app/lib/auth'
 import { SiteFooter } from '@/components/SiteFooter'
+import { Reveal } from '@/components/Reveal'
 
 export default function PricingPage() {
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly')
@@ -130,136 +131,172 @@ export default function PricingPage() {
 
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader solid />
-      <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="text-center">
-          <ExamBadgeRow className="justify-center" />
-          <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            Simple pricing
-          </h1>
-          <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
-            Free forever for serious daily practice. Pro when you want timed mocks and unlimited
-            drills for JAMB, WAEC and NECO.
-          </p>
+      <SiteHeader overDark />
 
-          <div className="mt-6 inline-flex rounded-full border border-line bg-[var(--paper-elevated)] p-1 text-[13px]">
-            <button
-              type="button"
-              onClick={() => setInterval('monthly')}
-              className={`rounded-full px-4 py-1.5 ${
-                interval === 'monthly' ? 'bg-accent text-[var(--on-accent)]' : 'text-ink-muted'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              onClick={() => setInterval('yearly')}
-              className={`rounded-full px-4 py-1.5 ${
-                interval === 'yearly' ? 'bg-accent text-[var(--on-accent)]' : 'text-ink-muted'
-              }`}
-            >
-              Yearly <span className="text-[11px] opacity-80">save ~33%</span>
-            </button>
-          </div>
+      {/* ═══ Hero band ═══════════════════════════════════════════════════ */}
+      <section className="aurora noise relative -mt-16 overflow-hidden bg-navy-800">
+        <div className="hairline-gold absolute inset-x-0 bottom-0 h-px" />
+        <div className="relative mx-auto max-w-5xl px-5 pb-16 pt-28 text-center sm:px-8 sm:pt-32">
+          <Reveal>
+            <ExamBadgeRow className="justify-center" variant="dark" />
+            <h1 className="mt-6 font-serif text-[clamp(2rem,4.4vw,3rem)] font-semibold tracking-[-0.03em] text-white">
+              Simple pricing
+            </h1>
+            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-[var(--on-accent-muted)]">
+              Free forever for serious daily practice. Pro when you want timed mocks and unlimited
+              drills for JAMB, WAEC and NECO.
+            </p>
+
+            {/* Interval toggle */}
+            <div className="mt-8 inline-flex rounded-full border border-white/12 bg-white/[0.06] p-1 text-[13px] backdrop-blur-sm">
+              <button
+                type="button"
+                onClick={() => setInterval('monthly')}
+                className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
+                  interval === 'monthly'
+                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-navy-800 shadow-[var(--shadow-gold)]'
+                    : 'text-[var(--on-accent-muted)] hover:text-white'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setInterval('yearly')}
+                className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
+                  interval === 'yearly'
+                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-navy-800 shadow-[var(--shadow-gold)]'
+                    : 'text-[var(--on-accent-muted)] hover:text-white'
+                }`}
+              >
+                Yearly
+                <span className="ml-1.5 text-[11px] opacity-75">save ~33%</span>
+              </button>
+            </div>
+          </Reveal>
         </div>
+      </section>
 
+      <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
         {msg && (
-          <p className="mx-auto mt-6 max-w-lg rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-center text-[13px] text-ink">
+          <p className="mx-auto mb-10 max-w-lg rounded-xl border border-gold-500/30 bg-gold-500/[0.08] px-4 py-3 text-center text-[13px] text-ink">
             {msg}
           </p>
         )}
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {/* Free */}
-          <div
-            className={`rounded-2xl border p-6 sm:p-8 ${
-              plan === 'free' ? 'border-accent' : 'border-line'
-            } bg-[var(--paper-elevated)]`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wider text-ink-muted">Free</p>
-            <p className="mt-2 font-serif text-3xl font-semibold">{formatNgn(0)}</p>
-            <p className="mt-1 text-sm text-ink-muted">{PLANS.free.blurb}</p>
-            <ul className="mt-6 space-y-2.5">
-              {PLANS.free.features.map((f) => (
-                <li key={f} className="flex gap-2 text-[13px] text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={stayFree}
-              className="mt-8 w-full rounded-full border border-line py-2.5 text-sm font-medium hover:border-accent"
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ── Free ─────────────────────────────────────────────────── */}
+          <Reveal>
+            <div
+              className={`lift h-full rounded-2xl border bg-white p-7 shadow-[var(--shadow-sm)] sm:p-8 ${
+                plan === 'free' ? 'border-navy-700' : 'border-line'
+              }`}
             >
-              {plan === 'free' ? 'Current plan' : PLANS.free.cta}
-            </button>
-          </div>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                Free
+              </p>
+              <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+                {formatNgn(0)}
+              </p>
+              <p className="mt-2 text-[14px] text-ink-muted">{PLANS.free.blurb}</p>
 
-          {/* Pro */}
-          <div
-            className={`rounded-2xl border p-6 sm:p-8 ${
-              plan === 'pro' ? 'border-accent' : 'border-accent/50'
-            } bg-[var(--paper-elevated)] relative overflow-hidden`}
-          >
-            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--on-accent)]">
-              Most popular
-            </span>
-            <p className="text-xs font-medium uppercase tracking-wider text-accent">Pro</p>
-            <p className="mt-2 font-serif text-3xl font-semibold">
-              {formatNgn(proPrice)}
-              <span className="text-base font-normal text-ink-muted">
-                /{interval === 'yearly' ? 'year' : 'month'}
+              <ul className="mt-7 space-y-3">
+                {PLANS.free.features.map((f) => (
+                  <li key={f} className="flex gap-3 text-[13.5px] text-ink">
+                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-paper-sunken">
+                      <Check className="h-3 w-3 text-ink-muted" />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                type="button"
+                onClick={stayFree}
+                className="mt-8 w-full rounded-xl border border-line py-3 text-[14px] font-medium transition-colors hover:bg-paper-sunken"
+              >
+                {plan === 'free' ? 'Current plan' : PLANS.free.cta}
+              </button>
+            </div>
+          </Reveal>
+
+          {/* ── Pro ──────────────────────────────────────────────────── */}
+          <Reveal delay={100}>
+            <div className="ring-gradient lift relative h-full rounded-2xl bg-white p-7 shadow-[var(--shadow-gold)] sm:p-8">
+              <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-navy-800">
+                Most popular
               </span>
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">{PLANS.pro.blurb}</p>
-            <ul className="mt-6 space-y-2.5">
-              {PLANS.pro.features.map((f) => (
-                <li key={f} className="flex gap-2 text-[13px] text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  {f}
-                </li>
-              ))}
-            </ul>
 
-            {plan !== 'pro' && (
-              <label className="mt-5 block">
-                <span className="text-[11px] text-ink-muted">Paystack email</span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@email.com"
-                  className="mt-1 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-accent"
-                />
-              </label>
-            )}
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-gold-600">
+                Pro
+              </p>
+              <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+                {formatNgn(proPrice)}
+                <span className="ml-1 text-base font-normal text-ink-muted">
+                  /{interval === 'yearly' ? 'year' : 'month'}
+                </span>
+              </p>
+              <p className="mt-2 text-[14px] text-ink-muted">{PLANS.pro.blurb}</p>
 
-            <button
-              type="button"
-              disabled={loading || plan === 'pro'}
-              onClick={upgrade}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-medium text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}
-            </button>
-            <p className="mt-3 text-center text-[11px] text-ink-muted">
-              Secured by Paystack · NGN · Cancel anytime when live billing is on
-            </p>
-          </div>
+              <ul className="mt-7 space-y-3">
+                {PLANS.pro.features.map((f) => (
+                  <li key={f} className="flex gap-3 text-[13.5px] text-ink">
+                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-gold-500/15">
+                      <Check className="h-3 w-3 text-gold-600" />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {plan !== 'pro' && (
+                <label className="mt-6 block">
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
+                    Paystack email
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@email.com"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-gold-500 focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
+                  />
+                </label>
+              )}
+
+              <button
+                type="button"
+                disabled={loading || plan === 'pro'}
+                onClick={upgrade}
+                className="sheen mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14px] font-semibold text-[var(--on-accent)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}
+              </button>
+
+              <p className="mt-3.5 text-center text-[11.5px] text-ink-muted">
+                Secured by Paystack · NGN · Cancel anytime when live billing is on
+              </p>
+            </div>
+          </Reveal>
         </div>
 
-        <p className="mt-10 text-center text-xs text-ink-muted">
-          Not affiliated with JAMB, WAEC, or NECO. Practice materials are for learning only.
-        </p>
-        <p className="mt-2 text-center text-sm">
-          <Link href="/dashboard" className="text-accent no-underline hover:underline">
-            ← Back to dashboard
-          </Link>
-        </p>
+        <Reveal delay={140}>
+          <p className="mt-12 text-center text-[12px] text-ink-muted">
+            Not affiliated with JAMB, WAEC, or NECO. Practice materials are for learning only.
+          </p>
+          <p className="mt-3 text-center">
+            <Link
+              href="/dashboard"
+              className="text-[14px] font-medium text-navy-700 no-underline hover:underline"
+            >
+              ← Back to dashboard
+            </Link>
+          </p>
+        </Reveal>
       </div>
+
       <SiteFooter />
     </main>
   )
