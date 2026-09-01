@@ -24,6 +24,7 @@ import {
   type LocalUser,
 } from '@/app/lib/auth'
 import { clearStudyData, getUsageStats, type UsageStats } from '@/app/lib/progress'
+import { PasswordField } from '@/components/PasswordField'
 
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => {
@@ -360,27 +361,25 @@ export default function SettingsPage() {
             <Group title="Password">
               <form onSubmit={savePassword}>
                 <Row>
-                  <Field label="Current">
-                    <input
-                      type="password"
-                      className={inputClass}
-                      value={curPass}
-                      onChange={(e) => setCurPass(e.target.value)}
-                      autoComplete="current-password"
-                    />
-                  </Field>
+                  <PasswordField
+                    label="Current"
+                    value={curPass}
+                    onChange={setCurPass}
+                    autoComplete="current-password"
+                    required={false}
+                  />
                 </Row>
                 <Row>
-                  <Field label="New">
-                    <input
-                      type="password"
-                      className={inputClass}
-                      value={newPass}
-                      onChange={(e) => setNewPass(e.target.value)}
-                      minLength={6}
-                      autoComplete="new-password"
-                    />
-                  </Field>
+                  <PasswordField
+                    id="new-password"
+                    name="new-password"
+                    label="New"
+                    value={newPass}
+                    onChange={setNewPass}
+                    autoComplete="new-password"
+                    minLength={6}
+                    required={false}
+                  />
                 </Row>
                 <Row last>
                   {passErr && <p className="mb-2 text-[13px] text-red-700">{passErr}</p>}
@@ -456,13 +455,17 @@ export default function SettingsPage() {
                   Removes sign-in and study data from this browser
                 </p>
                 {delStep >= 1 && (
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={delPass}
-                    onChange={(e) => setDelPass(e.target.value)}
-                    className={`${inputClass} mt-2`}
-                  />
+                  <div className="mt-2">
+                    <PasswordField
+                      id="del-password"
+                      name="del-password"
+                      label="Password"
+                      value={delPass}
+                      onChange={setDelPass}
+                      autoComplete="current-password"
+                      required={false}
+                    />
+                  </div>
                 )}
                 {delErr && <p className="mt-1.5 text-[13px] text-red-700">{delErr}</p>}
                 <div className="mt-2.5 flex flex-wrap gap-2">
