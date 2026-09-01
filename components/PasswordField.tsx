@@ -28,10 +28,17 @@ export function PasswordField({
 }: Props) {
   const [show, setShow] = useState(false)
 
+  // The label is a sibling with htmlFor rather than a wrapper: nesting the
+  // toggle button inside <label> made clicking it also target the input.
   return (
-    <label className="block">
-      <span className="text-xs font-medium text-ink-muted">{label}</span>
-      <div className="relative mt-1">
+    <div className="block">
+      <label
+        htmlFor={id}
+        className="text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-muted"
+      >
+        {label}
+      </label>
+      <div className="relative mt-1.5">
         <input
           id={id}
           name={name}
@@ -42,18 +49,17 @@ export function PasswordField({
           required={required}
           minLength={minLength}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-line bg-white px-3.5 py-2.5 pr-11 text-sm outline-none focus:border-accent"
+          className="w-full rounded-xl border border-line bg-white px-3.5 py-3 pr-11 text-[14.5px] outline-none transition-shadow focus:border-gold-500 focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
         />
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
-          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted hover:bg-accent-soft hover:text-ink"
+          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted transition-all duration-200 hover:bg-paper-sunken hover:text-ink active:scale-90"
           aria-label={show ? 'Hide password' : 'Show password'}
-          tabIndex={0}
         >
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-    </label>
+    </div>
   )
 }

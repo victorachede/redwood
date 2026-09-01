@@ -28,20 +28,31 @@ const ASSETS: Record<
   },
 }
 
+export type BadgeVariant = 'light' | 'dark'
+
 export function ExamBadge({
   exam,
   size = 'md',
   showLabel = true,
+  variant = 'light',
 }: {
   exam: ExamBoard
   size?: 'sm' | 'md' | 'lg'
   showLabel?: boolean
+  /** `dark` for navy sections — a white chip there looks pasted on. */
+  variant?: BadgeVariant
 }) {
   const a = ASSETS[exam]
   const px = size === 'sm' ? 28 : size === 'lg' ? 48 : 36
+  const dark = variant === 'dark'
+
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-2 py-1"
+      className={`group inline-flex items-center gap-2 rounded-xl px-2.5 py-1.5 transition-colors duration-300 ${
+        dark
+          ? 'border border-white/10 bg-white/[0.07] backdrop-blur-sm hover:bg-white/[0.12]'
+          : 'border border-line bg-white hover:border-line-strong'
+      }`}
       title={a.alt}
     >
       <Image
@@ -49,22 +60,34 @@ export function ExamBadge({
         alt={a.alt}
         width={px}
         height={px}
-        className="object-contain"
+        className="object-contain opacity-85 transition-opacity duration-300 group-hover:opacity-100"
         style={{ width: px, height: px }}
       />
       {showLabel && size !== 'sm' && (
-        <span className="text-[12px] font-semibold tracking-wide text-ink">{a.label}</span>
+        <span
+          className={`text-[12px] font-semibold tracking-wide ${
+            dark ? 'text-white/85' : 'text-ink'
+          }`}
+        >
+          {a.label}
+        </span>
       )}
     </span>
   )
 }
 
-export function ExamBadgeRow({ className = '' }: { className?: string }) {
+export function ExamBadgeRow({
+  className = '',
+  variant = 'light',
+}: {
+  className?: string
+  variant?: BadgeVariant
+}) {
   return (
     <div className={`flex flex-wrap items-center gap-2.5 ${className}`}>
-      <ExamBadge exam="JAMB" />
-      <ExamBadge exam="WAEC" />
-      <ExamBadge exam="NECO" />
+      <ExamBadge exam="JAMB" variant={variant} />
+      <ExamBadge exam="WAEC" variant={variant} />
+      <ExamBadge exam="NECO" variant={variant} />
     </div>
   )
 }

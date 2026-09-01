@@ -34,9 +34,9 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   return (
     <div
       role="status"
-      className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white shadow-xl animate-fade-up"
+      className="animate-fade-up fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-[var(--shadow-xl)] ring-1 ring-gold-500/25"
     >
-      <Check className="h-3.5 w-3.5 text-[#6ee7b7]" />
+      <Check className="h-3.5 w-3.5 text-gold-400" />
       {message}
     </div>
   )
@@ -50,13 +50,15 @@ function Group({
   children: React.ReactNode
 }) {
   return (
-    <div className="mb-6">
+    <div className="mb-7">
       {title && (
-        <p className="mb-2 px-1 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-muted">
+        <p className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-600">
           {title}
         </p>
       )}
-      <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)]">{children}</div>
+      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-sm)]">
+        {children}
+      </div>
     </div>
   )
 }
@@ -69,7 +71,11 @@ function Row({
   last?: boolean
 }) {
   return (
-    <div className={`px-4 py-3.5 ${last ? '' : 'border-b border-line'}`}>{children}</div>
+    <div
+      className={`px-4 py-4 transition-colors ${last ? '' : 'border-b border-line'}`}
+    >
+      {children}
+    </div>
   )
 }
 
@@ -89,7 +95,7 @@ function Field({
 }
 
 const inputClass =
-  'w-full rounded-lg border-0 bg-paper px-3 py-2 text-[14px] text-ink outline-none ring-1 ring-line transition focus:ring-accent'
+  'w-full rounded-xl border-0 bg-paper px-3.5 py-2.5 text-[14px] text-ink outline-none ring-1 ring-line transition-shadow focus:ring-2 focus:ring-gold-500'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -249,23 +255,34 @@ export default function SettingsPage() {
           Back
         </Link>
 
-        <h1 className="mb-6 font-serif text-[1.75rem] font-semibold tracking-tight">Settings</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-600">
+          Your account
+        </p>
+        <h1 className="mb-7 mt-2 font-serif text-[1.875rem] font-semibold tracking-[-0.025em]">
+          Settings
+        </h1>
 
-        {/* Person */}
+        {/* Identity card */}
         <Group>
-          <Row last={!user}>
-            <div className="flex items-center gap-3">
-              <EwinAvatar size={48} />
+          <div className="noise relative overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900 px-5 py-6">
+            <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+            <div className="relative flex items-center gap-4">
+              <EwinAvatar size={52} className="ring-2 ring-gold-500/30" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-semibold tracking-tight">
+                <p className="truncate font-serif text-lg font-semibold tracking-tight text-white">
                   {user?.displayName || 'Guest'}
                 </p>
-                <p className="truncate text-[13px] text-ink-muted">
+                <p className="truncate text-[13px] text-[var(--on-accent-muted)]">
                   {user?.email || 'Learning on this device only'}
                 </p>
+                {user && examFocus && (
+                  <span className="mt-2 inline-flex rounded-full border border-gold-500/30 bg-gold-500/10 px-2.5 py-0.5 text-[11px] font-medium text-gold-400">
+                    {examFocus}
+                  </span>
+                )}
               </div>
             </div>
-          </Row>
+          </div>
           {!user && (
             <Row last>
               <div className="flex gap-2 pt-0.5">
@@ -432,14 +449,14 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={clearHistory}
-                    className="rounded-full bg-red-700 px-3.5 py-1.5 text-[13px] font-medium text-white"
+                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
                   >
                     Confirm
                   </button>
                   <button
                     type="button"
                     onClick={() => setClearStep(0)}
-                    className="rounded-full px-3.5 py-1.5 text-[13px] text-ink-muted"
+                    className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-paper-sunken"
                   >
                     Cancel
                   </button>
@@ -472,7 +489,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={removeAccount}
-                    className="rounded-full bg-red-700 px-3.5 py-1.5 text-[13px] font-medium text-white"
+                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
                   >
                     {delStep === 0 ? 'Delete' : delStep === 1 ? 'Continue' : 'Delete forever'}
                   </button>
@@ -484,7 +501,7 @@ export default function SettingsPage() {
                         setDelPass('')
                         setDelErr(null)
                       }}
-                      className="rounded-full px-3.5 py-1.5 text-[13px] text-ink-muted"
+                      className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-paper-sunken"
                     >
                       Cancel
                     </button>

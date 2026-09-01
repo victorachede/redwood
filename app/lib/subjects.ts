@@ -6,17 +6,31 @@ export type SubjectId =
   | 'english'
   | 'economics'
 
+/** Lucide icon name rendered by components/SubjectIcon.tsx */
+export type SubjectIconName =
+  | 'Sigma'
+  | 'Atom'
+  | 'FlaskConical'
+  | 'Leaf'
+  | 'PenLine'
+  | 'TrendingUp'
+
 export type Subject = {
   id: SubjectId
   name: string
   exam: string
   blurb: string
   topics: string[]
+  /** Per-subject accent. Matched saturation/lightness so the six read as a set. */
+  accent: string
+  icon: SubjectIconName
 }
 
 export const SUBJECTS: Subject[] = [
   {
     id: 'mathematics',
+    accent: '#3b6fd4',
+    icon: 'Sigma',
     name: 'Mathematics',
     exam: 'WAEC · JAMB',
     blurb: 'From number bases to calculus — one idea at a time.',
@@ -30,6 +44,8 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'physics',
+    accent: '#7c4dd4',
+    icon: 'Atom',
     name: 'Physics',
     exam: 'WAEC · JAMB',
     blurb: 'Mechanics, waves, electricity — pictured, then tested.',
@@ -37,6 +53,8 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'chemistry',
+    accent: '#16a394',
+    icon: 'FlaskConical',
     name: 'Chemistry',
     exam: 'WAEC · JAMB',
     blurb: 'Atoms, bonds, equations that finally make sense.',
@@ -50,6 +68,8 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'biology',
+    accent: '#2f9e5f',
+    icon: 'Leaf',
     name: 'Biology',
     exam: 'WAEC · JAMB',
     blurb: 'Cells to systems — clear language, real examples.',
@@ -63,6 +83,8 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'english',
+    accent: '#d4763b',
+    icon: 'PenLine',
     name: 'English',
     exam: 'WAEC · JAMB',
     blurb: 'Grammar, comprehension, and writing that scores.',
@@ -76,6 +98,8 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'economics',
+    accent: '#c4485f',
+    icon: 'TrendingUp',
     name: 'Economics',
     exam: 'WAEC · JAMB',
     blurb: 'Demand, supply, national income — in plain English.',

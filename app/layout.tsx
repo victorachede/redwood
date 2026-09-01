@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#fafafa',
+  themeColor: '#0a1428',
   width: 'device-width',
   initialScale: 1,
 }
@@ -83,6 +83,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable}`}
     >
+      <head>
+        {/* Scroll-reveal is JS-driven. Without this, a no-JS visitor would see
+            every revealed section stranded at opacity 0. */}
+        <noscript>
+          <style>{`.reveal{opacity:1!important;animation:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

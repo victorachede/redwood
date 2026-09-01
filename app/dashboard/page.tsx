@@ -13,8 +13,12 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
-import { SUBJECTS } from '@/app/lib/subjects'
+import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { ShareStreakCard } from '@/components/ShareStreakCard'
+import { Reveal } from '@/components/Reveal'
+import { Stagger } from '@/components/Stagger'
+import { Counter } from '@/components/Counter'
+import { SubjectIcon } from '@/components/SubjectIcon'
 import {
   getStreak,
   loadPractice,
@@ -49,6 +53,11 @@ function accuracyColor(pct: number): string {
   return 'text-red-600'
 }
 
+/** Shimmer block shown while localStorage / cloud data hydrates. */
+function Bar() {
+  return <span className="skeleton inline-block h-7 w-12 align-middle" />
+}
+
 export default function DashboardPage() {
   const [sessions, setSessions] = useState<SessionRecord[]>([])
   const [practice, setPractice] = useState<PracticeRecord[]>([])
@@ -70,6 +79,7 @@ export default function DashboardPage() {
   }, [])
 
   const last = sessions[0]
+  const lastSubject = last ? getSubject(last.subjectId) : undefined
 
   const practiceTotals = useMemo(() => {
     let correct = 0
@@ -86,205 +96,227 @@ export default function DashboardPage() {
   const stats = [
     {
       label: 'Streak',
-      value: streak > 0 ? `${streak}` : '—',
+      value: streak,
       unit: streak > 0 ? 'd' : '',
       hint: streak > 0 ? 'days in a row' : 'Study today to start',
       Icon: Flame,
-      iconClass: streak > 0 ? 'text-orange-500' : 'text-ink-muted',
-      valueClass: streak > 0 ? 'text-ink' : 'text-ink-muted',
+      tint: '#e07b39',
+      show: streak > 0,
+      valueClass: 'text-ink',
     },
     {
       label: 'Sessions',
-      value: ready ? String(sessions.length) : '·',
+      value: sessions.length,
       unit: '',
       hint: 'Tutor opens',
       Icon: Zap,
-      iconClass: 'text-accent',
+      tint: '#3b6fd4',
+      show: true,
       valueClass: 'text-ink',
     },
     {
       label: 'Practice',
-      value: ready && practiceTotals.total > 0 ? String(practiceTotals.total) : '—',
+      value: practiceTotals.total,
       unit: '',
       hint: 'Questions answered',
       Icon: Target,
-      iconClass: 'text-accent',
+      tint: '#7c4dd4',
+      show: practiceTotals.total > 0,
       valueClass: 'text-ink',
     },
     {
       label: 'Accuracy',
-      value: ready && practiceTotals.pct != null ? `${practiceTotals.pct}` : '—',
+      value: practiceTotals.pct ?? 0,
       unit: practiceTotals.pct != null ? '%' : '',
       hint:
         practiceTotals.total > 0
           ? `${practiceTotals.correct} of ${practiceTotals.total} correct`
           : 'No drills yet',
       Icon: TrendingUp,
-      iconClass: 'text-accent',
-      valueClass:
-        practiceTotals.pct != null ? accuracyColor(practiceTotals.pct) : 'text-ink-muted',
+      tint: '#16a394',
+      show: practiceTotals.pct != null,
+      valueClass: practiceTotals.pct != null ? accuracyColor(practiceTotals.pct) : 'text-ink',
     },
   ]
 
   const quickActions = [
-    {
-      href: '/cards',
-      label: 'Study cards',
-      body: 'Flip and revise key facts',
-      Icon: Layers,
-    },
+    { href: '/cards', label: 'Study cards', body: 'Flip and revise key facts', Icon: Layers },
     {
       href: '/practice/mathematics',
       label: 'Practice MCQ',
       body: 'Past-style exam questions',
       Icon: Target,
     },
-    {
-      href: '/pricing',
-      label: 'Pro mocks',
-      body: 'Timed drills · Paystack',
-      Icon: BookOpen,
-    },
+    { href: '/pricing', label: 'Pro mocks', body: 'Timed drills · Paystack', Icon: BookOpen },
   ]
 
   return (
     <main className="min-h-dvh bg-paper text-ink">
       <SiteHeader solid />
 
-      <div className="mx-auto max-w-5xl space-y-8 px-5 py-8 sm:px-8 sm:py-12">
+      <div className="mx-auto max-w-5xl space-y-10 px-5 py-10 sm:px-8 sm:py-14">
+        {/* ── Greeting ───────────────────────────────────────────────────── */}
+        <Reveal>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              {user && (
+                <span className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-navy-600 to-navy-800 text-[15px] font-semibold text-white ring-2 ring-gold-500/30">
+                  {user.displayName.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <div>
+                <p className="text-[13px] text-ink-muted">{greeting()}</p>
+                <h1 className="mt-0.5 font-serif text-[1.875rem] font-semibold tracking-[-0.025em] sm:text-[2.25rem]">
+                  {user ? user.displayName : 'Your study home'}
+                </h1>
+                <p className="mt-1.5 text-[14px] text-ink-muted">
+                  {last
+                    ? `Last in ${subjectName(last.subjectId)} · ${last.topic}`
+                    : 'Ten focused minutes beat a late-night cram.'}
+                </p>
+              </div>
+            </div>
 
-        {/* ── Greeting ─────────────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-[13px] text-ink-muted">{greeting()}</p>
-            <h1 className="mt-1 font-serif text-[1.75rem] font-semibold tracking-tight sm:text-3xl">
-              {user ? user.displayName : 'Your study home'}
-            </h1>
-            {last ? (
-              <p className="mt-1.5 text-[14px] text-ink-muted">
-                Last in {subjectName(last.subjectId)} · {last.topic}
-              </p>
-            ) : (
-              <p className="mt-1.5 text-[14px] text-ink-muted">
-                Ten focused minutes beat a late-night cram.
-              </p>
+            {!user && (
+              <Link
+                href="/signup"
+                className="sheen rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-5 py-2.5 text-[13px] font-medium text-[var(--on-accent)] no-underline shadow-[var(--shadow-md)]"
+              >
+                Save progress
+              </Link>
             )}
           </div>
-          {!user && (
-            <Link
-              href="/signup"
-              className="rounded-lg bg-accent px-4 py-2.5 text-[13px] font-medium text-[var(--on-accent)] no-underline transition-opacity hover:opacity-90"
-            >
-              Save progress
-            </Link>
-          )}
-        </div>
+        </Reveal>
 
-        {/* ── Continue / empty ─────────────────────────────────────────── */}
-        {last ? (
-          <div className="relative overflow-hidden rounded-2xl bg-accent px-6 py-6 sm:py-7">
-            {/* Gold glow hint */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  'radial-gradient(ellipse 55% 80% at 90% 50%, rgba(201,168,76,0.22) 0%, transparent 70%)',
-              }}
-            />
-            <div className="relative flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
-                  Continue learning
-                </p>
-                <h2 className="mt-2 font-serif text-2xl font-semibold text-white sm:text-3xl">
-                  {subjectName(last.subjectId)}
-                </h2>
-                <p className="mt-1 text-[14px] text-white/65">{last.topic}</p>
+        {/* ── Continue / empty ───────────────────────────────────────────── */}
+        <Reveal delay={60}>
+          {last ? (
+            <div className="noise relative overflow-hidden rounded-[1.4rem] bg-gradient-to-br from-navy-700 to-navy-900 px-6 py-7 shadow-[var(--shadow-navy)] sm:px-8 sm:py-8">
+              {/* Glow tinted with the subject's own accent */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `radial-gradient(ellipse 55% 80% at 88% 50%, ${
+                    lastSubject?.accent ?? '#c9a84c'
+                  }38 0%, transparent 70%)`,
+                }}
+              />
+              <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+
+              <div className="relative flex flex-wrap items-end justify-between gap-5">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-400">
+                    Continue learning
+                  </p>
+                  <h2 className="mt-2 font-serif text-2xl font-semibold text-white sm:text-3xl">
+                    {subjectName(last.subjectId)}
+                  </h2>
+                  <p className="mt-1 text-[14px] text-[var(--on-accent-muted)]">{last.topic}</p>
+                </div>
+
+                <Link
+                  href={`/learn/${last.subjectId}`}
+                  className="sheen group inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 py-3 text-[13px] font-medium text-white no-underline backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  Resume
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
               </div>
+            </div>
+          ) : (
+            <div className="rounded-[1.4rem] border border-dashed border-line-strong bg-white px-6 py-10 text-center">
+              <p className="text-[15px] font-medium text-ink">No session yet</p>
+              <p className="mx-auto mt-1.5 max-w-sm text-[13.5px] text-ink-muted">
+                Open a subject below — Ewin explains one idea, then checks you.
+              </p>
               <Link
-                href={`/learn/${last.subjectId}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-2.5 text-[13px] font-medium text-white no-underline transition-colors hover:bg-white/25"
+                href="#subjects"
+                className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-5 py-2.5 text-[13px] font-medium text-[var(--on-accent)] no-underline shadow-[var(--shadow-md)]"
               >
-                Resume
-                <ArrowRight className="h-4 w-4" />
+                Browse subjects
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-line bg-white px-6 py-8 text-center">
-            <p className="text-[13px] font-medium text-ink">No session yet</p>
-            <p className="mt-1 text-[13px] text-ink-muted">
-              Open a subject below — Ewin explains one idea, then checks you.
-            </p>
-            <Link
-              href="#subjects"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-[var(--on-accent)] no-underline hover:opacity-90"
-            >
-              Browse subjects
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        )}
+          )}
+        </Reveal>
 
-        {/* ── Stats ────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* ── Stats ──────────────────────────────────────────────────────── */}
+        <Stagger className="grid grid-cols-2 gap-3 sm:grid-cols-4" step={70}>
           {stats.map((s) => (
             <div
               key={s.label}
-              className="flex flex-col rounded-xl border border-line bg-white p-4"
+              className="lift flex flex-col rounded-2xl border border-line bg-white p-4 shadow-[var(--shadow-sm)]"
             >
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.10em] text-ink-muted">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
                   {s.label}
                 </p>
-                <s.Icon className={`h-4 w-4 ${s.iconClass}`} />
-              </div>
-              <div className="mt-3 flex items-baseline gap-0.5">
-                <span className={`text-2xl font-semibold tracking-tight ${s.valueClass}`}>
-                  {s.value}
+                <span
+                  className="flex h-7 w-7 items-center justify-center rounded-lg"
+                  style={{ background: `color-mix(in srgb, ${s.tint} 12%, transparent)` }}
+                >
+                  <s.Icon className="h-3.5 w-3.5" style={{ color: s.tint }} />
                 </span>
-                {s.unit && (
-                  <span className="text-[14px] font-medium text-ink-muted">{s.unit}</span>
+              </div>
+
+              <div className="mt-3 flex items-baseline gap-0.5">
+                {!ready ? (
+                  <Bar />
+                ) : s.show ? (
+                  <>
+                    <span
+                      className={`tnum font-serif text-[1.75rem] font-semibold tracking-tight ${s.valueClass}`}
+                    >
+                      <Counter value={s.value} />
+                    </span>
+                    {s.unit && (
+                      <span className="text-[14px] font-medium text-ink-muted">{s.unit}</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="font-serif text-[1.75rem] font-semibold text-ink-subtle">—</span>
                 )}
               </div>
+
               <p className="mt-1 text-[12px] text-ink-muted">{s.hint}</p>
             </div>
           ))}
-        </div>
+        </Stagger>
 
-        {/* ── Quick actions ─────────────────────────────────────────────── */}
-        <div className="grid gap-3 sm:grid-cols-3">
+        {/* ── Quick actions ──────────────────────────────────────────────── */}
+        <Stagger className="grid gap-3 sm:grid-cols-3" step={70}>
           {quickActions.map((a) => (
             <Link
               key={a.href}
               href={a.href}
-              className="group flex items-center gap-3.5 rounded-xl border border-line bg-white px-4 py-4 no-underline transition hover:border-neutral-300 hover:shadow-sm"
+              className="lift group flex items-center gap-3.5 rounded-2xl border border-line bg-white px-4 py-4 no-underline shadow-[var(--shadow-sm)]"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
-                <a.Icon className="h-4 w-4 text-accent" />
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-navy-700/[0.07] transition-colors group-hover:bg-navy-700/[0.12]">
+                <a.Icon className="h-4 w-4 text-navy-700" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-medium text-ink">{a.label}</p>
                 <p className="text-[12px] text-ink-muted">{a.body}</p>
               </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted opacity-0 transition group-hover:opacity-100 group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 shrink-0 text-ink-subtle transition-all duration-300 group-hover:translate-x-1 group-hover:text-navy-700" />
             </Link>
           ))}
-        </div>
+        </Stagger>
 
-        {/* ── Subjects ─────────────────────────────────────────────────── */}
+        {/* ── Subjects ───────────────────────────────────────────────────── */}
         <div id="subjects" className="scroll-mt-20">
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="font-serif text-xl font-semibold tracking-tight">Subjects</h2>
-              <p className="mt-0.5 text-[13px] text-ink-muted">
-                Tutor or practice — your call.
+          <Reveal>
+            <div className="mb-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-600">
+                Keep going
               </p>
+              <h2 className="mt-2 font-serif text-2xl font-semibold tracking-[-0.02em]">Subjects</h2>
+              <p className="mt-1 text-[13.5px] text-ink-muted">Tutor or practice — your call.</p>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" step={60}>
             {SUBJECTS.map((s) => {
               const pr = practice.find((p) => p.subjectId === s.id)
               const hasSession = sessions.some((sess) => sess.subjectId === s.id)
@@ -292,31 +324,39 @@ export default function DashboardPage() {
               return (
                 <div
                   key={s.id}
-                  className="flex flex-col rounded-xl border border-line bg-white p-5 transition-shadow hover:shadow-sm"
+                  className="lift flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-[15px] font-semibold text-ink">{s.name}</h3>
+                    <SubjectIcon icon={s.icon} accent={s.accent} size={38} />
                     {hasSession && (
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Started
+                      </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-muted">
+
+                  <h3 className="mt-3.5 text-[15px] font-semibold text-ink">{s.name}</h3>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-subtle">
                     {s.exam}
                   </p>
-                  <p className="mt-2.5 flex-1 text-[13px] leading-relaxed text-ink-muted line-clamp-2">
+                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-ink-muted line-clamp-2">
                     {s.blurb}
                   </p>
 
                   {pct !== null && (
-                    <div className="mt-3">
-                      <div className="mb-1 flex items-center justify-between text-[11px] text-ink-muted">
-                        <span>Practice score</span>
-                        <span className={accuracyColor(pct)}>{pct}%</span>
+                    <div className="mt-3.5">
+                      <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                        <span className="text-ink-muted">Practice score</span>
+                        <span className={`tnum font-medium ${accuracyColor(pct)}`}>{pct}%</span>
                       </div>
-                      <div className="h-1 w-full overflow-hidden rounded-full bg-neutral-100">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-paper-sunken">
                         <div
-                          className="h-full rounded-full bg-accent transition-all"
-                          style={{ width: `${pct}%` }}
+                          className="h-full rounded-full transition-[width] duration-700 ease-out"
+                          style={{
+                            width: `${pct}%`,
+                            background: `linear-gradient(90deg, ${s.accent}, ${s.accent}bb)`,
+                          }}
                         />
                       </div>
                     </div>
@@ -325,13 +365,14 @@ export default function DashboardPage() {
                   <div className="mt-4 flex gap-2">
                     <Link
                       href={`/learn/${s.id}`}
-                      className="flex-1 rounded-lg bg-accent py-2 text-center text-[12px] font-medium text-[var(--on-accent)] no-underline transition-opacity hover:opacity-90"
+                      className="flex-1 rounded-xl py-2.5 text-center text-[12.5px] font-medium text-white no-underline transition-opacity hover:opacity-90"
+                      style={{ background: s.accent }}
                     >
                       Learn
                     </Link>
                     <Link
                       href={`/practice/${s.id}`}
-                      className="flex-1 rounded-lg border border-line py-2 text-center text-[12px] font-medium text-ink no-underline transition-colors hover:bg-neutral-50"
+                      className="flex-1 rounded-xl border border-line py-2.5 text-center text-[12.5px] font-medium text-ink no-underline transition-colors hover:bg-paper-sunken"
                     >
                       Practice
                     </Link>
@@ -339,46 +380,59 @@ export default function DashboardPage() {
                 </div>
               )
             })}
-          </div>
+          </Stagger>
         </div>
 
-        {/* ── Streak share ─────────────────────────────────────────────── */}
+        {/* ── Streak share ───────────────────────────────────────────────── */}
         {streak > 0 && (
-          <div className="max-w-sm">
-            <ShareStreakCard />
-          </div>
+          <Reveal>
+            <div className="max-w-sm">
+              <ShareStreakCard />
+            </div>
+          </Reveal>
         )}
 
-        {/* ── Recent sessions ───────────────────────────────────────────── */}
+        {/* ── Recent sessions ────────────────────────────────────────────── */}
         {sessions.length > 0 && (
-          <div>
-            <h2 className="mb-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              Recently opened
-            </h2>
-            <div className="overflow-hidden rounded-xl border border-line bg-white divide-y divide-line">
-              {sessions.slice(0, 6).map((s, i) => (
-                <Link
-                  key={`${s.subjectId}-${s.topic}-${i}`}
-                  href={`/learn/${s.subjectId}`}
-                  className="flex items-center gap-3 px-4 py-3.5 no-underline transition-colors hover:bg-neutral-50"
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
-                    <span className="text-[11px] font-semibold text-accent">
-                      {s.subjectName.slice(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-medium text-ink">{s.subjectName}</p>
-                    <p className="text-[12px] text-ink-muted truncate">{s.topic}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-[12px] text-ink-muted shrink-0">
-                    <span className="hidden sm:block">{timeAgo(s.at)}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </div>
-                </Link>
-              ))}
+          <Reveal>
+            <div>
+              <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">
+                Recently opened
+              </h2>
+              <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-sm)]">
+                {sessions.slice(0, 6).map((s, i) => {
+                  const meta = getSubject(s.subjectId)
+                  return (
+                    <Link
+                      key={`${s.subjectId}-${s.topic}-${i}`}
+                      href={`/learn/${s.subjectId}`}
+                      className="group flex items-center gap-3.5 px-4 py-3.5 no-underline transition-colors hover:bg-paper-sunken"
+                    >
+                      <span
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-semibold"
+                        style={{
+                          background: `color-mix(in srgb, ${
+                            meta?.accent ?? '#0e1b3a'
+                          } 12%, transparent)`,
+                          color: meta?.accent ?? '#0e1b3a',
+                        }}
+                      >
+                        {s.subjectName.slice(0, 2).toUpperCase()}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[14px] font-medium text-ink">{s.subjectName}</p>
+                        <p className="truncate text-[12px] text-ink-muted">{s.topic}</p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2 text-[12px] text-ink-muted">
+                        <span className="hidden sm:block">{timeAgo(s.at)}</span>
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          </Reveal>
         )}
       </div>
     </main>
