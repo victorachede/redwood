@@ -18,7 +18,7 @@ export function HomeHeroCTAs() {
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <Link
           href="#subjects"
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline transition-colors hover:bg-accent-hover"
+          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-paper no-underline shadow-[0_8px_24px_-8px_rgba(201,162,39,0.55)] transition hover:bg-accent-hover"
         >
           Choose a subject
           <ArrowRight className="h-4 w-4" />
@@ -26,14 +26,14 @@ export function HomeHeroCTAs() {
         {signedIn ? (
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)] px-5 py-2.5 text-sm font-medium text-ink no-underline transition hover:border-accent"
           >
             Dashboard
           </Link>
         ) : (
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)] px-5 py-2.5 text-sm font-medium text-ink no-underline transition hover:border-accent"
           >
             Create account
           </Link>
@@ -58,7 +58,7 @@ export function HomeBottomCTA() {
     <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
       <Link
         href="#subjects"
-        className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+        className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-paper no-underline shadow-[0_8px_24px_-8px_rgba(201,162,39,0.55)] hover:bg-accent-hover"
       >
         {signedIn ? 'Continue learning' : 'Start learning'}
         <ArrowRight className="h-4 w-4" />
@@ -66,7 +66,7 @@ export function HomeBottomCTA() {
       {!signedIn && (
         <Link
           href="/signup"
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
+          className="inline-flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)] px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
         >
           Create account
         </Link>
@@ -74,9 +74,9 @@ export function HomeBottomCTA() {
       {signedIn && (
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
+          className="inline-flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)] px-6 py-3 text-sm font-medium text-ink no-underline hover:border-accent"
         >
-          Dashboard
+          Open dashboard
         </Link>
       )}
     </div>

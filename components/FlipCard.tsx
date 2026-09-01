@@ -35,7 +35,7 @@ export function FlipCard({
         className="relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d]"
         style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
       >
-        <div className="absolute inset-0 flex flex-col rounded-2xl border border-line bg-white p-7 shadow-[0_1px_0_var(--line),0_12px_32px_-16px_rgba(22,21,19,0.18)] [backface-visibility:hidden]">
+        <div className="absolute inset-0 flex flex-col rounded-2xl border border-line bg-[var(--paper-elevated)] p-7 shadow-[0_1px_0_var(--line),0_12px_32px_-16px_rgba(22,21,19,0.18)] [backface-visibility:hidden]">
           {subject && (
             <span className="font-mono text-[11px] tracking-wide text-ink-muted">{subject}</span>
           )}

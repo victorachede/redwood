@@ -46,7 +46,7 @@ export default function SignupPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Ada"
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-[var(--paper-elevated)] px-3.5 py-2.5 text-sm outline-none focus:border-accent"
             />
           </label>
           <label className="block">
@@ -57,7 +57,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-[var(--paper-elevated)] px-3.5 py-2.5 text-sm outline-none focus:border-accent"
             />
           </label>
           <label className="block">
@@ -69,7 +69,7 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+              className="mt-1 w-full rounded-xl border border-line bg-[var(--paper-elevated)] px-3.5 py-2.5 text-sm outline-none focus:border-accent"
             />
           </label>
           {error && (

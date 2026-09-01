@@ -36,7 +36,7 @@ export function ShareStreakCard() {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_1px_0_var(--line)]">
+    <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)] shadow-[0_1px_0_var(--line)]">
       <div
         className="relative px-5 pb-5 pt-6 text-paper"
         style={{

@@ -55,7 +55,7 @@ function Group({
           {title}
         </p>
       )}
-      <div className="overflow-hidden rounded-2xl border border-line bg-white">{children}</div>
+      <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)]">{children}</div>
     </div>
   )
 }
@@ -221,7 +221,7 @@ export default function SettingsPage() {
             </Link>
             <Link
               href="/signup"
-              className="rounded-full border border-line bg-white px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+              className="rounded-full border border-line bg-[var(--paper-elevated)] px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
             >
               Create account
             </Link>

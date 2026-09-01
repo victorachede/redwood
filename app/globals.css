@@ -2,17 +2,19 @@
 
 :root {
   /* Brand: deep navy + gold from Ewin Academy crest */
-  --paper: #0a1628;
+  --paper: #070f1c;
   --ink: #f5f0e6;
-  --ink-muted: #a8a090;
-  --line: #1e2d45;
+  --ink-muted: #9aa3b5;
+  --line: #1a2740;
+  --line-strong: #2a3d5c;
   --accent: #c9a227;
-  --accent-hover: #d4af37;
-  --accent-soft: #1a2438;
+  --accent-hover: #dbb43a;
+  --accent-soft: rgba(201, 162, 39, 0.12);
   --danger: #e85d4c;
-  /* keep paper-light for cards that need contrast */
-  --paper-card: #0f1c32;
-  --paper-elevated: #132038;
+  --paper-card: #0c1628;
+  --paper-elevated: #111e36;
+  --success: #3ecf8e;
+  --glow: rgba(201, 162, 39, 0.18);
 }
 
 @theme inline {
@@ -20,10 +22,12 @@
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
+  --color-success: var(--success);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-source-serif);
@@ -32,17 +36,22 @@
 body {
   background: var(--paper);
   color: var(--ink);
+  background-image:
+    radial-gradient(ellipse 90% 50% at 50% -20%, rgba(201, 162, 39, 0.08), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(30, 64, 120, 0.25), transparent 50%);
+  background-attachment: fixed;
 }
 
 :focus-visible {
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Subtle focus only where it helps forms — not chat chrome */
 input:not([type="file"]):focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .ewin-composer button:focus-visible,
@@ -64,7 +73,7 @@ textarea:focus-visible {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -72,8 +81,52 @@ textarea:focus-visible {
   }
 }
 
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 .animate-fade-up {
-  animation: fade-up 0.5s ease-out both;
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-float {
+  animation: float-soft 5s ease-in-out infinite;
+}
+
+.surface-card {
+  background: linear-gradient(165deg, var(--paper-elevated) 0%, var(--paper-card) 100%);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 12px 40px -20px rgba(0, 0, 0, 0.55);
+}
+
+.surface-glow {
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.15),
+    0 20px 50px -24px rgba(201, 162, 39, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.gold-text {
+  background: linear-gradient(120deg, #f0d78c 0%, #c9a227 45%, #a8841a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mesh-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
 }
 
 .typing-dot {
@@ -100,15 +153,7 @@ textarea:focus-visible {
   }
 }
 
-/* Map legacy bg-white / light surfaces to elevated navy in brand dark theme */
-@layer utilities {
-  .bg-white {
-    background-color: var(--paper-elevated);
-  }
-  .hover\:bg-white:hover {
-    background-color: var(--paper-card);
-  }
-  .shadow-sm {
-    --tw-shadow-color: rgba(0, 0, 0, 0.35);
-  }
+::selection {
+  background: rgba(201, 162, 39, 0.35);
+  color: var(--ink);
 }

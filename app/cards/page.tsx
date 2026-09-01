@@ -65,7 +65,7 @@ export default function CardsPage() {
         </p>
 
         {!current ? (
-          <div className="rounded-2xl border border-line bg-white p-8 text-center">
+          <div className="rounded-2xl border border-line bg-[var(--paper-elevated)] p-8 text-center">
             <p className="font-serif text-xl font-semibold">
               {allCount === 0 ? 'No cards yet' : 'Caught up'}
             </p>
@@ -110,7 +110,7 @@ export default function CardsPage() {
                     className={`rounded-full py-2.5 text-[12px] font-medium ${
                       g === 4
                         ? 'bg-accent text-paper'
-                        : 'border border-line bg-white text-ink hover:border-accent'
+                        : 'border border-line bg-[var(--paper-elevated)] text-ink hover:border-accent'
                     }`}
                   >
                     {label}

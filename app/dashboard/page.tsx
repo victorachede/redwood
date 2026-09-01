@@ -50,7 +50,7 @@ export default function DashboardPage() {
             </h1>
           </div>
           {streak > 0 && (
-            <div className="flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5">
+            <div className="flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)] px-3 py-1.5">
               <Flame className="h-4 w-4 text-accent" />
               <span className="text-sm font-medium text-ink">
                 {streak}-day streak
@@ -96,7 +96,7 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/practice/mathematics"
-                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-[var(--paper-elevated)] px-5 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
               >
                 Try practice questions
               </Link>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-3">
             <Link
               href="/cards"
-              className="flex-1 rounded-2xl border border-line bg-white p-5 no-underline shadow-[0_1px_0_var(--line)] hover:border-accent"
+              className="flex-1 rounded-2xl border border-line bg-[var(--paper-elevated)] p-5 no-underline shadow-[0_1px_0_var(--line)] hover:border-accent"
             >
               <p className="text-[15px] font-semibold text-ink">Study cards</p>
               <p className="mt-1 text-[13px] text-ink-muted">Flip cards from lessons and homework.</p>
@@ -122,7 +122,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="mb-10 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-line bg-white p-5">
+          <div className="rounded-2xl border border-line bg-[var(--paper-elevated)] p-5">
             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
               <BookOpen className="h-4 w-4 text-accent" />
             </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
               Ewin explains, then you type an answer. You get clear feedback.
             </p>
           </div>
-          <div className="rounded-2xl border border-line bg-white p-5">
+          <div className="rounded-2xl border border-line bg-[var(--paper-elevated)] p-5">
             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
               <Target className="h-4 w-4 text-accent" />
             </div>
@@ -151,7 +151,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={s.id}
-                className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_0_var(--line)]"
+                className="rounded-2xl border border-line bg-[var(--paper-elevated)] p-5 shadow-[0_1px_0_var(--line)]"
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <h3 className="font-semibold text-ink">{s.name}</h3>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
               Recently opened
             </h2>
-            <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+            <ul className="divide-y divide-line rounded-2xl border border-line bg-[var(--paper-elevated)]">
               {sessions.slice(0, 8).map((s, i) => (
                 <li key={`${s.subjectId}-${s.topic}-${i}`}>
                   <Link
