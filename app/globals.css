@@ -1,40 +1,128 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Ewin design system
+   Navy + gold, taken from the brand crest. Depth, atmosphere and motion are
+   part of the system — not decoration bolted on afterwards.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* Neutral-first system. Gold is brand mark only — not UI chrome. */
-  --paper: #fafafa;
-  --ink: #171717;
-  --ink-muted: #737373;
-  --line: #e5e5e5;
-  --line-strong: #d4d4d4;
-  --accent: #0e1b3a;
-  --accent-hover: #1a3260;
-  --accent-soft: #f0f3f8;
-  --brand: #c9a84c;
-  --danger: #dc2626;
+  /* ── Surfaces: light ──────────────────────────────────────────────────── */
+  --paper: #fbfaf8;
   --paper-card: #ffffff;
   --paper-elevated: #ffffff;
+  --paper-sunken: #f4f2ee;
+
+  /* ── Surfaces: navy ───────────────────────────────────────────────────── */
+  --navy-900: #070f22;
+  --navy-800: #0a1428;
+  --navy-700: #0e1b3a;
+  --navy-600: #16274d;
+  --navy-500: #1f3563;
+
+  /* ── Ink ──────────────────────────────────────────────────────────────── */
+  --ink: #14161c;
+  --ink-muted: #6b7180;
+  --ink-subtle: #9aa0ad;
+  --on-accent: #f5f7fa;
+  --on-accent-muted: #9fb0cc;
+
+  /* ── Brand gold ───────────────────────────────────────────────────────── */
+  --gold-300: #eddcaa;
+  --gold-400: #e0c579;
+  --gold-500: #c9a84c;
+  --gold-600: #a8862f;
+
+  /* ── Lines ────────────────────────────────────────────────────────────── */
+  --line: #e8e5e0;
+  --line-strong: #d6d2cb;
+  --line-inverse: rgba(255, 255, 255, 0.1);
+
+  /* ── Status ───────────────────────────────────────────────────────────── */
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
   --success: #15803d;
-  --on-accent: #fafafa;
+  --success-soft: #f0fdf4;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+
+  /* ── Elevation ────────────────────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(16, 24, 40, 0.08), 0 2px 6px -2px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 12px 28px -6px rgba(16, 24, 40, 0.12), 0 4px 10px -4px rgba(16, 24, 40, 0.06);
+  --shadow-xl: 0 24px 56px -12px rgba(16, 24, 40, 0.18), 0 8px 20px -8px rgba(16, 24, 40, 0.08);
+  --shadow-navy: 0 20px 50px -14px rgba(14, 27, 58, 0.45);
+  --shadow-gold: 0 8px 28px -6px rgba(201, 168, 76, 0.35);
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 560ms;
+
+  /* ── Radii ────────────────────────────────────────────────────────────── */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --r-2xl: 28px;
+
+  /* ── Back-compat aliases (existing class strings keep working) ─────────── */
+  --accent: var(--navy-700);
+  --accent-hover: var(--navy-600);
+  --accent-soft: #f0f3f8;
+  --brand: var(--gold-500);
 }
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-paper-card: var(--paper-card);
+  --color-paper-elevated: var(--paper-elevated);
+  --color-paper-sunken: var(--paper-sunken);
+
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-500: var(--navy-500);
+
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-on-accent: var(--on-accent);
+  --color-on-accent-muted: var(--on-accent-muted);
+
+  --color-gold-300: var(--gold-300);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+  --color-line-inverse: var(--line-inverse);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-brand: var(--brand);
-  --color-danger: var(--danger);
-  --color-success: var(--success);
-  --color-on-accent: var(--on-accent);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-source-serif);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Base
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 * {
   box-sizing: border-box;
@@ -48,17 +136,18 @@ body {
   background: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 :focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--gold-500);
   outline-offset: 2px;
 }
 
 input:not([type="file"]):focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--gold-500);
   outline-offset: 1px;
 }
 
@@ -68,15 +157,46 @@ textarea:focus-visible {
   box-shadow: none !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+::selection {
+  background: var(--gold-300);
+  color: var(--navy-800);
 }
+
+/* Scrollbars — thin, brand-neutral, no layout jump between pages */
+html {
+  scrollbar-gutter: stable;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b9bcc2;
+  background-clip: content-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Motion primitives
+   Every animation below drives only opacity / transform — never layout.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 @keyframes fade-up {
   from {
@@ -90,24 +210,203 @@ textarea:focus-visible {
 }
 
 .animate-fade-up {
-  animation: fade-up 0.45s ease-out both;
+  animation: fade-up 0.45s var(--ease-out) both;
 }
 
-@keyframes typing-bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
-  30% { transform: translateY(-4px); opacity: 1; }
+/* ── Scroll reveal (IntersectionObserver adds .is-visible) ───────────────── */
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.typing-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ink-muted);
-  animation: typing-bounce 1.3s ease-in-out infinite;
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.typing-dot:nth-child(2) { animation-delay: 0.18s; }
-.typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.is-visible {
+  animation: reveal-up var(--dur-slow) var(--ease-out) both;
+}
+
+.reveal[data-variant="scale"].is-visible {
+  animation-name: reveal-scale;
+}
+
+/* ── Atmosphere ─────────────────────────────────────────────────────────── */
+
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0) scale(1.06);
+  }
+}
+
+.aurora {
+  position: relative;
+  isolation: isolate;
+}
+
+.aurora::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 20% 25%, rgba(201, 168, 76, 0.16), transparent 70%),
+    radial-gradient(45% 55% at 80% 70%, rgba(31, 53, 99, 0.35), transparent 70%);
+  animation: aurora-drift 18s ease-in-out infinite;
+}
+
+.noise {
+  position: relative;
+  isolation: isolate;
+}
+
+.noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Surfaces & text treatments ─────────────────────────────────────────── */
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-500) 55%, var(--gold-600));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass-dark {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-inverse);
+  backdrop-filter: blur(12px);
+}
+
+.hairline-gold {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold-500) 20%,
+    var(--gold-400) 50%,
+    var(--gold-500) 80%,
+    transparent
+  );
+}
+
+/* Gradient hairline border. The mask trick paints a 1px gradient ring
+   without a wrapper element or a second background layer. */
+.ring-gradient {
+  position: relative;
+}
+
+.ring-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    140deg,
+    rgba(201, 168, 76, 0.8) 0%,
+    rgba(201, 168, 76, 0) 38%,
+    rgba(31, 53, 99, 0.3) 78%,
+    rgba(201, 168, 76, 0.35) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Light sweep across a button on hover */
+@keyframes sheen-sweep {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(240%);
+  }
+}
+
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+}
+
+.sheen:hover::after,
+.sheen:focus-visible::after {
+  animation: sheen-sweep 900ms var(--ease-out);
+}
+
+.lift {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.lift:active {
+  transform: translateY(-1px);
+  transition-duration: var(--dur-fast);
+}
+
+/* Tabular figures — stops counters jittering as digits change */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
 
 .surface-card {
   background: var(--paper-elevated);
@@ -118,7 +417,115 @@ textarea:focus-visible {
   border-color: var(--line-strong);
 }
 
-::selection {
-  background: #e5e5e5;
-  color: var(--ink);
+/* ── Loading ────────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--paper-sunken) 25%, #ffffff 50%, var(--paper-sunken) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: var(--r-sm);
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  animation: typing-bounce 1.3s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* ── Hero showcase message entrance ─────────────────────────────────────── */
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.msg-in {
+  animation: msg-in 0.5s var(--ease-out) both;
+}
+
+/* Streaming caret shown while tutor chunks arrive */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.stream-caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--ink-muted);
+  animation: caret-blink 1s step-end infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Reduced motion
+   Animations stop, but nothing may be left invisible or mis-sized.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Reveal content must never be stranded at opacity 0 */
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .lift:hover {
+    transform: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
