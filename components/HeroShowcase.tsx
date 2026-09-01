@@ -44,13 +44,13 @@ const SCENES: Scene[] = [
     messages: [
       {
         role: 'tutor',
-        body: 'A linear equation is a balanced scale. Whatever you do to one side, do the same to the other — equality stays true.',
+        body: 'A linear equation is a balanced scale. Do the same to both sides and equality holds.',
         question: 'If 3x − 5 = 10, what is x? Show each step.',
       },
       { role: 'student', body: 'Add 5 to both sides: 3x = 15. Then divide by 3 → x = 5.' },
       {
         role: 'tutor',
-        body: 'Correct — clean method. The balance rule is the foundation for all of algebra.',
+        body: 'Correct — clean method. That balance rule underpins all of algebra.',
         card: { q: 'What keeps an equation valid?', a: 'Do the same operation to both sides.' },
       },
     ],
@@ -79,16 +79,16 @@ const SCENES: Scene[] = [
     messages: [
       {
         role: 'tutor',
-        body: 'The cell membrane is selectively permeable — it controls exactly what enters and leaves the cell.',
+        body: 'The cell membrane is selectively permeable — it controls what enters and leaves.',
         question: 'Why is that an advantage over being fully open?',
       },
       {
         role: 'student',
-        body: 'Only what the cell needs gets in, and waste goes out without letting harmful things enter.',
+        body: 'Only what the cell needs gets in, and waste leaves without harmful things entering.',
       },
       {
         role: 'tutor',
-        body: "You covered both entry and exit — that's the full idea, and it would score well.",
+        body: "You covered both entry and exit — that is the full idea, and it would score well.",
         card: {
           q: 'What does selectively permeable mean?',
           a: 'Only certain substances can pass through.',
@@ -102,13 +102,13 @@ const SCENES: Scene[] = [
     messages: [
       {
         role: 'tutor',
-        body: 'Elements in the same group share the same number of outer electrons — that is why they react similarly.',
+        body: 'Same group means the same number of outer electrons — which is why they react alike.',
         question: 'Sodium is in Group I. What does that tell you about its electrons?',
       },
       { role: 'student', body: 'It has one electron in its outer shell.' },
       {
         role: 'tutor',
-        body: 'Correct. That lone electron is easily lost — which is why Group I metals react vigorously with water.',
+        body: 'Correct. That lone electron is easily lost, so Group I metals react vigorously with water.',
         action: 'HOMEWORK',
         brief: 'Word equations for sodium, potassium and lithium in water.',
       },
@@ -120,13 +120,13 @@ const SCENES: Scene[] = [
     messages: [
       {
         role: 'tutor',
-        body: 'A strong body paragraph has three parts: topic sentence, evidence, explanation. The topic sentence makes a promise — the rest keeps it.',
+        body: 'A body paragraph has three parts: topic sentence, evidence, explanation. The first makes a promise; the rest keeps it.',
         question: 'What job does the topic sentence do?',
       },
       { role: 'student', body: 'It tells the reader what the paragraph is about.' },
       {
         role: 'tutor',
-        body: 'Right. Think of it as a contract — every sentence after it must deliver on that one claim.',
+        body: 'Right — a contract. Every sentence after it must deliver on that one claim.',
         card: {
           q: 'Three parts of a body paragraph?',
           a: 'Topic sentence, evidence, explanation.',
@@ -140,13 +140,13 @@ const SCENES: Scene[] = [
     messages: [
       {
         role: 'tutor',
-        body: 'Demand rises as price falls. Plot price on the vertical axis and the curve slopes down to the right.',
+        body: 'Demand rises as price falls, so the curve slopes down to the right.',
         question: 'If the price of rice drops, what happens to quantity demanded?',
       },
       { role: 'student', body: 'It increases, because more people can afford it.' },
       {
         role: 'tutor',
-        body: 'Right — and note the wording: quantity demanded moves along the curve. Demand itself only shifts when something other than price changes.',
+        body: 'Note the wording: quantity demanded moves along the curve. Demand shifts only when something other than price changes.',
         card: {
           q: 'Movement along vs shift of the demand curve?',
           a: 'Price change moves along it; anything else shifts it.',
@@ -254,8 +254,16 @@ function SceneCard({ scene, active }: { scene: Scene; active: boolean }) {
         </span>
       </div>
 
-      {/* Messages — flex-1 so the card height is set by the frame, not content */}
-      <div className="flex flex-1 flex-col justify-end gap-2.5 overflow-hidden p-4">
+      {/* Messages — flex-1 so the card height is set by the frame, not content.
+          The mask fades the top edge so a long scene reads as scrolled rather
+          than chopped. */}
+      <div
+        className="flex flex-1 flex-col justify-end gap-2.5 overflow-hidden p-4"
+        style={{
+          maskImage: 'linear-gradient(180deg, transparent 0, #000 7%)',
+          WebkitMaskImage: 'linear-gradient(180deg, transparent 0, #000 7%)',
+        }}
+      >
         {scene.messages.map((msg, i) => (
           <Bubble
             key={i}
@@ -309,7 +317,7 @@ export function HeroShowcase() {
   return (
     <div className="w-full">
       {/* FIXED height frame — the guarantee against layout shift */}
-      <div className="relative h-[440px] sm:h-[480px]">
+      <div data-hero-frame className="relative h-[500px] sm:h-[540px]">
         {SCENES.map((scene, i) => (
           <div
             key={scene.id}
@@ -326,8 +334,9 @@ export function HeroShowcase() {
         ))}
       </div>
 
-      {/* Subject rail — doubles as progress */}
-      <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+      {/* Subject rail — doubles as progress. Scrolls rather than wrapping so
+          the block below it never moves. */}
+      <div className="mt-4 flex justify-start gap-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:justify-center [&::-webkit-scrollbar]:hidden">
         {SCENES.map((scene, i) => {
           const subject = subjectFor(scene.id)
           const isActive = i === active
@@ -339,7 +348,7 @@ export function HeroShowcase() {
                 setActive(i)
                 setRun((r) => r + 1)
               }}
-              className="rounded-full px-2.5 py-1 text-[11px] font-medium transition-all duration-300"
+              className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-all duration-300"
               style={{
                 background: isActive
                   ? `color-mix(in srgb, ${subject.accent} 14%, transparent)`

@@ -28,8 +28,9 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(
     if (!el) return
 
     if (typeof IntersectionObserver === 'undefined') {
-      setInView(true)
-      return
+      // Defer rather than setting state synchronously in the effect body
+      const id = requestAnimationFrame(() => setInView(true))
+      return () => cancelAnimationFrame(id)
     }
 
     const observer = new IntersectionObserver(

@@ -62,9 +62,23 @@ function GitHubIcon({ className = 'h-4 w-4' }: { className?: string }) {
 }
 
 export function SiteFooter() {
+  const socials = [
+    { href: 'https://discord.gg/ewin', label: 'Discord', Icon: DiscordIcon },
+    { href: 'https://x.com/victorachede', label: 'X', Icon: XIcon },
+    { href: 'https://github.com/victorachede/redwood', label: 'GitHub', Icon: GitHubIcon },
+  ]
+
+  const columns = [
+    { title: 'Product', links: PRODUCT, external: false },
+    { title: 'Company', links: COMPANY, external: false },
+    { title: 'Community', links: COMMUNITY, external: true },
+  ]
+
   return (
-    <footer className="border-t border-line bg-[var(--paper-elevated)] text-ink">
-      <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+    <footer className="noise relative overflow-hidden bg-navy-900 text-[var(--on-accent)]">
+      <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+
+      <div className="relative mx-auto max-w-5xl px-5 py-16 sm:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
@@ -74,110 +88,73 @@ export function SiteFooter() {
                 alt="Ewin"
                 width={32}
                 height={32}
-                className="h-8 w-8 object-contain"
+                className="h-8 w-8 rounded-lg object-contain"
               />
-              <span className="text-[15px] font-semibold tracking-tight text-ink">Ewin</span>
+              <span className="text-[15px] font-semibold tracking-tight text-white">Ewin</span>
             </Link>
-            <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-ink-muted">
+
+            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-[var(--on-accent-muted)]">
               AI tutor for Nigerian secondary students. Learn one idea, then prove you got it —
               for WAEC, NECO and JAMB.
             </p>
-            <div className="mt-4">
-              <ExamBadgeRow />
+
+            <div className="mt-5">
+              <ExamBadgeRow variant="dark" />
             </div>
-            <div className="mt-5 flex items-center gap-3">
-              <a
-                href="https://discord.gg/ewin"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-accent hover:text-accent"
-                aria-label="Discord"
-              >
-                <DiscordIcon />
-              </a>
-              <a
-                href="https://x.com/victorachede"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-accent hover:text-accent"
-                aria-label="X"
-              >
-                <XIcon />
-              </a>
-              <a
-                href="https://github.com/victorachede/redwood"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-accent hover:text-accent"
-                aria-label="GitHub"
-              >
-                <GitHubIcon />
-              </a>
+
+            <div className="mt-6 flex items-center gap-2.5">
+              {socials.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-[var(--on-accent-muted)] transition-all duration-300 hover:border-gold-500/50 hover:bg-white/10 hover:text-gold-400"
+                  aria-label={s.label}
+                >
+                  <s.Icon />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-              Product
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {PRODUCT.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="text-[13px] text-ink-muted no-underline transition-colors hover:text-ink"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-              Company
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {COMPANY.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="text-[13px] text-ink-muted no-underline transition-colors hover:text-ink"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-              Community
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {COMMUNITY.map((l) => (
-                <li key={l.href}>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[13px] text-ink-muted no-underline transition-colors hover:text-ink"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {columns.map((col) => (
+            <div key={col.title}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-500">
+                {col.title}
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                {col.links.map((l) => (
+                  <li key={l.href}>
+                    {col.external ? (
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[13px] text-[var(--on-accent-muted)] no-underline transition-colors hover:text-white"
+                      >
+                        {l.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={l.href}
+                        className="text-[13px] text-[var(--on-accent-muted)] no-underline transition-colors hover:text-white"
+                      >
+                        {l.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] text-ink-muted">
+        <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[11px] text-[var(--on-accent-muted)]">
             © {new Date().getFullYear()} Ewin Academy · Not affiliated with WAEC, JAMB, or NECO
           </p>
-          <p className="text-[11px] text-ink-muted">
+          <p className="text-[11px] text-[var(--on-accent-muted)]">
             Built for students who want understanding, not shortcuts.
           </p>
         </div>

@@ -35,8 +35,8 @@ export function Counter({
     if (!inView || !ready) return
 
     if (prefersReducedMotion() || value === 0) {
-      setDisplay(value)
-      return
+      const id = requestAnimationFrame(() => setDisplay(value))
+      return () => cancelAnimationFrame(id)
     }
 
     let raf = 0
