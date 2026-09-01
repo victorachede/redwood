@@ -51,7 +51,6 @@ export default function Home() {
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="text-[13px] text-ink-muted">AI tutor for secondary school</p>
             <h1 className="mt-3 font-serif text-[clamp(2.25rem,4.5vw,3.25rem)] font-semibold leading-[1.15] tracking-tight text-ink">
               Learn one idea.
               <br />

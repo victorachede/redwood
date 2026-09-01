@@ -38,7 +38,7 @@ export function HomeHeroCTAs() {
         )}
       </div>
       <p className="mt-4 text-[13px] text-ink-muted">
-        {signedIn ? 'Welcome back' : 'Free to start · No account required'}
+        {signedIn ? 'Welcome back' : 'Free to start'}
       </p>
     </>
   )
