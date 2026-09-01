@@ -4,13 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Settings } from 'lucide-react'
-import { getSession, signOut, useAuthListener, type LocalUser } from '@/app/lib/auth'
+import { getSession, refreshSession, signOut, useAuthListener, type LocalUser } from '@/app/lib/auth'
 
 export function SiteHeader({ solid = false }: { solid?: boolean }) {
   const [user, setUser] = useState<LocalUser | null>(null)
 
   useEffect(() => {
     setUser(getSession())
+    void refreshSession().then((u) => setUser(u ?? getSession()))
     return useAuthListener(() => setUser(getSession()))
   }, [])
 

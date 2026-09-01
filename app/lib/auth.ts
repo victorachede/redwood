@@ -305,6 +305,77 @@ export function deleteAccount(
 }
 
 
+
+/** Send password reset email (Supabase) or mark local account for reset. */
+export async function requestPasswordReset(
+  emailRaw: string,
+): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  const email = emailRaw.trim().toLowerCase()
+  if (!email.includes('@')) return { ok: false, error: 'Enter a valid email.' }
+
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (!sb) return { ok: false, error: 'Auth is not configured.' }
+    const redirectTo =
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/reset-password`
+        : undefined
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    })
+    if (error) return { ok: false, error: error.message }
+    return {
+      ok: true,
+      message: 'If an account exists for that email, a reset link is on the way. Check your inbox.',
+    }
+  }
+
+  const s = read()
+  const u = s.users.find((x) => x.email === email)
+  if (!u) {
+    // Same message as success to avoid account enumeration
+    return {
+      ok: true,
+      message: 'If an account exists for that email on this device, you can set a new password next.',
+    }
+  }
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('ewin-reset-email', email)
+  }
+  return {
+    ok: true,
+    message: 'Account found on this device. Set a new password on the next screen.',
+  }
+}
+
+/** Set a new password after reset (Supabase recovery session or local flagged email). */
+export async function setNewPassword(
+  next: string,
+  opts?: { email?: string },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (next.length < 6) return { ok: false, error: 'Password must be at least 6 characters.' }
+
+  if (isSupabaseConfigured) {
+    const sb = createBrowserClient()
+    if (!sb) return { ok: false, error: 'Auth is not configured.' }
+    const { error } = await sb.auth.updateUser({ password: next })
+    if (error) return { ok: false, error: error.message }
+    return { ok: true }
+  }
+
+  const email =
+    opts?.email?.trim().toLowerCase() ||
+    (typeof window !== 'undefined' ? sessionStorage.getItem('ewin-reset-email') : null)
+  if (!email) return { ok: false, error: 'Start from “Forgot password” with your email first.' }
+  const s = read()
+  const idx = s.users.findIndex((x) => x.email === email)
+  if (idx < 0) return { ok: false, error: 'No account found for that email on this device.' }
+  s.users[idx] = { ...s.users[idx], password: next }
+  write(s)
+  if (typeof window !== 'undefined') sessionStorage.removeItem('ewin-reset-email')
+  return { ok: true }
+}
+
 /** Subscribe to auth changes (local + Supabase). */
 export function useAuthListener(onChange: () => void): () => void {
   if (typeof window === 'undefined') return () => {}
