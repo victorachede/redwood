@@ -147,7 +147,7 @@ export default function PricingPage() {
               type="button"
               onClick={() => setInterval('monthly')}
               className={`rounded-full px-4 py-1.5 ${
-                interval === 'monthly' ? 'bg-accent text-paper' : 'text-ink-muted'
+                interval === 'monthly' ? 'bg-accent text-[var(--on-accent)]' : 'text-ink-muted'
               }`}
             >
               Monthly
@@ -156,7 +156,7 @@ export default function PricingPage() {
               type="button"
               onClick={() => setInterval('yearly')}
               className={`rounded-full px-4 py-1.5 ${
-                interval === 'yearly' ? 'bg-accent text-paper' : 'text-ink-muted'
+                interval === 'yearly' ? 'bg-accent text-[var(--on-accent)]' : 'text-ink-muted'
               }`}
             >
               Yearly <span className="text-[11px] opacity-80">save ~33%</span>
@@ -203,7 +203,7 @@ export default function PricingPage() {
               plan === 'pro' ? 'border-accent' : 'border-accent/50'
             } bg-[var(--paper-elevated)] relative overflow-hidden`}
           >
-            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper">
+            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--on-accent)]">
               Most popular
             </span>
             <p className="text-xs font-medium uppercase tracking-wider text-accent">Pro</p>
@@ -240,7 +240,7 @@ export default function PricingPage() {
               type="button"
               disabled={loading || plan === 'pro'}
               onClick={upgrade}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-medium text-paper hover:bg-accent-hover disabled:opacity-60"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-medium text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-60"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}

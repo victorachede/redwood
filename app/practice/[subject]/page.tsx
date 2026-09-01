@@ -137,7 +137,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 onClick={() => setExam(e)}
                 className={`rounded-full border px-3.5 py-1.5 text-[12px] font-medium transition-colors ${
                   exam === e
-                    ? 'border-accent bg-accent text-paper'
+                    ? 'border-accent bg-accent text-[var(--on-accent)]'
                     : 'border-line bg-[var(--paper-elevated)] text-ink hover:border-accent'
                 }`}
               >
@@ -190,7 +190,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               type="button"
               onClick={start}
               disabled={!total}
-              className="mt-6 w-full rounded-full bg-accent py-2.5 text-sm font-medium text-paper hover:bg-accent-hover disabled:opacity-50"
+              className="mt-6 w-full rounded-full bg-accent py-2.5 text-sm font-medium text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-50"
             >
               Start practice
             </button>
@@ -241,7 +241,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
             </button>
             <Link
               href={`/learn/${subject}`}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
             >
               Learn with tutor
             </Link>
@@ -326,7 +326,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 <button
                   type="button"
                   onClick={next}
-                  className="mt-4 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-accent-hover"
+                  className="mt-4 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-[var(--on-accent)] hover:bg-accent-hover"
                 >
                   {index + 1 >= total ? 'See results' : 'Next question'}
                 </button>

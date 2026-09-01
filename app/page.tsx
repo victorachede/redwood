@@ -74,12 +74,12 @@ const FAQS = [
 ]
 
 const SUBJECT_ACCENTS: Record<string, string> = {
-  mathematics: 'from-amber-500/20 to-transparent',
-  physics: 'from-sky-500/20 to-transparent',
-  chemistry: 'from-violet-500/20 to-transparent',
-  biology: 'from-emerald-500/20 to-transparent',
-  english: 'from-rose-500/20 to-transparent',
-  economics: 'from-teal-500/20 to-transparent',
+  mathematics: 'from-amber-100',
+  physics: 'from-sky-100',
+  chemistry: 'from-violet-100',
+  biology: 'from-emerald-100',
+  english: 'from-rose-100',
+  economics: 'from-teal-100',
 }
 
 export default function Home() {
@@ -87,22 +87,21 @@ export default function Home() {
     <main className="min-h-dvh bg-paper text-ink">
       <SiteHeader />
 
-      {/* Hero */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-0 mesh-grid opacity-60" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 mesh-grid opacity-50" />
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[min(100%,800px)] -translate-x-1/2 rounded-full opacity-80"
+          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[min(100%,720px)] -translate-x-1/2 rounded-full"
           style={{
             background:
-              'radial-gradient(ellipse at center, rgba(201,162,39,0.16) 0%, transparent 68%)',
+              'radial-gradient(ellipse at center, rgba(184,146,31,0.14) 0%, transparent 68%)',
           }}
         />
 
-        <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
+        <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
           <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
             <div className="animate-fade-up">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-[var(--paper-elevated)]/80 px-3 py-1 text-[11px] font-medium text-ink-muted backdrop-blur">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-[11px] font-medium text-ink-muted shadow-sm">
                 <Sparkles className="h-3.5 w-3.5 text-accent" />
                 AI tutor · Built for Nigerian secondary school
               </div>
@@ -124,15 +123,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="animate-fade-up animate-float" style={{ animationDelay: '90ms' }}>
+            <div className="animate-fade-up" style={{ animationDelay: '90ms' }}>
               <InteractiveHeroDemo />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-line bg-[var(--paper-card)]/80">
+      <section className="border-y border-line bg-white">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-9 sm:grid-cols-4 sm:px-6">
           {[
             { v: '6', l: 'Core subjects' },
@@ -150,7 +148,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features — bento */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="max-w-xl">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">How it works</p>
@@ -164,13 +161,9 @@ export default function Home() {
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.title}
-              className="surface-card group rounded-2xl p-5 transition hover:border-[var(--line-strong)]"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent transition group-hover:scale-105">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="surface-card rounded-2xl p-5 transition">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
                 <f.icon className="h-5 w-5" />
               </div>
               <h3 className="text-[15px] font-semibold text-ink">{f.title}</h3>
@@ -180,15 +173,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="border-y border-line bg-[var(--paper-card)]/50">
+      <section className="border-y border-line bg-white">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             Three steps. No fluff.
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {STEPS.map((s) => (
-              <div key={s.n} className="relative">
+              <div key={s.n}>
                 <p className="font-mono text-[11px] font-semibold tracking-widest text-accent">
                   {s.n}
                 </p>
@@ -200,7 +192,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Subjects */}
       <section id="subjects" className="scroll-mt-20 mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -219,11 +210,11 @@ export default function Home() {
             <Link
               key={s.id}
               href={`/learn/${s.id}`}
-              className="surface-card group relative overflow-hidden rounded-2xl p-5 no-underline transition hover:border-accent/40 hover:surface-glow"
+              className="surface-card group relative overflow-hidden rounded-2xl p-5 no-underline transition hover:surface-glow"
             >
               <div
                 aria-hidden
-                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${SUBJECT_ACCENTS[s.id] ?? 'from-accent/10 to-transparent'} opacity-60`}
+                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${SUBJECT_ACCENTS[s.id] ?? 'from-amber-50'} to-transparent opacity-70`}
               />
               <div className="relative">
                 <div className="flex items-start justify-between gap-2">
@@ -240,7 +231,7 @@ export default function Home() {
                   {s.topics.slice(0, 3).map((t) => (
                     <span
                       key={t}
-                      className="rounded-md border border-line/80 bg-paper/40 px-2 py-0.5 text-[10px] text-ink-muted"
+                      className="rounded-md border border-line bg-paper px-2 py-0.5 text-[10px] text-ink-muted"
                     >
                       {t}
                     </span>
@@ -251,7 +242,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6">
           <Link
             href="/practice/mathematics"
             className="inline-flex items-center gap-2 text-[13px] font-medium text-accent no-underline hover:underline"
@@ -262,8 +253,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust strip */}
-      <section className="border-y border-line">
+      <section className="border-y border-line bg-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-4 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
@@ -283,7 +273,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing teaser */}
       <section id="pricing" className="scroll-mt-16 mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">Pricing</p>
@@ -312,14 +301,14 @@ export default function Home() {
             </ul>
             <Link
               href="#subjects"
-              className="mt-6 inline-flex w-full justify-center rounded-full border border-line bg-[var(--paper-elevated)] py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+              className="mt-6 inline-flex w-full justify-center rounded-full border border-line bg-white py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
             >
               Start free
             </Link>
           </div>
 
           <div className="surface-card surface-glow relative rounded-2xl p-6">
-            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-paper">
+            <span className="absolute right-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--on-accent)]">
               Popular
             </span>
             <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
@@ -340,7 +329,7 @@ export default function Home() {
             </ul>
             <Link
               href="/pricing"
-              className="mt-6 inline-flex w-full justify-center rounded-full bg-accent py-2.5 text-sm font-semibold text-paper no-underline hover:bg-accent-hover"
+              className="mt-6 inline-flex w-full justify-center rounded-full bg-accent py-2.5 text-sm font-semibold text-[var(--on-accent)] no-underline hover:bg-accent-hover"
             >
               Upgrade with Paystack
             </Link>
@@ -353,8 +342,7 @@ export default function Home() {
         </p>
       </section>
 
-      {/* FAQ */}
-      <section className="border-t border-line bg-[var(--paper-card)]/60">
+      <section className="border-t border-line bg-white">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">Questions</h2>
           <div className="mt-8 divide-y divide-line">
@@ -368,27 +356,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="border-t border-line">
-        <div className="relative mx-auto max-w-5xl overflow-hidden px-4 py-16 text-center sm:px-6 sm:py-20">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              background:
-                'radial-gradient(ellipse at center, rgba(201,162,39,0.12) 0%, transparent 65%)',
-            }}
-          />
-          <GraduationCap className="relative mx-auto h-9 w-9 text-accent" />
-          <h2 className="relative mt-4 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+        <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
+          <GraduationCap className="mx-auto h-9 w-9 text-accent" />
+          <h2 className="mt-4 font-serif text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             Ready when you are
           </h2>
-          <p className="relative mx-auto mt-3 max-w-md text-sm text-ink-muted">
+          <p className="mx-auto mt-3 max-w-md text-sm text-ink-muted">
             Even 10 minutes a day helps more than cramming the night before.
           </p>
-          <div className="relative">
-            <HomeBottomCTA />
-          </div>
+          <HomeBottomCTA />
         </div>
       </section>
 

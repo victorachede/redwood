@@ -114,7 +114,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
           </p>
           <Link
             href="/dashboard"
-            className="mt-8 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline hover:bg-accent-hover"
+            className="mt-8 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
           >
             Back to dashboard
           </Link>
@@ -170,7 +170,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-[14.5px] leading-relaxed ${
                   m.role === 'student'
-                    ? 'rounded-tr-md bg-accent text-paper'
+                    ? 'rounded-tr-md bg-accent text-[var(--on-accent)]'
                     : 'rounded-tl-md border border-line bg-white'
                 }`}
               >
@@ -187,7 +187,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
                     <span className="text-ink">{c.front}</span>
                     <button
                       type="button"
-                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-paper"
+                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-[var(--on-accent)]"
                       onClick={() => {
                         addCard({ ...c, subject: meta.title, source: 'work' })
                         setSuggested((s) => s.filter((x) => x.front !== c.front))

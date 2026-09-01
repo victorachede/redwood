@@ -76,7 +76,7 @@ export default function CardsPage() {
             </p>
             <Link
               href="/dashboard"
-              className="mt-5 inline-block rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-paper no-underline"
+              className="mt-5 inline-block rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-[var(--on-accent)] no-underline"
             >
               Go learn
             </Link>
@@ -109,7 +109,7 @@ export default function CardsPage() {
                     onClick={() => onGrade(g)}
                     className={`rounded-full py-2.5 text-[12px] font-medium ${
                       g === 4
-                        ? 'bg-accent text-paper'
+                        ? 'bg-accent text-[var(--on-accent)]'
                         : 'border border-line bg-[var(--paper-elevated)] text-ink hover:border-accent'
                     }`}
                   >

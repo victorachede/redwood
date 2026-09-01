@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand: deep navy + gold from Ewin Academy crest */
-  --paper: #070f1c;
-  --ink: #f5f0e6;
-  --ink-muted: #9aa3b5;
-  --line: #1a2740;
-  --line-strong: #2a3d5c;
-  --accent: #c9a227;
-  --accent-hover: #dbb43a;
-  --accent-soft: rgba(201, 162, 39, 0.12);
-  --danger: #e85d4c;
-  --paper-card: #0c1628;
-  --paper-elevated: #111e36;
-  --success: #3ecf8e;
-  --glow: rgba(201, 162, 39, 0.18);
+  /* Light surface system — ASKTC-inspired warmth, Ewin gold accent */
+  --paper: #fffbf7;
+  --ink: #1c1917;
+  --ink-muted: #78716c;
+  --line: #e7e5e4;
+  --line-strong: #d6d3d1;
+  --accent: #b8921f;
+  --accent-hover: #9a7a18;
+  --accent-soft: #faf3e0;
+  --danger: #dc2626;
+  --paper-card: #ffffff;
+  --paper-elevated: #ffffff;
+  --success: #16a34a;
+  --on-accent: #1c1917;
+  --glow: rgba(184, 146, 31, 0.15);
 }
 
 @theme inline {
@@ -28,18 +29,24 @@
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-on-accent: var(--on-accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-source-serif);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--paper);
   color: var(--ink);
-  background-image:
-    radial-gradient(ellipse 90% 50% at 50% -20%, rgba(201, 162, 39, 0.08), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(30, 64, 120, 0.25), transparent 50%);
-  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
 }
 
 :focus-visible {
@@ -87,12 +94,12 @@ textarea:focus-visible {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
 .animate-fade-up {
-  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .animate-float {
@@ -100,33 +107,32 @@ textarea:focus-visible {
 }
 
 .surface-card {
-  background: linear-gradient(165deg, var(--paper-elevated) 0%, var(--paper-card) 100%);
+  background: var(--paper-elevated);
   border: 1px solid var(--line);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.03) inset,
-    0 12px 40px -20px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.04);
+}
+
+.surface-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 24px -12px rgba(28, 25, 23, 0.12);
 }
 
 .surface-glow {
   box-shadow:
-    0 0 0 1px rgba(201, 162, 39, 0.15),
-    0 20px 50px -24px rgba(201, 162, 39, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    0 0 0 1px rgba(184, 146, 31, 0.2),
+    0 12px 32px -16px rgba(184, 146, 31, 0.35);
 }
 
 .gold-text {
-  background: linear-gradient(120deg, #f0d78c 0%, #c9a227 45%, #a8841a 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 .mesh-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(28, 25, 23, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 25, 23, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, black 25%, transparent 75%);
 }
 
 .typing-dot {
@@ -154,6 +160,6 @@ textarea:focus-visible {
 }
 
 ::selection {
-  background: rgba(201, 162, 39, 0.35);
+  background: rgba(184, 146, 31, 0.25);
   color: var(--ink);
 }

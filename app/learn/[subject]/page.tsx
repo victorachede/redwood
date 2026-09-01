@@ -429,7 +429,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               <div
                 className={`max-w-[min(100%,26rem)] sm:max-w-[80%] ${
                   m.role === 'student'
-                    ? 'rounded-2xl rounded-tr-md bg-accent px-4 py-3 text-paper shadow-[0_8px_24px_-12px_rgba(27,67,50,0.45)]'
+                    ? 'rounded-2xl rounded-tr-md bg-accent px-4 py-3 text-[var(--on-accent)] shadow-[0_8px_24px_-12px_rgba(27,67,50,0.45)]'
                     : 'rounded-2xl rounded-tl-md border border-line bg-white px-4 py-3 shadow-[0_1px_0_var(--line),0_8px_24px_-16px_rgba(22,21,19,0.12)]'
                 }`}
               >
@@ -440,7 +440,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                         key={a.name}
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] ${
                           m.role === 'student'
-                            ? 'bg-white/15 text-paper'
+                            ? 'bg-white/15 text-[var(--on-accent)]'
                             : 'bg-accent-soft text-accent'
                         }`}
                       >
@@ -468,7 +468,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                     <span className="text-ink">{c.front}</span>
                     <button
                       type="button"
-                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-paper"
+                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-[var(--on-accent)]"
                       onClick={() => {
                         addCard({
                           front: c.front,

@@ -87,8 +87,8 @@ export function InteractiveHeroDemo() {
               <div
                 className={`max-w-[92%] rounded-2xl px-3.5 py-3 text-[13px] leading-relaxed sm:text-[14px] ${
                   m.kind === 'student'
-                    ? 'rounded-tr-md bg-accent text-paper'
-                    : 'rounded-tl-md border border-line bg-paper/80 text-ink'
+                    ? 'rounded-tr-md bg-accent text-[var(--on-accent)]'
+                    : 'rounded-tl-md border border-line bg-white text-ink'
                 }`}
               >
                 <p>{m.body}</p>
@@ -106,14 +106,14 @@ export function InteractiveHeroDemo() {
         </div>
 
         {/* Controls — interactive */}
-        <div className="flex items-center gap-2 border-t border-line bg-paper/50 px-4 py-3">
+        <div className="flex items-center gap-2 border-t border-line bg-paper px-4 py-3">
           <button
             type="button"
             onClick={() => {
               setAuto(false)
               setStep((s) => (s + 1) % STEPS.length)
             }}
-            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-paper hover:bg-accent-hover"
+            className="rounded-full bg-accent px-3.5 py-1.5 text-[12px] font-medium text-[var(--on-accent)] hover:bg-accent-hover"
           >
             Next step
           </button>
