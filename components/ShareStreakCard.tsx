@@ -36,35 +36,44 @@ export function ShareStreakCard() {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)] shadow-[0_1px_0_var(--line)]">
+    <div className="overflow-hidden rounded-2xl border border-line bg-[var(--paper-elevated)] shadow-[var(--shadow-md)]">
+      {/* Navy + gold, not the old green — this card is the artefact students
+          screenshot and share, so it has to look like the brand. */}
       <div
-        className="relative px-5 pb-5 pt-6 text-white"
+        className="noise relative overflow-hidden px-5 pb-5 pt-6 text-white"
         style={{
-          background: 'linear-gradient(145deg, #143526 0%, #1b4332 50%, #2d6a4f 100%)',
+          background:
+            'radial-gradient(ellipse 60% 80% at 85% 110%, rgba(201,168,76,0.38), transparent 62%), linear-gradient(158deg, #0a1428 0%, #0e1b3a 48%, #16274d 100%)',
         }}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+
+        <div className="relative flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/55">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-400">
               Ewin · Study streak
             </p>
-            <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-              {streak > 0 ? `${streak}` : '0'}
-              <span className="ml-1 text-lg font-normal text-white/70">days</span>
+            <p className="mt-3 flex items-baseline gap-2">
+              <span className="text-gold-gradient font-serif text-5xl font-semibold tracking-tight">
+                {streak > 0 ? `${streak}` : '0'}
+              </span>
+              <span className="text-lg font-normal text-white/70">days</span>
             </p>
-            <p className="mt-1 text-[13px] text-white/75">{name}</p>
+            <p className="mt-1 text-[13px] text-[var(--on-accent-muted)]">{name}</p>
           </div>
-          <EwinAvatar size={40} className="ring-2 ring-white/20" />
+          <EwinAvatar size={40} className="ring-2 ring-gold-500/30" />
         </div>
-        <p className="mt-4 text-[13px] leading-relaxed text-white/80">
+
+        <p className="relative mt-4 text-[13px] leading-relaxed text-[var(--on-accent-muted)]">
           One idea at a time. Prove it. Show up tomorrow.
         </p>
       </div>
+
       <div className="flex gap-2 p-3">
         <button
           type="button"
           onClick={() => void share()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-[13px] font-medium text-[var(--on-accent)] hover:opacity-90"
+          className="sheen flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 py-2.5 text-[13px] font-semibold text-navy-800 shadow-[var(--shadow-gold)] transition-transform duration-200 hover:scale-[1.01] active:scale-100"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
           {copied ? 'Copied' : 'Share streak'}
