@@ -8,6 +8,7 @@ import { saveSession, saveTutorMessages } from '../../lib/progress'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
 import { openWorkFromTutor } from '@/app/lib/workGate'
 import { EwinAvatar } from '@/components/EwinAvatar'
+import { SubjectIcon } from '@/components/SubjectIcon'
 
 type Message = {
   role: 'tutor' | 'student'
@@ -69,9 +70,9 @@ async function readTutorStream(
 
 function TypingIndicator() {
   return (
-    <div className="flex items-start gap-2.5">
+    <div className="animate-fade-up flex items-start gap-2.5">
       <EwinAvatar size={30} />
-      <div className="flex items-center gap-1.5 rounded-2xl border border-line bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="flex items-center gap-1.5 rounded-2xl border border-line bg-white px-4 py-3.5 shadow-[var(--shadow-sm)]">
         <span className="typing-dot" />
         <span className="typing-dot" />
         <span className="typing-dot" />
@@ -82,34 +83,55 @@ function TypingIndicator() {
 
 function YouAvatar() {
   return (
-    <div className="mt-0.5 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-accent-soft">
+    <div className="mt-0.5 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-navy-600 to-navy-800">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <circle cx="12" cy="8" r="4" fill="var(--ink-muted)" />
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="var(--ink-muted)" />
+        <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.85)" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.85)" />
       </svg>
     </div>
   )
 }
 
-function formatContent(text: string) {
+/** Splits a tutor reply into prose plus its check question, keyed to the
+ *  subject's own accent so the chat feels part of that subject. */
+function formatContent(text: string, accent: string, streaming = false) {
   const qIdx = text.search(/Question:/i)
   if (qIdx === -1) {
     return (
-      <p className="whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink">{text.trim()}</p>
+      <p
+        className={`whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink ${
+          streaming ? 'stream-caret' : ''
+        }`}
+      >
+        {text.trim()}
+      </p>
     )
   }
   const body = text.slice(0, qIdx).trim()
   const question = text.slice(qIdx).replace(/^Question:\s*/i, '').trim()
   return (
     <div className="space-y-2.5">
-      {body && (
-        <p className="whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink">{body}</p>
-      )}
-      <div className="rounded-xl border-l-[3px] border-accent bg-accent-soft/70 px-3.5 py-3">
-        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+      {body && <p className="whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink">{body}</p>}
+      <div
+        className="rounded-xl border-l-[3px] px-3.5 py-3"
+        style={{
+          borderColor: accent,
+          background: `color-mix(in srgb, ${accent} 7%, transparent)`,
+        }}
+      >
+        <p
+          className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em]"
+          style={{ color: accent }}
+        >
           Your turn
         </p>
-        <p className="text-[14.5px] font-medium leading-[1.5] text-ink">{question}</p>
+        <p
+          className={`text-[14.5px] font-medium leading-[1.5] text-ink ${
+            streaming ? 'stream-caret' : ''
+          }`}
+        >
+          {question}
+        </p>
       </div>
     </div>
   )
@@ -139,6 +161,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const meta = getSubject(subject)
   const subjectLabel =
     meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
+  /** Subject accent drives the question block, topic numerals and header rule. */
+  const accent = meta?.accent ?? 'var(--navy-700)'
 
   const [topic, setTopic] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -341,11 +365,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   if (!started) {
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <header className="border-b border-line bg-paper">
+        <header className="border-b border-line bg-paper/90 backdrop-blur-md">
           <div className="mx-auto flex h-14 max-w-lg items-center gap-3 px-4">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] text-ink-muted no-underline transition-colors hover:bg-neutral-100 hover:text-ink"
+              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] text-ink-muted no-underline transition-colors hover:bg-paper-sunken hover:text-ink"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back
@@ -354,13 +378,17 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         </header>
 
         <div className="mx-auto max-w-lg px-4 py-10 sm:py-14">
-          <div className="flex items-center gap-3">
-            <EwinAvatar size={40} />
+          <div className="flex items-center gap-3.5">
+            {meta ? (
+              <SubjectIcon icon={meta.icon} accent={accent} size={48} tone="solid" />
+            ) : (
+              <EwinAvatar size={44} />
+            )}
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-subtle">
                 {meta?.exam ?? 'WAEC · JAMB'}
               </p>
-              <h1 className="font-serif text-2xl font-semibold tracking-tight text-ink">
+              <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.025em] text-ink">
                 {subjectLabel}
               </h1>
             </div>
@@ -371,7 +399,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           )}
 
           {focus && (
-            <div className="mt-4 rounded-xl border-l-[3px] border-accent bg-accent-soft/70 px-3.5 py-3">
+            <div
+              className="mt-4 rounded-xl border-l-[3px] px-3.5 py-3"
+              style={{
+                borderColor: accent,
+                background: `color-mix(in srgb, ${accent} 8%, transparent)`,
+              }}
+            >
               <p className="text-[13px] text-ink">
                 Starting a focused lesson on the question you missed…
               </p>
@@ -379,7 +413,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           )}
 
           {error && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3">
+            <div className="mt-4 rounded-xl border border-red-200 bg-danger-soft px-3.5 py-3">
               <p className="text-[13px] text-red-800">{error}</p>
             </div>
           )}
@@ -394,25 +428,34 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                 return (
                   <div
                     key={t}
-                    className="group overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-sm"
+                    className="lift group overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-sm)]"
                   >
                     <button
                       type="button"
                       disabled={loading}
                       onClick={() => void startSession(t)}
-                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-paper/60 disabled:opacity-60"
+                      className="flex w-full items-center gap-3.5 px-4 py-4 text-left transition-colors hover:bg-paper-sunken/60 disabled:opacity-60"
                     >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[10px] font-semibold text-accent">
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold"
+                        style={{
+                          background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+                          color: accent,
+                        }}
+                      >
                         {String(idx + 1).padStart(2, '0')}
                       </span>
-                      <span className="flex-1 text-[14px] font-medium text-ink">{t}</span>
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex-1 text-[14.5px] font-medium text-ink">{t}</span>
+                      <span className="flex items-center gap-2">
                         {hasSaved && (
-                          <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                          <span className="rounded-full bg-success-soft px-2 py-0.5 text-[10px] font-medium text-green-700">
                             In progress
                           </span>
                         )}
-                        <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+                        <ArrowRight
+                          className="h-4 w-4 text-ink-subtle transition-all duration-300 group-hover:translate-x-1"
+                          style={{ color: accent }}
+                        />
                       </span>
                     </button>
                     {hasSaved && (
@@ -420,7 +463,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                         type="button"
                         disabled={loading}
                         onClick={() => void startSession(t, { resume: true })}
-                        className="flex w-full items-center gap-2 border-t border-line px-4 py-2 text-left text-[12px] font-medium text-accent transition-colors hover:bg-accent-soft disabled:opacity-60"
+                        className="flex w-full items-center gap-2 border-t border-line px-4 py-2.5 text-left text-[12px] font-medium transition-colors hover:bg-paper-sunken disabled:opacity-60"
+                        style={{ color: accent }}
                       >
                         <BookOpen className="h-3.5 w-3.5" />
                         Resume where I left off
@@ -442,7 +486,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       {/* Header */}
-      <header className="shrink-0 border-b border-line bg-paper/95 backdrop-blur-md">
+      <header className="relative shrink-0 border-b border-line bg-paper/90 backdrop-blur-md">
+        {/* Subject accent seals the top of the chat */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[2px]"
+          style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+        />
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
           <button
             type="button"
@@ -452,13 +502,17 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               setTopic(null)
               setError(null)
             }}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-neutral-100 hover:text-ink"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-paper-sunken hover:text-ink"
             aria-label="Back to topics"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
 
-          <EwinAvatar size={30} />
+          {meta ? (
+            <SubjectIcon icon={meta.icon} accent={accent} size={30} />
+          ) : (
+            <EwinAvatar size={30} />
+          )}
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-[14px] font-semibold leading-tight text-ink">
@@ -492,8 +546,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               <div
                 className={`max-w-[min(100%,26rem)] sm:max-w-[82%] ${
                   m.role === 'student'
-                    ? 'rounded-2xl bg-gradient-to-br from-[#0e1b3a] to-[#1a3260] px-4 py-3 text-[var(--on-accent)] shadow-[0_4px_20px_-6px_rgba(14,27,58,0.45)]'
-                    : 'rounded-2xl border border-line bg-white px-4 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
+                    ? 'rounded-2xl bg-gradient-to-br from-[#0e1b3a] to-[#1f3563] px-4 py-3 text-[var(--on-accent)] shadow-[var(--shadow-navy)]'
+                    : 'rounded-2xl border border-line bg-white px-4 py-3 shadow-[var(--shadow-md)]'
                 }`}
               >
                 {m.attachments && m.attachments.length > 0 && (
@@ -504,7 +558,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] ${
                           m.role === 'student'
                             ? 'bg-white/15 text-[var(--on-accent)]'
-                            : 'bg-accent-soft text-accent'
+                            : 'bg-paper-sunken text-ink-muted'
                         }`}
                       >
                         <FileText className="h-3 w-3" />
@@ -514,7 +568,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                   </div>
                 )}
                 {m.role === 'tutor' ? (
-                  formatContent(m.content)
+                  formatContent(
+                    m.content,
+                    accent,
+                    loading && i === messages.length - 1,
+                  )
                 ) : (
                   <p className="whitespace-pre-wrap text-[14.5px] leading-[1.55]">{m.content}</p>
                 )}
@@ -526,8 +584,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
           {/* Study card suggestions */}
           {suggestedCards.length > 0 && (
-            <div className="animate-fade-up rounded-2xl border border-accent/20 bg-accent-soft/60 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">
+            <div className="animate-fade-up rounded-2xl border border-gold-500/25 bg-gold-500/[0.07] p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-600">
                 Study cards
               </p>
               <p className="mt-0.5 mb-3 text-[12px] text-ink-muted">
@@ -601,12 +659,15 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             onChange={(e) => void onPickFiles(e.target.files)}
           />
 
-          <div className="ewin-composer flex items-end gap-1 rounded-[1.25rem] bg-[#28282e] px-1.5 py-1.5 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.28),0_0_0_1px_rgba(255,255,255,0.06)] transition-shadow focus-within:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.28),0_0_0_1px_rgba(255,255,255,0.16)]">
+          <div
+            className="ewin-composer flex items-end gap-1 rounded-[1.5rem] px-1.5 py-1.5 shadow-[0_4px_18px_-4px_rgba(10,20,40,0.4),0_0_0_1px_rgba(255,255,255,0.07)] transition-shadow focus-within:shadow-[0_4px_18px_-4px_rgba(10,20,40,0.45),0_0_0_1px_rgba(201,168,76,0.45)]"
+            style={{ background: 'linear-gradient(180deg, #16223d 0%, #0c1428 100%)' }}
+          >
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={loading || docs.length >= 3}
-              className="mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white/55 transition-colors hover:bg-white/8 hover:text-white/85 disabled:opacity-30 focus:outline-none"
+              className="mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white/50 transition-colors hover:bg-white/10 hover:text-white/90 disabled:opacity-30 focus:outline-none"
               aria-label="Attach document"
             >
               <Plus className="h-[18px] w-[18px]" strokeWidth={2.2} />
@@ -628,10 +689,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               type="button"
               onClick={() => void send()}
               disabled={!canSend}
-              className={`mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all focus:outline-none ${
+              className={`mb-[1px] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none ${
                 canSend
-                  ? 'bg-white text-[#1c1c22] shadow-[0_1px_3px_rgba(0,0,0,0.25)] hover:bg-white/92 active:scale-95'
-                  : 'bg-white/12 text-white/35'
+                  ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-navy-800 shadow-[0_2px_10px_-2px_rgba(201,168,76,0.6)] hover:scale-105 active:scale-95'
+                  : 'bg-white/10 text-white/30'
               }`}
               aria-label="Send"
             >
