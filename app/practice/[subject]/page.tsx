@@ -13,6 +13,9 @@ import {
 } from '@/app/lib/questions'
 import { savePractice } from '@/app/lib/progress'
 import { ExamBadge } from '@/components/ExamBadges'
+import { SubjectIcon } from '@/components/SubjectIcon'
+import { Counter } from '@/components/Counter'
+import { Reveal } from '@/components/Reveal'
 import { canAccessTimedMocks, isPro } from '@/app/lib/billing'
 
 type Phase = 'idle' | 'active' | 'done'
@@ -21,6 +24,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   const { subject } = use(params)
   const meta = getSubject(subject)
   const subjectLabel = meta?.name ?? subject
+  const accent = meta?.accent ?? '#0e1b3a'
 
   const [exam, setExam] = useState<ExamBoard>('ALL')
   const [timed, setTimed] = useState(false)
@@ -116,85 +120,126 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   if (phase === 'idle') {
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <header className="border-b border-line">
+        <header className="border-b border-line bg-paper/90 backdrop-blur-md">
           <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
-            <Link href="/dashboard" className="text-ink-muted hover:text-ink">
-              <ArrowLeft className="h-5 w-5" />
+            <Link
+              href="/dashboard"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-paper-sunken hover:text-ink"
+            >
+              <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
-              <p className="text-[15px] font-semibold">{subjectLabel} practice</p>
-              <p className="text-[11px] text-ink-muted">Past-style questions · pick an exam board</p>
+              <p className="text-[14px] font-semibold leading-tight">{subjectLabel} practice</p>
+              <p className="text-[11px] leading-tight text-ink-muted">
+                Past-style questions · pick an exam board
+              </p>
             </div>
           </div>
         </header>
+
         <div className="mx-auto max-w-2xl px-4 py-10">
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-muted">Exam board</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(['ALL', 'JAMB', 'WAEC', 'NECO'] as ExamBoard[]).map((e) => (
-              <button
-                key={e}
-                type="button"
-                onClick={() => setExam(e)}
-                className={`rounded-full border px-3.5 py-1.5 text-[12px] font-medium transition-colors ${
-                  exam === e
-                    ? 'border-accent bg-accent text-[var(--on-accent)]'
-                    : 'border-line bg-[var(--paper-elevated)] text-ink hover:border-accent'
-                }`}
-              >
-                {e === 'ALL' ? 'All boards' : e}{' '}
-                <span className="opacity-70">({counts[e]})</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-8 rounded-2xl border border-line bg-[var(--paper-elevated)] p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              {exam !== 'ALL' && <ExamBadge exam={exam} />}
-              <h1 className="font-serif text-xl font-semibold">
-                {total} question{total === 1 ? '' : 's'}
-              </h1>
+          <Reveal>
+            <div className="flex items-center gap-3.5">
+              {meta && <SubjectIcon icon={meta.icon} accent={accent} size={48} tone="solid" />}
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                  {meta?.exam ?? 'WAEC · JAMB'}
+                </p>
+                <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.025em]">
+                  {subjectLabel}
+                </h1>
+              </div>
             </div>
-            <p className="mt-2 text-sm text-ink-muted">
-              {exam === 'ALL'
-                ? 'Mixed JAMB, WAEC and NECO style items for this subject.'
-                : `${exam}-style questions. Feedback after each answer.`}
+          </Reveal>
+
+          <Reveal delay={70}>
+            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">
+              Exam board
             </p>
-
-            <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-paper p-3 text-sm">
-              <input
-                type="checkbox"
-                checked={timed}
-                onChange={(e) => {
-                  if (e.target.checked && !canAccessTimedMocks()) {
-                    window.location.href = '/pricing'
-                    return
+            {/* Segmented control */}
+            <div className="mt-3 inline-flex rounded-2xl border border-line bg-white p-1 shadow-[var(--shadow-sm)]">
+              {(['ALL', 'JAMB', 'WAEC', 'NECO'] as ExamBoard[]).map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => setExam(e)}
+                  className="rounded-xl px-3.5 py-2 text-[12.5px] font-medium transition-all duration-300"
+                  style={
+                    exam === e
+                      ? { background: accent, color: '#fff' }
+                      : { color: 'var(--ink-muted)' }
                   }
-                  setTimed(e.target.checked)
-                }}
-                className="mt-1"
-              />
-              <span>
-                <span className="font-medium text-ink">Timed mode</span>
-                <span className="block text-[12px] text-ink-muted">
-                  {perQ}s per question · exam pressure{' '}
-                  {!isPro() && (
-                    <Link href="/pricing" className="text-accent no-underline">
-                      (Pro)
-                    </Link>
-                  )}
-                </span>
-              </span>
-            </label>
+                >
+                  {e === 'ALL' ? 'All' : e}
+                  <span className="ml-1 opacity-60">{counts[e]}</span>
+                </button>
+              ))}
+            </div>
+          </Reveal>
 
-            <button
-              type="button"
-              onClick={start}
-              disabled={!total}
-              className="mt-6 w-full rounded-full bg-accent py-2.5 text-sm font-medium text-[var(--on-accent)] hover:bg-accent-hover disabled:opacity-50"
-            >
-              Start practice
-            </button>
-          </div>
+          <Reveal delay={140}>
+            <div className="mt-7 rounded-2xl border border-line bg-white p-6 shadow-[var(--shadow-md)]">
+              <div className="flex flex-wrap items-center gap-2.5">
+                {exam !== 'ALL' && <ExamBadge exam={exam} />}
+                <h2 className="font-serif text-xl font-semibold">
+                  {total} question{total === 1 ? '' : 's'}
+                </h2>
+              </div>
+              <p className="mt-2 text-[14px] text-ink-muted">
+                {exam === 'ALL'
+                  ? 'Mixed JAMB, WAEC and NECO style items for this subject.'
+                  : `${exam}-style questions. Feedback after each answer.`}
+              </p>
+
+              {/* Timed toggle */}
+              <div className="mt-6 flex items-start justify-between gap-4 rounded-xl border border-line bg-paper-sunken p-4">
+                <div>
+                  <p className="text-[14px] font-medium text-ink">Timed mode</p>
+                  <p className="mt-0.5 text-[12px] text-ink-muted">
+                    {perQ}s per question · exam pressure
+                    {!isPro() && (
+                      <Link
+                        href="/pricing"
+                        className="ml-1 font-medium text-gold-600 no-underline"
+                      >
+                        Pro
+                      </Link>
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={timed}
+                  aria-label="Timed mode"
+                  onClick={() => {
+                    if (!timed && !canAccessTimedMocks()) {
+                      window.location.href = '/pricing'
+                      return
+                    }
+                    setTimed(!timed)
+                  }}
+                  className="relative mt-1 h-6 w-11 shrink-0 rounded-full transition-colors duration-300"
+                  style={{ background: timed ? accent : 'var(--line-strong)' }}
+                >
+                  <span
+                    className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300"
+                    style={{ transform: timed ? 'translateX(22px)' : 'translateX(2px)' }}
+                  />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={start}
+                disabled={!total}
+                className="sheen mt-6 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-50"
+                style={{ background: accent }}
+              >
+                Start practice
+              </button>
+            </div>
+          </Reveal>
         </div>
       </main>
     )
@@ -202,75 +247,143 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
 
   if (phase === 'done') {
     const pct = total ? Math.round((correctCount / total) * 100) : 0
+    const R = 54
+    const C = 2 * Math.PI * R
+    const ringColor = pct >= 70 ? '#2f9e5f' : pct >= 50 ? '#d4763b' : '#c4485f'
+
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-          <p className="text-xs uppercase tracking-wider text-ink-muted">Session complete</p>
-          <p className="mt-3 font-serif text-4xl font-semibold">
-            {correctCount}/{total}
-          </p>
-          <p className="mt-1 text-sm text-ink-muted">{pct}% correct · {subjectLabel}</p>
-          {exam !== 'ALL' && (
-            <div className="mt-3 flex justify-center">
-              <ExamBadge exam={exam} />
+        <div className="mx-auto max-w-2xl px-4 py-16">
+          <Reveal variant="scale">
+            <div className="text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-600">
+                Session complete
+              </p>
+
+              {/* Score ring */}
+              <div className="relative mx-auto mt-6 h-36 w-36">
+                <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r={R}
+                    fill="none"
+                    stroke="var(--paper-sunken)"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r={R}
+                    fill="none"
+                    stroke={ringColor}
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeDasharray={C}
+                    strokeDashoffset={C - (C * pct) / 100}
+                    style={{ transition: 'stroke-dashoffset 1s var(--ease-out)' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="tnum font-serif text-4xl font-semibold" style={{ color: ringColor }}>
+                    <Counter value={pct} />%
+                  </span>
+                  <span className="tnum text-[12px] text-ink-muted">
+                    {correctCount} of {total}
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-4 text-[14px] text-ink-muted">{subjectLabel}</p>
+              {exam !== 'ALL' && (
+                <div className="mt-3 flex justify-center">
+                  <ExamBadge exam={exam} />
+                </div>
+              )}
             </div>
-          )}
+          </Reveal>
+
           {misses.length > 0 && (
-            <div className="mt-8 text-left rounded-2xl border border-line bg-[var(--paper-elevated)] p-5">
-              <p className="text-sm font-semibold">Review misses</p>
-              <ul className="mt-3 space-y-3">
-                {misses.map((m) => (
-                  <li key={m.id} className="text-[13px]">
-                    <p className="text-ink">{m.question}</p>
-                    <p className="mt-1 text-ink-muted">
-                      Answer: <span className="text-accent font-medium">{m.answer}</span> —{' '}
-                      {m.explanation}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <Reveal delay={100}>
+              <div className="mt-10 rounded-2xl border border-line bg-white p-5 text-left shadow-[var(--shadow-sm)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                  Review misses
+                </p>
+                <ul className="mt-4 space-y-4">
+                  {misses.map((m) => (
+                    <li key={m.id} className="border-l-[3px] border-danger/40 pl-3.5">
+                      <p className="text-[13.5px] font-medium text-ink">{m.question}</p>
+                      <p className="mt-1 text-[13px] text-ink-muted">
+                        Answer:{' '}
+                        <span className="font-semibold" style={{ color: accent }}>
+                          {m.answer}
+                        </span>{' '}
+                        — {m.explanation}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
           )}
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setPhase('idle')}
-              className="rounded-full border border-line px-4 py-2 text-sm hover:border-accent"
-            >
-              Practice again
-            </button>
-            <Link
-              href={`/learn/${subject}`}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
-            >
-              Learn with tutor
-            </Link>
-          </div>
+
+          <Reveal delay={160}>
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setPhase('idle')}
+                className="rounded-xl border border-line bg-white px-5 py-2.5 text-[13.5px] font-medium transition-colors hover:bg-paper-sunken"
+              >
+                Practice again
+              </button>
+              <Link
+                href={`/learn/${subject}`}
+                className="sheen rounded-xl px-5 py-2.5 text-[13.5px] font-medium text-white no-underline"
+                style={{ background: accent }}
+              >
+                Learn with tutor
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </main>
     )
   }
 
-  // active
+  // ── Active ────────────────────────────────────────────────────────────────
+  const progress = total ? ((index + (revealed ? 1 : 0)) / total) * 100 : 0
+
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <header className="border-b border-line">
+      <header className="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur-md">
+        {/* Progress rail */}
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-paper-sunken">
+          <div
+            className="h-full transition-[width] duration-500 ease-out"
+            style={{ width: `${progress}%`, background: accent }}
+          />
+        </div>
+
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
-          <button type="button" onClick={finishEarly} className="text-sm text-ink-muted hover:text-ink">
+          <button
+            type="button"
+            onClick={finishEarly}
+            className="text-[13px] text-ink-muted transition-colors hover:text-ink"
+          >
             End
           </button>
-          <p className="text-[13px] text-ink-muted">
+
+          <p className="tnum flex items-center gap-2 text-[13px] text-ink-muted">
             {index + 1} / {total}
-            {exam !== 'ALL' && (
-              <span className="ml-2 inline-block align-middle">
-                <ExamBadge exam={exam} size="sm" />
-              </span>
-            )}
+            {exam !== 'ALL' && <ExamBadge exam={exam} size="sm" />}
           </p>
+
           {timed ? (
             <span
-              className={`flex items-center gap-1 font-mono text-sm ${
-                secondsLeft <= 10 ? 'text-danger' : 'text-ink'
+              className={`tnum flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[13px] transition-colors ${
+                secondsLeft <= 10
+                  ? 'bg-danger-soft text-danger'
+                  : 'bg-paper-sunken text-ink'
               }`}
             >
               <Clock className="h-3.5 w-3.5" />
@@ -285,48 +398,70 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
       <div className="mx-auto max-w-2xl px-4 py-8">
         {q && (
           <>
-            <p className="text-[11px] text-ink-muted">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-ink-subtle">
               {q.exam} · {q.year}
             </p>
-            <h2 className="mt-2 font-serif text-lg font-semibold leading-snug sm:text-xl">
+            <h2 className="mt-2.5 font-serif text-xl font-semibold leading-snug sm:text-2xl">
               {q.question}
             </h2>
-            <div className="mt-6 space-y-2">
+
+            <div className="mt-7 space-y-2.5">
               {(['A', 'B', 'C', 'D'] as const).map((key) => {
                 const selected = picked === key
                 const isAnswer = q.answer === key
-                let cls =
-                  'w-full rounded-xl border border-line bg-[var(--paper-elevated)] px-4 py-3 text-left text-sm transition-colors'
-                if (revealed && isAnswer) cls += ' border-accent bg-accent-soft'
-                else if (revealed && selected && !isAnswer) cls += ' border-danger/50 opacity-80'
-                else if (selected) cls += ' border-accent'
+                const showCorrect = revealed && isAnswer
+                const showWrong = revealed && selected && !isAnswer
+
                 return (
                   <button
                     key={key}
                     type="button"
                     disabled={revealed}
                     onClick={() => choose(key)}
-                    className={cls}
+                    className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left text-[14.5px] transition-all duration-200 ${
+                      showCorrect
+                        ? 'border-green-500/50 bg-success-soft'
+                        : showWrong
+                          ? 'border-danger/40 bg-danger-soft'
+                          : revealed
+                            ? 'border-line bg-white opacity-55'
+                            : 'lift border-line bg-white shadow-[var(--shadow-sm)]'
+                    }`}
                   >
-                    <span className="font-semibold text-accent">{key}.</span> {q.options[key]}
-                    {revealed && isAnswer && (
-                      <Check className="ml-2 inline h-4 w-4 text-accent" />
-                    )}
-                    {revealed && selected && !isAnswer && (
-                      <X className="ml-2 inline h-4 w-4 text-danger" />
-                    )}
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold"
+                      style={
+                        showCorrect
+                          ? { background: '#2f9e5f', color: '#fff' }
+                          : showWrong
+                            ? { background: 'var(--danger)', color: '#fff' }
+                            : {
+                                background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+                                color: accent,
+                              }
+                      }
+                    >
+                      {key}
+                    </span>
+                    <span className="flex-1 pt-0.5">{q.options[key]}</span>
+                    {showCorrect && <Check className="mt-1 h-4 w-4 shrink-0 text-green-600" />}
+                    {showWrong && <X className="mt-1 h-4 w-4 shrink-0 text-danger" />}
                   </button>
                 )
               })}
             </div>
+
             {revealed && (
-              <div className="mt-5 rounded-xl border border-line bg-[var(--paper-elevated)] p-4 text-sm">
-                <p className="font-medium text-ink">Explanation</p>
-                <p className="mt-1 text-ink-muted">{q.explanation}</p>
+              <div className="animate-fade-up mt-6 rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-md)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                  Explanation
+                </p>
+                <p className="mt-2 text-[14px] leading-relaxed text-ink">{q.explanation}</p>
                 <button
                   type="button"
                   onClick={next}
-                  className="mt-4 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-[var(--on-accent)] hover:bg-accent-hover"
+                  className="sheen mt-5 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 sm:w-auto sm:px-6"
+                  style={{ background: accent }}
                 >
                   {index + 1 >= total ? 'See results' : 'Next question'}
                 </button>

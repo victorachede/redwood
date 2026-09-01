@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Lock, Send } from 'lucide-react'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { addCard, parseTutorCards, stripStudyCardsBlock } from '@/app/lib/cards'
 import { consumeWorkTicket, type WorkKind } from '@/app/lib/workGate'
@@ -97,8 +97,13 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
 
   if (allowed === null) {
     return (
-      <main className="min-h-dvh bg-paper text-ink flex items-center justify-center">
-        <p className="text-sm text-ink-muted">Checking access…</p>
+      <main className="flex min-h-dvh items-center justify-center bg-paper text-ink">
+        <div className="w-full max-w-sm space-y-3 px-6">
+          <div className="skeleton h-11 w-11 rounded-2xl" />
+          <div className="skeleton h-5 w-2/3" />
+          <div className="skeleton h-4 w-full" />
+          <div className="skeleton h-4 w-4/5" />
+        </div>
       </main>
     )
   }
@@ -106,24 +111,35 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
   if (allowed === false) {
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <div className="mx-auto max-w-md px-4 py-20 text-center">
-          <p className="font-serif text-xl font-semibold">Ewin opens this when you are ready</p>
-          <p className="mt-3 text-sm text-ink-muted leading-relaxed">
-            Classwork and homework are not open menus. During a lesson, when Ewin decides you should
-            practise or submit work, it will open this screen for you.
-          </p>
-          <Link
-            href="/dashboard"
-            className="mt-8 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
-          >
-            Back to dashboard
-          </Link>
-          <p className="mt-4 text-[12px] text-ink-muted">
-            Or continue learning —{' '}
-            <Link href="/learn/mathematics" className="text-accent no-underline">
-              start a tutor session
+        <div className="mx-auto flex min-h-dvh max-w-md items-center px-4 py-16">
+          <div className="noise relative w-full overflow-hidden rounded-[1.4rem] bg-gradient-to-br from-navy-700 to-navy-900 px-7 py-10 text-center shadow-[var(--shadow-navy)]">
+            <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+
+            <span className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold-500/30 bg-gold-500/10">
+              <Lock className="h-6 w-6 text-gold-400" />
+            </span>
+
+            <p className="font-serif text-xl font-semibold text-white">
+              Ewin opens this when you are ready
+            </p>
+            <p className="mx-auto mt-3 max-w-xs text-[13.5px] leading-relaxed text-[var(--on-accent-muted)]">
+              Classwork and homework are not open menus. During a lesson, when Ewin decides you
+              should practise or submit work, it will open this screen for you.
+            </p>
+
+            <Link
+              href="/dashboard"
+              className="sheen mt-7 inline-flex rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 px-6 py-3 text-[14px] font-semibold text-navy-800 no-underline shadow-[var(--shadow-gold)]"
+            >
+              Back to dashboard
             </Link>
-          </p>
+            <p className="mt-4 text-[12px] text-[var(--on-accent-muted)]">
+              Or continue learning —{' '}
+              <Link href="/learn/mathematics" className="text-gold-400 no-underline">
+                start a tutor session
+              </Link>
+            </p>
+          </div>
         </div>
       </main>
     )
@@ -147,10 +163,20 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
           {messages.length === 0 && (
-            <div className="rounded-2xl border border-line bg-white p-5">
+            <div className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
               <p className="font-serif text-lg font-semibold">{meta.title}</p>
               <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{meta.blurb}</p>
-              <p className="mt-3 text-[12px] text-ink-muted">
+
+              {ticketBrief && (
+                <div className="mt-4 rounded-xl border-l-[3px] border-gold-500 bg-gold-500/[0.07] px-3.5 py-3">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-600">
+                    What Ewin set
+                  </p>
+                  <p className="text-[13.5px] leading-relaxed text-ink">{ticketBrief}</p>
+                </div>
+              )}
+
+              <p className="mt-3.5 text-[12px] text-ink-muted">
                 Tip: paste the full question and your answer, or only the question if you want help.
               </p>
             </div>
@@ -211,7 +237,10 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
 
       <div className="shrink-0 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2">
         <div className="mx-auto max-w-2xl px-3">
-          <div className="ewin-composer flex items-end gap-1.5 rounded-full bg-[#303036] px-1.5 py-1.5">
+          <div
+            className="ewin-composer flex items-end gap-1.5 rounded-full px-1.5 py-1.5 shadow-[0_4px_18px_-4px_rgba(10,20,40,0.4),0_0_0_1px_rgba(255,255,255,0.07)] transition-shadow focus-within:shadow-[0_4px_18px_-4px_rgba(10,20,40,0.45),0_0_0_1px_rgba(201,168,76,0.45)]"
+            style={{ background: 'linear-gradient(180deg, #16223d 0%, #0c1428 100%)' }}
+          >
             <textarea
               ref={inputRef}
               value={input}
