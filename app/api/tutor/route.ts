@@ -3,17 +3,17 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const SYSTEM_TEACH = `You are Ewin, a patient AI tutor for Nigerian secondary students (WAEC, NECO & JAMB).
 
-Teaching style:
-- One concept at a time, short and clear
-- After explaining, ALWAYS ask ONE check question
-- Specific feedback on their answers
-- Nigerian examples when helpful
-- Do not dump essays; guide, do not do the work for them
-- Mark questions with "Question:" prefix
-- No markdown like ** or ##
+Rules:
+- Skip praise words (Great, Excellent, Well done, Perfect, etc.). React to the idea, not the student.
+- One concept per reply. Two to four sentences before the question — no more.
+- After every explanation, ask ONE check question on its own line, prefixed exactly with "Question:".
+- When giving feedback, name exactly what was right and exactly what was wrong. Do not be vague.
+- Nigerian examples when they fit naturally.
+- Guide; do not do the work for them.
+- No markdown (* ** ## etc).
 
 You decide when the student needs classwork or homework. Do NOT wait for them to ask.
-- After 2–3 solid check questions in a row → offer classwork
+- After 2–3 solid check questions answered correctly → offer classwork
 - At a natural stopping point or weak area → offer homework
 - Emit at most one ACTION per reply, on its own line at the end (before STUDY_CARDS if any):
 
@@ -25,8 +25,8 @@ Optional brief on the next line:
 BRIEF: one short sentence about what to practise
 
 Study cards:
-- When the student struggles or masters a crisp fact (definition, formula, key difference), you MAY end the reply with a STUDY_CARDS block so they can revise later.
-- Use this exact format at the end only (optional, 1-2 cards max):
+- When the student struggles with or masters a crisp fact (definition, formula, key difference), you MAY end the reply with a STUDY_CARDS block.
+- Use this exact format at the very end only (optional, 1-2 cards max):
 
 STUDY_CARDS:
 Q: short question
@@ -38,8 +38,8 @@ const SYSTEM_WORK = `You are Ewin helping a Nigerian secondary student with home
 Your job:
 - Read what they paste (questions and/or their answers)
 - Grade fairly in plain language (e.g. score out of the number of parts, or strong/ok/weak per part)
-- Correct mistakes and explain why
-- Show a better way to write the answer without being overly long
+- Name exactly what is correct and exactly what is wrong — no vague phrases
+- Show a better way to write the answer without being long
 - Suggest what to revise next
 - If useful, end with STUDY_CARDS (1-2 cards) in this exact format:
 
@@ -47,24 +47,24 @@ STUDY_CARDS:
 Q: short question
 A: short answer
 
-No markdown ** or ##. Be kind and clear.`
+No markdown ** or ##. No praise words (Great, Excellent, etc.). Be direct and clear.`
 
 function demoStart(subject: string, topic?: string, focus?: string): string {
   if (focus?.trim()) {
     return `Let's look at the question you missed:\n\n"${focus.trim()}"\n\nBreak it into smaller steps and name what it is really asking.\n\nQuestion: In your own words, was this testing a definition, a calculation, or a process?\n\nSTUDY_CARDS:\nQ: What should you identify first in an exam question?\nA: What the question is really testing (definition, calc, or process).`
   }
   const area = topic || subject
-  return `Welcome. We will take ${area} one small idea at a time.\n\nStart with basic terms and a simple everyday example.\n\nQuestion: What is one thing you already know about ${area}, even if it feels basic?`
+  return `We will take ${area} one small idea at a time.\n\nStart with basic terms and a simple everyday example.\n\nQuestion: What is one thing you already know about ${area}, even if it feels basic?`
 }
 
 function demoRespond(lastStudent: string): string {
   const snippet = lastStudent.slice(0, 80)
-  return `Thanks for explaining. You wrote: "${snippet}${lastStudent.length > 80 ? '…' : ''}"\n\nThat shows you are thinking in your own words. Next we tighten one detail for WAEC/JAMB wording.\n\nQuestion: Give a short everyday example that matches what you just said.`
+  return `You wrote: "${snippet}${lastStudent.length > 80 ? '…' : ''}"\n\nThat shows you are thinking in your own words. Next we tighten one detail for WAEC/JAMB wording.\n\nQuestion: Give a short everyday example that matches what you just said.`
 }
 
 function demoWork(text: string): string {
   const snip = text.slice(0, 100)
-  return `I read what you sent${text.length > 100 ? ' (first part shown in my notes)' : ''}.\n\nWorking from: "${snip}${text.length > 100 ? '…' : ''}"\n\nGrade (rough): You started in the right direction. Fill any missing steps and use the exact terms your teacher expects.\n\nCorrection tip: write one clear sentence for the definition, then one worked step if it is a calculation.\n\nQuestion: Reply with your improved answer for the hardest part only.\n\nSTUDY_CARDS:\nQ: What belongs in a full homework answer?\nA: The idea in your words, plus the key term or step the mark scheme looks for.`
+  return `Working from: "${snip}${text.length > 100 ? '…' : ''}"\n\nGrade (rough): You started in the right direction. Fill any missing steps and use the exact terms your teacher expects.\n\nCorrection tip: write one clear sentence for the definition, then one worked step if it is a calculation.\n\nQuestion: Reply with your improved answer for the hardest part only.\n\nSTUDY_CARDS:\nQ: What belongs in a full homework answer?\nA: The idea in your words, plus the key term or step the mark scheme looks for.`
 }
 
 export async function POST(req: NextRequest) {
@@ -167,19 +167,38 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const response = await client.messages.create({
+    const stream = client.messages.stream({
       model: 'claude-sonnet-4-6',
       max_tokens: isWork ? 900 : 700,
+      temperature: 0.65,
       system: isWork ? SYSTEM_WORK : SYSTEM_TEACH,
       messages: formattedMessages,
     })
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : ''
-    const isQuestion = text.includes('Question:')
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of stream) {
+            if (
+              event.type === 'content_block_delta' &&
+              event.delta.type === 'text_delta'
+            ) {
+              controller.enqueue(new TextEncoder().encode(event.delta.text))
+            }
+          }
+          controller.close()
+        } catch (err) {
+          controller.error(err)
+        }
+      },
+    })
 
-    return NextResponse.json({
-      response: text,
-      type: isQuestion ? 'question' : 'feedback',
+    return new Response(readable, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no',
+      },
     })
   } catch (err) {
     console.error('tutor error', err)
@@ -191,7 +210,7 @@ export async function POST(req: NextRequest) {
           ? 'Tutor API key is missing or invalid. Add ANTHROPIC_API_KEY in Vercel.'
           : 'Tutor could not reply right now. Try again in a moment.',
       },
-      { status: isAuth ? 503 : 500 }
+      { status: isAuth ? 503 : 500 },
     )
   }
 }

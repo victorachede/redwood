@@ -51,11 +51,27 @@ async function readTutorError(res: Response): Promise<string> {
   return 'Something went wrong. Try again.'
 }
 
+async function readTutorStream(
+  res: Response,
+  onAccumulated: (text: string) => void,
+): Promise<string> {
+  const reader = res.body!.getReader()
+  const decoder = new TextDecoder()
+  let full = ''
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    full += decoder.decode(value, { stream: true })
+    onAccumulated(full)
+  }
+  return full
+}
+
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-2.5">
       <EwinAvatar size={30} />
-      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-line bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="flex items-center gap-1.5 rounded-2xl border border-line bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <span className="typing-dot" />
         <span className="typing-dot" />
         <span className="typing-dot" />
@@ -214,11 +230,23 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
-      const data = await res.json()
-      if (data.demo) setDemoMode(true)
-      const rawStart = applyTutorSideEffects(data.response as string, subject)
-      setSuggestedCards(parseTutorCards(rawStart))
-      const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(rawStart), type: 'lesson' }]
+
+      let rawStart: string
+      const ct = res.headers.get('Content-Type') || ''
+
+      if (ct.includes('text/plain')) {
+        rawStart = await readTutorStream(res, (accumulated) => {
+          setMessages([{ role: 'tutor', content: accumulated, type: 'lesson' }])
+        })
+      } else {
+        const data = await res.json()
+        if (data.demo) setDemoMode(true)
+        rawStart = data.response as string
+      }
+
+      const processed = applyTutorSideEffects(rawStart, subject)
+      setSuggestedCards(parseTutorCards(processed))
+      const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(processed), type: 'lesson' }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
       saveSession({ subjectId: subject, subjectName: subjectLabel, topic: chosenTopic, at: Date.now() })
@@ -262,13 +290,25 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
-      const data = await res.json()
-      if (data.demo) setDemoMode(true)
-      const rawNext = applyTutorSideEffects(data.response as string, subject)
-      setSuggestedCards(parseTutorCards(rawNext))
+
+      let rawNext: string
+      const ct = res.headers.get('Content-Type') || ''
+
+      if (ct.includes('text/plain')) {
+        rawNext = await readTutorStream(res, (accumulated) => {
+          setMessages([...updated, { role: 'tutor', content: accumulated }])
+        })
+      } else {
+        const data = await res.json()
+        if (data.demo) setDemoMode(true)
+        rawNext = data.response as string
+      }
+
+      const processed = applyTutorSideEffects(rawNext, subject)
+      setSuggestedCards(parseTutorCards(processed))
       const next: Message[] = [
         ...updated,
-        { role: 'tutor', content: stripStudyCardsBlock(rawNext), type: data.type as string },
+        { role: 'tutor', content: stripStudyCardsBlock(processed) },
       ]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
@@ -452,8 +492,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               <div
                 className={`max-w-[min(100%,26rem)] sm:max-w-[82%] ${
                   m.role === 'student'
-                    ? 'rounded-2xl rounded-tr-sm bg-accent px-4 py-3 text-[var(--on-accent)] shadow-[0_4px_16px_-6px_rgba(14,27,58,0.35)]'
-                    : 'rounded-2xl rounded-tl-sm border border-line bg-white px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.05),0_4px_20px_-8px_rgba(0,0,0,0.10)]'
+                    ? 'rounded-2xl bg-gradient-to-br from-[#0e1b3a] to-[#1a3260] px-4 py-3 text-[var(--on-accent)] shadow-[0_4px_20px_-6px_rgba(14,27,58,0.45)]'
+                    : 'rounded-2xl border border-line bg-white px-4 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
                 }`}
               >
                 {m.attachments && m.attachments.length > 0 && (
@@ -482,7 +522,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             </div>
           ))}
 
-          {loading && <TypingIndicator />}
+          {loading && messages[messages.length - 1]?.role !== 'tutor' && <TypingIndicator />}
 
           {/* Study card suggestions */}
           {suggestedCards.length > 0 && (
