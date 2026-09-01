@@ -73,7 +73,7 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
                 </Link>
                 <Link
                   href="/signup"
-                  className="rounded-md bg-ink px-3.5 py-2 text-[13px] font-medium text-white no-underline hover:bg-accent-hover"
+                  className="rounded-md bg-accent px-3.5 py-2 text-[13px] font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
                 >
                   Sign up
                 </Link>

@@ -23,12 +23,6 @@ const FEATURES = [
   },
 ]
 
-const STEPS = [
-  { n: '1', title: 'Pick a subject', body: 'Maths, Physics, Chemistry, Biology, English, or Economics.' },
-  { n: '2', title: 'Learn, then answer', body: 'Ewin explains. You reply. You get clear feedback.' },
-  { n: '3', title: 'Drill when ready', body: 'Multiple-choice practice with explanations after each question.' },
-]
-
 const FAQS = [
   {
     q: 'Is Ewin free?',
@@ -57,7 +51,6 @@ export default function Home() {
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="text-[13px] text-ink-muted">AI tutor for secondary school</p>
             <h1 className="mt-3 font-serif text-[clamp(2.25rem,4.5vw,3.25rem)] font-semibold leading-[1.15] tracking-tight text-ink">
               Learn one idea.
               <br />
@@ -79,23 +72,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quiet stats */}
-      <section className="border-y border-line">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-5 py-10 sm:grid-cols-4 sm:px-8">
-          {[
-            { v: '6', l: 'Core subjects' },
-            { v: '1', l: 'Concept at a time' },
-            { v: '₦0', l: 'To start' },
-            { v: 'Socratic', l: 'Not answer keys' },
-          ].map((s) => (
-            <div key={s.l}>
-              <p className="text-xl font-semibold tracking-tight text-ink">{s.v}</p>
-              <p className="mt-1 text-[13px] text-ink-muted">{s.l}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Features */}
       <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
         <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">
@@ -111,22 +87,6 @@ export default function Home() {
               <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{f.body}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Steps */}
-      <section className="border-y border-line bg-white">
-        <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
-          <h2 className="font-serif text-2xl font-semibold tracking-tight text-ink">How it works</h2>
-          <ol className="mt-10 grid gap-8 sm:grid-cols-3">
-            {STEPS.map((s) => (
-              <li key={s.n}>
-                <span className="text-[12px] font-medium text-ink-muted">{s.n}</span>
-                <h3 className="mt-2 text-[15px] font-semibold text-ink">{s.title}</h3>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">{s.body}</p>
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
 
@@ -196,8 +156,8 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-lg border border-ink p-6">
-              <p className="text-[13px] font-medium text-ink">{PLANS.pro.name}</p>
+            <div className="rounded-lg border-2 border-accent p-6">
+              <p className="text-[13px] font-medium" style={{ color: 'var(--brand)' }}>{PLANS.pro.name}</p>
               <p className="mt-2 text-2xl font-semibold tracking-tight text-ink">
                 {formatNgn(PLANS.pro.priceMonthlyNgn)}
                 <span className="text-sm font-normal text-ink-muted">/mo</span>
@@ -213,7 +173,7 @@ export default function Home() {
               </ul>
               <Link
                 href="/pricing"
-                className="mt-6 inline-flex w-full justify-center rounded-md bg-ink py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
+                className="mt-6 inline-flex w-full justify-center rounded-md bg-accent py-2.5 text-sm font-medium text-[var(--on-accent)] no-underline hover:bg-accent-hover"
               >
                 Upgrade with Paystack
               </Link>
