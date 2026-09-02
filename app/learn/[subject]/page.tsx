@@ -4,8 +4,14 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, FileText, Plus, X, BookOpen } from 'lucide-react'
 import { getSubject } from '../../lib/subjects'
-import { saveSession, saveTutorMessages } from '../../lib/progress'
-import { addCard, parseTutorCards, stripStudyCardsBlock } from '../../lib/cards'
+import { saveSession, saveTutorMessages, recordMastery } from '../../lib/progress'
+import { addCard } from '../../lib/cards'
+import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
+import type {
+  AssignWorkInput,
+  SaveStudyCardInput,
+  RecordMasteryInput,
+} from '@/app/lib/tutorProtocol'
 import { openWorkFromTutor } from '@/app/lib/workGate'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { SubjectIcon } from '@/components/SubjectIcon'
@@ -50,22 +56,6 @@ async function readTutorError(res: Response): Promise<string> {
   if (res.status === 503) return 'Tutor is not set up yet. Add ANTHROPIC_API_KEY in Vercel.'
   if (res.status >= 500) return 'Tutor could not reply right now. Try again in a moment.'
   return 'Something went wrong. Try again.'
-}
-
-async function readTutorStream(
-  res: Response,
-  onAccumulated: (text: string) => void,
-): Promise<string> {
-  const reader = res.body!.getReader()
-  const decoder = new TextDecoder()
-  let full = ''
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    full += decoder.decode(value, { stream: true })
-    onAccumulated(full)
-  }
-  return full
 }
 
 function TypingIndicator() {
@@ -137,22 +127,6 @@ function formatContent(text: string, accent: string, streaming = false) {
   )
 }
 
-function applyTutorSideEffects(raw: string, subjectId: string): string {
-  const actionMatch = raw.match(/ACTION:\s*(CLASSWORK|HOMEWORK)/i)
-  if (actionMatch) {
-    const kind = actionMatch[1].toUpperCase() === 'CLASSWORK' ? 'classwork' : 'homework'
-    const briefMatch = raw.match(/BRIEF:\s*(.+)/i)
-    const brief = briefMatch?.[1]?.trim()
-    setTimeout(() => {
-      openWorkFromTutor(kind as 'classwork' | 'homework', { subjectId, brief })
-    }, 1600)
-  }
-  return raw
-    .replace(/ACTION:\s*(CLASSWORK|HOMEWORK)\s*/gi, '')
-    .replace(/BRIEF:\s*.+/gi, '')
-    .trim()
-}
-
 export default function LearnPage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject } = use(params)
   const [focus, setFocus] = useState<string | null>(null)
@@ -172,6 +146,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [error, setError] = useState<string | null>(null)
   const [demoMode, setDemoMode] = useState(false)
   const [suggestedCards, setSuggestedCards] = useState<{ front: string; back: string }[]>([])
+  const [pendingWork, setPendingWork] = useState<AssignWorkInput | null>(null)
+  const clarifyUsedRef = useRef(false)
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const [docs, setDocs] = useState<DocAttach[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -228,6 +204,52 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     if (fileRef.current) fileRef.current.value = ''
   }
 
+  /**
+   * Runs one streamed turn: appends prose deltas to a live tutor message and
+   * routes tool calls to real handlers. Replaces the old regex scraping of
+   * ACTION:/BRIEF:/STUDY_CARDS: out of the model's prose.
+   */
+  async function runTurn(res: Response, base: Message[], type?: string) {
+    let text = ''
+    let failed: string | null = null
+
+    await readTutorStream(res, (e: TutorEvent) => {
+      switch (e.t) {
+        case 'text': {
+          text += e.v
+          setMessages([...base, { role: 'tutor', content: text, type }])
+          break
+        }
+        case 'tool': {
+          if (e.name === 'save_study_card') {
+            const c = e.input as SaveStudyCardInput
+            if (c?.front && c?.back) {
+              setSuggestedCards((prev) =>
+                prev.some((x) => x.front === c.front) ? prev : [...prev, c],
+              )
+            }
+          } else if (e.name === 'assign_work') {
+            const w = e.input as AssignWorkInput
+            if (w?.kind) setPendingWork(w)
+          } else if (e.name === 'record_mastery') {
+            const m = e.input as RecordMasteryInput
+            if (m?.topic && m?.level) recordMastery(subject, m.topic, m.level)
+          }
+          break
+        }
+        case 'error':
+          failed = e.message
+          break
+        case 'done':
+        default:
+          break
+      }
+    })
+
+    if (failed && !text) throw new Error(failed)
+    return { text, failed }
+  }
+
   async function startSession(chosenTopic: string, opts?: { resume?: boolean; focus?: string }) {
     setTopic(chosenTopic)
     setStarted(true)
@@ -251,26 +273,17 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           action: 'start',
           focus: focusHint,
           documents: docs,
+          clarifyUsed: clarifyUsedRef.current,
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
 
-      let rawStart: string
-      const ct = res.headers.get('Content-Type') || ''
+      setSuggestedCards([])
+      setPendingWork(null)
+      const { text, failed } = await runTurn(res, [], 'lesson')
+      if (failed) setError(failed)
 
-      if (ct.includes('text/plain')) {
-        rawStart = await readTutorStream(res, (accumulated) => {
-          setMessages([{ role: 'tutor', content: accumulated, type: 'lesson' }])
-        })
-      } else {
-        const data = await res.json()
-        if (data.demo) setDemoMode(true)
-        rawStart = data.response as string
-      }
-
-      const processed = applyTutorSideEffects(rawStart, subject)
-      setSuggestedCards(parseTutorCards(processed))
-      const initial: Message[] = [{ role: 'tutor', content: stripStudyCardsBlock(processed), type: 'lesson' }]
+      const initial: Message[] = [{ role: 'tutor', content: text, type: 'lesson' }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
       saveSession({ subjectId: subject, subjectName: subjectLabel, topic: chosenTopic, at: Date.now() })
@@ -311,29 +324,16 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           messages: updated,
           action: 'respond',
           documents: docsSnapshot,
+          clarifyUsed: clarifyUsedRef.current,
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
 
-      let rawNext: string
-      const ct = res.headers.get('Content-Type') || ''
+      setSuggestedCards([])
+      const { text, failed } = await runTurn(res, updated)
+      if (failed) setError(failed)
 
-      if (ct.includes('text/plain')) {
-        rawNext = await readTutorStream(res, (accumulated) => {
-          setMessages([...updated, { role: 'tutor', content: accumulated }])
-        })
-      } else {
-        const data = await res.json()
-        if (data.demo) setDemoMode(true)
-        rawNext = data.response as string
-      }
-
-      const processed = applyTutorSideEffects(rawNext, subject)
-      setSuggestedCards(parseTutorCards(processed))
-      const next: Message[] = [
-        ...updated,
-        { role: 'tutor', content: stripStudyCardsBlock(processed) },
-      ]
+      const next: Message[] = [...updated, { role: 'tutor', content: text }]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
       inputRef.current?.blur()
@@ -581,6 +581,47 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           ))}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && <TypingIndicator />}
+
+          {/* Work assigned by the tutor — a card the student taps, replacing the
+              old unannounced window.location redirect 1.6s after a reply. */}
+          {pendingWork && (
+            <div className="animate-fade-up rounded-2xl border border-line bg-white p-4 shadow-[var(--shadow-sm)]">
+              <p
+                className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+                style={{ color: accent }}
+              >
+                {pendingWork.kind === 'classwork' ? 'Classwork' : 'Homework'} ready
+              </p>
+              <p className="mt-1.5 text-[14px] leading-relaxed text-ink">
+                {pendingWork.brief}
+              </p>
+              <div className="mt-3.5 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const w = pendingWork
+                    setPendingWork(null)
+                    openWorkFromTutor(w.kind, {
+                      subjectId: subject,
+                      topic: w.topic ?? topic ?? undefined,
+                      brief: w.brief,
+                    })
+                  }}
+                  className="rounded-xl px-4 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                  style={{ background: accent }}
+                >
+                  Start {pendingWork.kind}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingWork(null)}
+                  className="rounded-xl border border-line px-4 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-paper-sunken"
+                >
+                  Not now
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Study card suggestions */}
           {suggestedCards.length > 0 && (

@@ -4,7 +4,10 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Lock, Send } from 'lucide-react'
 import { EwinAvatar } from '@/components/EwinAvatar'
-import { addCard, parseTutorCards, stripStudyCardsBlock } from '@/app/lib/cards'
+import { addCard } from '@/app/lib/cards'
+import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
+import type { SaveStudyCardInput, RecordMasteryInput } from '@/app/lib/tutorProtocol'
+import { recordMastery } from '@/app/lib/progress'
 import { consumeWorkTicket, type WorkKind } from '@/app/lib/workGate'
 
 type Msg = { role: 'tutor' | 'student'; content: string }
@@ -78,12 +81,45 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
           workKind: slug,
         }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
-      const raw = data.response as string
-      const cards = parseTutorCards(raw)
-      const clean = stripStudyCardsBlock(raw)
-      setMessages([...updated, { role: 'tutor', content: clean }])
+      if (!res.ok) {
+        let msg = 'Ewin could not mark this right now. Try again.'
+        try {
+          const data = (await res.json()) as { error?: string }
+          if (data?.error) msg = data.error
+        } catch {
+          /* non-JSON error body */
+        }
+        throw new Error(msg)
+      }
+
+      // The route streams NDJSON. This page previously called res.json() on it,
+      // which threw for every user with a real API key — the flow only ever
+      // worked in keyless demo mode.
+      let text = ''
+      let failed: string | null = null
+      const cards: { front: string; back: string }[] = []
+
+      await readTutorStream(res, (e: TutorEvent) => {
+        if (e.t === 'text') {
+          text += e.v
+          setMessages([...updated, { role: 'tutor', content: text }])
+        } else if (e.t === 'tool') {
+          if (e.name === 'save_study_card') {
+            const c = e.input as SaveStudyCardInput
+            if (c?.front && c?.back) cards.push(c)
+          } else if (e.name === 'record_mastery') {
+            const m = e.input as RecordMasteryInput
+            if (m?.topic && m?.level) recordMastery(slug, m.topic, m.level)
+          }
+        } else if (e.t === 'error') {
+          failed = e.message
+        }
+      })
+
+      if (failed && !text) throw new Error(failed)
+      if (failed) setError(failed)
+
+      setMessages([...updated, { role: 'tutor', content: text }])
       if (cards.length) setSuggested(cards)
       inputRef.current?.blur()
     } catch (e) {

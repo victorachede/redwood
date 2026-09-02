@@ -1,83 +1,157 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { encodeEvent, type TutorEvent } from '@/app/lib/tutorProtocol'
+import { TUTOR_TOOLS, WORK_TOOLS } from '@/app/lib/tutorTools'
 
-const SYSTEM_TEACH = `You are Ewin, a patient AI tutor for Nigerian secondary students (WAEC, NECO & JAMB).
+export const maxDuration = 60
 
-Rules:
-- Skip praise words (Great, Excellent, Well done, Perfect, etc.). React to the idea, not the student.
-- One concept per reply. Two to four sentences before the question — no more.
-- After every explanation, ask ONE check question on its own line, prefixed exactly with "Question:".
-- When giving feedback, name exactly what was right and exactly what was wrong. Do not be vague.
-- Nigerian examples when they fit naturally.
-- Guide; do not do the work for them.
-- No markdown (* ** ## etc).
+/* ═══════════════════════════════════════════════════════════════════════════
+   System prompts
 
-You decide when the student needs classwork or homework. Do NOT wait for them to ask.
-- After 2–3 solid check questions answered correctly → offer classwork
-- At a natural stopping point or weak area → offer homework
-- Emit at most one ACTION per reply, on its own line at the end (before STUDY_CARDS if any):
+   Split into a static half (cached) and a volatile half (the learner profile,
+   added per request in Phase 2). Only the static half carries cache_control.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-ACTION: CLASSWORK
-or
-ACTION: HOMEWORK
+const TEACH_RULES = `You are Ewin, a tutor for Nigerian secondary students preparing for WAEC, NECO and JAMB.
 
-Optional brief on the next line:
-BRIEF: one short sentence about what to practise
+How you teach:
+- One idea per reply. Two to four sentences, then a check question. Never a wall of text.
+- End every explanation with ONE question on its own line, prefixed exactly "Question:".
+- Skip praise words — no "Great", "Excellent", "Well done", "Perfect". React to the idea, not the student.
+- Feedback names specifics: what exactly was right, what exactly was wrong, and why. Never "good try".
+- If they are wrong, do not simply give the answer. Point at the step that broke and ask again.
+- Nigerian examples when they fit naturally. Never forced.
+- Plain text only. No markdown, no ** or ##.
 
-Study cards:
-- When the student struggles with or masters a crisp fact (definition, formula, key difference), you MAY end the reply with a STUDY_CARDS block.
-- Use this exact format at the very end only (optional, 1-2 cards max):
+Exam awareness:
+- WAEC and NECO reward method marks and correct units. Say so when it matters.
+- JAMB is multiple choice under time pressure. Mention shortcuts where they are real.
 
-STUDY_CARDS:
-Q: short question
-A: short answer
-`
+Using your tools:
+- They are for real moments, not decoration. A reply with no tool call is normal and usually correct.
+- record_mastery is your memory. When their answers show you where they stand on a topic, record it — that is how you will know next session what to revisit.
+- Prefer teaching in prose. Reach for a diagram only when a picture is genuinely faster than a sentence.`
 
-const SYSTEM_WORK = `You are Ewin helping a Nigerian secondary student with homework or classwork.
+const WORK_RULES = `You are Ewin, marking a Nigerian secondary student's homework or classwork.
 
-Your job:
-- Read what they paste (questions and/or their answers)
-- Grade fairly in plain language (e.g. score out of the number of parts, or strong/ok/weak per part)
-- Name exactly what is correct and exactly what is wrong — no vague phrases
-- Show a better way to write the answer without being long
-- Suggest what to revise next
-- If useful, end with STUDY_CARDS (1-2 cards) in this exact format:
+How you mark:
+- Read what they sent — typed, pasted, or photographed — and grade it fairly.
+- Give a score in plain language: out of the number of parts, or strong/ok/weak per part.
+- Name exactly what is correct and exactly what is wrong. No vague phrases.
+- Show a better way to write the answer, briefly. Do not rewrite the whole thing for them.
+- Say what to revise next, specifically.
+- If a photo is unreadable in part, say which part and ask for a clearer shot of just that bit.
+- Skip praise words. Plain text only, no markdown.`
 
-STUDY_CARDS:
-Q: short question
-A: short answer
-
-No markdown ** or ##. No praise words (Great, Excellent, etc.). Be direct and clear.`
+/* ═══════════════════════════════════════════════════════════════════════════
+   Demo fallbacks (no API key)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function demoStart(subject: string, topic?: string, focus?: string): string {
   if (focus?.trim()) {
-    return `Let's look at the question you missed:\n\n"${focus.trim()}"\n\nBreak it into smaller steps and name what it is really asking.\n\nQuestion: In your own words, was this testing a definition, a calculation, or a process?\n\nSTUDY_CARDS:\nQ: What should you identify first in an exam question?\nA: What the question is really testing (definition, calc, or process).`
+    return `Let's look at the question you missed:\n\n"${focus.trim()}"\n\nBreak it into steps and name what it is really asking.\n\nQuestion: Was this testing a definition, a calculation, or a process?`
   }
   const area = topic || subject
-  return `We will take ${area} one small idea at a time.\n\nStart with basic terms and a simple everyday example.\n\nQuestion: What is one thing you already know about ${area}, even if it feels basic?`
+  return `We will take ${area} one small idea at a time.\n\nStart with the basic terms and one everyday example.\n\nQuestion: What is one thing you already know about ${area}, even if it feels basic?`
 }
 
-function demoRespond(lastStudent: string): string {
-  const snippet = lastStudent.slice(0, 80)
-  return `You wrote: "${snippet}${lastStudent.length > 80 ? '…' : ''}"\n\nThat shows you are thinking in your own words. Next we tighten one detail for WAEC/JAMB wording.\n\nQuestion: Give a short everyday example that matches what you just said.`
+function demoRespond(last: string): string {
+  const snip = last.slice(0, 80)
+  return `You wrote: "${snip}${last.length > 80 ? '…' : ''}"\n\nThat is your own wording, which is what we want. Now we tighten one detail for exam phrasing.\n\nQuestion: Give a short everyday example that matches what you just said.`
 }
 
 function demoWork(text: string): string {
   const snip = text.slice(0, 100)
-  return `Working from: "${snip}${text.length > 100 ? '…' : ''}"\n\nGrade (rough): You started in the right direction. Fill any missing steps and use the exact terms your teacher expects.\n\nCorrection tip: write one clear sentence for the definition, then one worked step if it is a calculation.\n\nQuestion: Reply with your improved answer for the hardest part only.\n\nSTUDY_CARDS:\nQ: What belongs in a full homework answer?\nA: The idea in your words, plus the key term or step the mark scheme looks for.`
+  return `Working from: "${snip}${text.length > 100 ? '…' : ''}"\n\nGrade (rough): the direction is right. Fill the missing steps and use the exact terms the mark scheme expects.\n\nQuestion: Send your improved answer for the hardest part only.`
+}
+
+function demoStream(text: string): Response {
+  const stream = new ReadableStream({
+    start(controller) {
+      // Chunked so the client's typing behaviour is exercised in demo mode too
+      for (const part of text.match(/[\s\S]{1,24}/g) ?? [text]) {
+        controller.enqueue(encodeEvent({ t: 'text', v: part }))
+      }
+      controller.enqueue(encodeEvent({ t: 'done' }))
+      controller.close()
+    },
+  })
+  return ndjson(stream)
+}
+
+function ndjson(body: ReadableStream): Response {
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Accel-Buffering': 'no',
+    },
+  })
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Request shape
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+type ImageAttachment = { mediaType: string; data: string }
+
+type IncomingMessage = {
+  role: string
+  content: string
+  images?: ImageAttachment[]
+}
+
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+])
+
+function imageBlocks(images?: ImageAttachment[]): Anthropic.ImageBlockParam[] {
+  if (!Array.isArray(images)) return []
+  return images
+    .filter((img) => img?.data && ALLOWED_IMAGE_TYPES.has(img.mediaType))
+    .slice(0, 4)
+    .map((img) => ({
+      type: 'image' as const,
+      source: {
+        type: 'base64' as const,
+        media_type: img.mediaType as 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif',
+        data: img.data,
+      },
+    }))
+}
+
+/** Text + any attached images, as a content block array. */
+function toContent(m: IncomingMessage): string | Anthropic.ContentBlockParam[] {
+  const imgs = imageBlocks(m.images)
+  if (imgs.length === 0) return m.content
+  // Images first reads better for the model than trailing them after prose.
+  return [...imgs, { type: 'text', text: m.content || 'Here is my work.' }]
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { subject, topic, messages, action, focus, documents, workKind } = body as {
+    const {
+      subject,
+      topic,
+      messages,
+      action,
+      focus,
+      documents,
+      workKind,
+      clarifyUsed,
+    } = body as {
       subject?: string
       topic?: string
-      messages?: { role: string; content: string }[]
+      messages?: IncomingMessage[]
       action?: string
       focus?: string
       documents?: { name: string; text: string }[]
       workKind?: string
+      clarifyUsed?: boolean
     }
 
     if (!subject || typeof subject !== 'string') {
@@ -86,120 +160,169 @@ export async function POST(req: NextRequest) {
 
     const isWork = action === 'work_start' || action === 'work_respond'
     const apiKey = process.env.ANTHROPIC_API_KEY
+    const history = messages ?? []
 
+    /* ── Demo mode ──────────────────────────────────────────────────────── */
     if (!apiKey) {
-      if (isWork) {
-        const last = [...(messages ?? [])].reverse().find((m) => m.role === 'student')
-        return NextResponse.json({
-          response: demoWork(last?.content || ''),
-          type: 'feedback',
-          demo: true,
-        })
-      }
-      if (action === 'start') {
-        return NextResponse.json({
-          response: demoStart(subject, topic, focus),
-          type: 'question',
-          demo: true,
-        })
-      }
-      const lastStudent = [...(messages ?? [])].reverse().find((m) => m.role === 'student')
-      return NextResponse.json({
-        response: demoRespond(lastStudent?.content || 'your answer'),
-        type: 'question',
-        demo: true,
-      })
+      const lastStudent = [...history].reverse().find((m) => m.role === 'student')
+      if (isWork) return demoStream(demoWork(lastStudent?.content || ''))
+      if (action === 'start') return demoStream(demoStart(subject, topic, focus))
+      return demoStream(demoRespond(lastStudent?.content || 'your answer'))
     }
 
     const client = new Anthropic({ apiKey })
 
-    const topicLine = topic ? ` Focus on this topic path: ${topic}.` : ''
+    /* ── Build messages ─────────────────────────────────────────────────── */
+    const topicLine = topic ? ` Focus on this topic: ${topic}.` : ''
     const focusLine =
       typeof focus === 'string' && focus.trim()
-        ? ` The student got this practice question wrong and needs it explained clearly: "${focus.trim()}". Start by helping them understand that question, then teach the underlying idea and ask one check question.`
+        ? ` They got this practice question wrong and need it explained: "${focus.trim()}". Start there, then teach the underlying idea and check them on it.`
         : ''
     const docs =
       Array.isArray(documents) && documents.length
         ? documents
             .slice(0, 3)
-            .map((d) => `--- Document: ${d.name} ---\n${(d.text || '').slice(0, 6000)}`)
+            .map((d) => `--- ${d.name} ---\n${(d.text || '').slice(0, 6000)}`)
             .join('\n\n')
         : ''
-    const docsLine = docs
-      ? ` The student attached study notes. Use them when helpful:\n${docs}`
-      : ''
+    const docsLine = docs ? `\n\nThey attached notes. Use them when relevant:\n${docs}` : ''
 
-    let formattedMessages: { role: 'user' | 'assistant'; content: string }[]
+    let formatted: Anthropic.MessageParam[]
 
     if (isWork) {
       const kind = workKind || topic || 'homework'
-      if (action === 'work_start' || (messages?.length ?? 0) <= 1) {
-        const first = messages?.[messages.length - 1]?.content || ''
-        formattedMessages = [
+      if (action === 'work_start' || history.length <= 1) {
+        const first = history[history.length - 1]
+        formatted = [
           {
             role: 'user',
-            content: `This is ${kind}. Please grade and correct my work.\n\n${first}`,
+            content: (() => {
+              const imgs = imageBlocks(first?.images)
+              const text = `This is my ${kind}. Please grade and correct it.\n\n${first?.content ?? ''}`
+              return imgs.length ? [...imgs, { type: 'text' as const, text }] : text
+            })(),
           },
         ]
       } else {
-        formattedMessages = (messages ?? []).map((m) => ({
+        formatted = history.map((m) => ({
           role: (m.role === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
-          content: m.content,
+          content: toContent(m),
         }))
       }
     } else if (action === 'start') {
-      formattedMessages = [
+      formatted = [
         {
           role: 'user',
           content: focusLine
             ? `I am studying ${subject}.${topicLine}${focusLine}${docsLine}`
-            : `Start teaching me ${subject}.${topicLine}${docsLine} Begin with the most fundamental concept in this area and teach me step by step. After your first explanation, ask me a question to test if I understood.`,
+            : `Teach me ${subject}.${topicLine}${docsLine}\n\nBegin with the most fundamental idea here, then check I understood.`,
         },
       ]
     } else {
-      formattedMessages = (messages ?? []).map((m) => ({
+      formatted = history.map((m) => ({
         role: (m.role === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
-        content: m.content,
+        content: toContent(m),
       }))
-      if (docsLine && formattedMessages.length) {
-        const last = formattedMessages[formattedMessages.length - 1]
-        if (last.role === 'user') last.content = `${last.content}\n\n${docsLine}`
+      if (docsLine && formatted.length) {
+        const last = formatted[formatted.length - 1]
+        if (last.role === 'user' && typeof last.content === 'string') {
+          last.content = `${last.content}${docsLine}`
+        }
       }
     }
 
+    /* ── Clarifying-question budget ─────────────────────────────────────────
+       A prompt instruction alone will not hold this. Allow the tool only at
+       the very start of a conversation, or when the student's message is too
+       short to act on — and only once per session. Calls outside the budget
+       are dropped below rather than forwarded to the UI.                     */
+    const lastStudentText =
+      [...history].reverse().find((m) => m.role === 'student')?.content ?? ''
+    const clarifyAllowed =
+      !isWork &&
+      !clarifyUsed &&
+      (history.length <= 2 || lastStudentText.trim().length < 25)
+
+    const tools = isWork
+      ? WORK_TOOLS
+      : TUTOR_TOOLS.filter((t) => clarifyAllowed || t.name !== 'ask_clarifying')
+
+    /* ── Stream ─────────────────────────────────────────────────────────── */
     const stream = client.messages.stream({
       model: 'claude-sonnet-4-6',
-      max_tokens: isWork ? 900 : 700,
-      temperature: 0.65,
-      system: isWork ? SYSTEM_WORK : SYSTEM_TEACH,
-      messages: formattedMessages,
+      max_tokens: isWork ? 1200 : 900,
+      temperature: 0.6,
+      system: [
+        {
+          type: 'text',
+          text: isWork ? WORK_RULES : TEACH_RULES,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      tools,
+      messages: formatted,
     })
 
     const readable = new ReadableStream({
       async start(controller) {
+        const send = (e: TutorEvent) => controller.enqueue(encodeEvent(e))
+
+        // tool_use arrives as a block header then input_json_delta fragments;
+        // hold each block until content_block_stop so partial JSON never ships.
+        const pending = new Map<number, { name: string; json: string }>()
+
         try {
           for await (const event of stream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(new TextEncoder().encode(event.delta.text))
+            if (event.type === 'content_block_start') {
+              if (event.content_block.type === 'tool_use') {
+                pending.set(event.index, { name: event.content_block.name, json: '' })
+              }
+              continue
+            }
+
+            if (event.type === 'content_block_delta') {
+              if (event.delta.type === 'text_delta') {
+                send({ t: 'text', v: event.delta.text })
+              } else if (event.delta.type === 'input_json_delta') {
+                const p = pending.get(event.index)
+                if (p) p.json += event.delta.partial_json
+              }
+              continue
+            }
+
+            if (event.type === 'content_block_stop') {
+              const p = pending.get(event.index)
+              if (!p) continue
+              pending.delete(event.index)
+              try {
+                const input = p.json ? JSON.parse(p.json) : {}
+                send({ t: 'tool', name: p.name as never, input })
+              } catch {
+                /* drop a tool call we cannot parse rather than break the turn */
+              }
             }
           }
+
+          const final = await stream.finalMessage().catch(() => null)
+          send({
+            t: 'done',
+            usage: final
+              ? { in: final.usage.input_tokens, out: final.usage.output_tokens }
+              : undefined,
+          })
           controller.close()
         } catch (err) {
-          controller.error(err)
+          // Once bytes are on the wire the route's try/catch can no longer
+          // respond, so the failure has to travel as an envelope.
+          const message =
+            err instanceof Error ? err.message : 'The tutor stopped unexpectedly.'
+          send({ t: 'error', message })
+          controller.close()
         }
       },
     })
 
-    return new Response(readable, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'X-Accel-Buffering': 'no',
-      },
-    })
+    return ndjson(readable)
   } catch (err) {
     console.error('tutor error', err)
     const message = err instanceof Error ? err.message : 'Tutor failed'
