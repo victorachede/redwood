@@ -3,6 +3,8 @@
 export type PastQuestion = {
   id: string
   subjectId: string
+  /** Syllabus topic from subjects.ts, so a miss can be retaught in context. */
+  topic?: string
   year: number
   exam: 'JAMB' | 'WAEC' | 'NECO'
   question: string
@@ -15,6 +17,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-001',
     subjectId: 'mathematics',
+    topic: 'Algebraic processes',
     year: 2023,
     exam: 'JAMB',
     question: 'If 2x + 5 = 17, what is the value of x?',
@@ -25,6 +28,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-002',
     subjectId: 'mathematics',
+    topic: 'Statistics & probability',
     year: 2022,
     exam: 'WAEC',
     question: 'The mean of 3, 5, 7, 9 is:',
@@ -35,6 +39,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-003',
     subjectId: 'mathematics',
+    topic: 'Number & numeration',
     year: 2021,
     exam: 'JAMB',
     question: 'Simplify: 2³ × 2²',
@@ -45,6 +50,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-001',
     subjectId: 'physics',
+    topic: 'Mechanics',
     year: 2023,
     exam: 'JAMB',
     question: 'The S.I. unit of force is the:',
@@ -55,6 +61,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-002',
     subjectId: 'physics',
+    topic: 'Mechanics',
     year: 2022,
     exam: 'WAEC',
     question: 'Which of the following is a vector quantity?',
@@ -65,6 +72,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-003',
     subjectId: 'physics',
+    topic: 'Waves & sound',
     year: 2021,
     exam: 'JAMB',
     question: 'Light travels fastest in:',
@@ -75,6 +83,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-001',
     subjectId: 'chemistry',
+    topic: 'Periodic table',
     year: 2023,
     exam: 'JAMB',
     question: 'The atomic number of an element is the number of:',
@@ -85,6 +94,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-002',
     subjectId: 'chemistry',
+    topic: 'Acids, bases & salts',
     year: 2022,
     exam: 'WAEC',
     question: 'A Brønsted-Lowry acid is a substance that:',
@@ -100,6 +110,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-003',
     subjectId: 'chemistry',
+    topic: 'Particulate nature of matter',
     year: 2021,
     exam: 'JAMB',
     question: 'The process of converting a liquid to a gas is called:',
@@ -110,6 +121,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-001',
     subjectId: 'biology',
+    topic: 'Cell biology',
     year: 2023,
     exam: 'JAMB',
     question: 'The powerhouse of the cell is the:',
@@ -120,6 +132,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-002',
     subjectId: 'biology',
+    topic: 'Cell biology',
     year: 2022,
     exam: 'WAEC',
     question: 'Photosynthesis takes place in the:',
@@ -130,6 +143,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-003',
     subjectId: 'biology',
+    topic: 'Transport systems',
     year: 2021,
     exam: 'JAMB',
     question: 'Which blood group is the universal donor?',
@@ -140,6 +154,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eng-001',
     subjectId: 'english',
+    topic: 'Lexis & structure',
     year: 2023,
     exam: 'JAMB',
     question: 'Choose the option nearest in meaning to “abundant”:',
@@ -150,6 +165,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eng-002',
     subjectId: 'english',
+    topic: 'Lexis & structure',
     year: 2022,
     exam: 'WAEC',
     question: 'The opposite of “generous” is:',
@@ -160,6 +176,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eco-001',
     subjectId: 'economics',
+    topic: 'Demand & supply',
     year: 2023,
     exam: 'JAMB',
     question: 'Demand for a commodity is said to be elastic when:',
@@ -176,6 +193,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-004',
     subjectId: 'mathematics',
+    topic: 'Number & numeration',
     year: 2020,
     exam: 'WAEC',
     question: 'Factorize: x² − 5x + 6',
@@ -186,6 +204,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-005',
     subjectId: 'mathematics',
+    topic: 'Number & numeration',
     year: 2019,
     exam: 'JAMB',
     question: 'What is 15% of 80?',
@@ -196,6 +215,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-004',
     subjectId: 'physics',
+    topic: 'Electricity',
     year: 2020,
     exam: 'WAEC',
     question: 'Ohm’s law states that V is proportional to I when:',
@@ -206,6 +226,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-005',
     subjectId: 'physics',
+    topic: 'Electricity',
     year: 2019,
     exam: 'JAMB',
     question: 'The unit of electric current is the:',
@@ -216,6 +237,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-004',
     subjectId: 'chemistry',
+    topic: 'Particulate nature of matter',
     year: 2020,
     exam: 'WAEC',
     question: 'Which gas is produced when dilute HCl reacts with zinc?',
@@ -226,6 +248,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-005',
     subjectId: 'chemistry',
+    topic: 'Acids, bases & salts',
     year: 2019,
     exam: 'JAMB',
     question: 'The pH of a neutral solution at 25°C is:',
@@ -236,6 +259,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-004',
     subjectId: 'biology',
+    topic: 'Transport systems',
     year: 2020,
     exam: 'WAEC',
     question: 'How many chambers does the human heart have?',
@@ -246,6 +270,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-005',
     subjectId: 'biology',
+    topic: 'Cell biology',
     year: 2019,
     exam: 'JAMB',
     question: 'The process by which plants lose water vapour is:',
@@ -256,6 +281,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eng-003',
     subjectId: 'english',
+    topic: 'Lexis & structure',
     year: 2021,
     exam: 'JAMB',
     question: 'Choose the correctly spelled word:',
@@ -266,6 +292,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eng-004',
     subjectId: 'english',
+    topic: 'Lexis & structure',
     year: 2020,
     exam: 'WAEC',
     question: '“She has sung the song” is in the:',
@@ -276,6 +303,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eco-003',
     subjectId: 'economics',
+    topic: 'Demand & supply',
     year: 2021,
     exam: 'JAMB',
     question: 'A market with only one seller is a:',
@@ -286,6 +314,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eco-004',
     subjectId: 'economics',
+    topic: 'Money & banking',
     year: 2020,
     exam: 'WAEC',
     question: 'Inflation is a sustained increase in:',
@@ -296,6 +325,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eco-002',
     subjectId: 'economics',
+    topic: 'Basic economic problems',
     year: 2022,
     exam: 'WAEC',
     question: 'The basic economic problem is:',
@@ -311,6 +341,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-neco-001',
     subjectId: 'mathematics',
+    topic: 'Number & numeration',
     year: 2023,
     exam: 'NECO',
     question: 'Evaluate 3/4 + 1/6',
@@ -321,6 +352,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'mth-neco-002',
     subjectId: 'mathematics',
+    topic: 'Number & numeration',
     year: 2022,
     exam: 'NECO',
     question: 'If the probability of an event is 0.35, the probability it does not occur is:',
@@ -331,6 +363,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-neco-001',
     subjectId: 'physics',
+    topic: 'Mechanics',
     year: 2023,
     exam: 'NECO',
     question: 'Which of the following is a renewable energy source?',
@@ -341,6 +374,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'phy-neco-002',
     subjectId: 'physics',
+    topic: 'Electricity',
     year: 2021,
     exam: 'NECO',
     question: 'The unit of electric current is the:',
@@ -351,6 +385,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'chm-neco-001',
     subjectId: 'chemistry',
+    topic: 'Particulate nature of matter',
     year: 2022,
     exam: 'NECO',
     question: 'The most abundant gas in the atmosphere is:',
@@ -361,6 +396,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'bio-neco-001',
     subjectId: 'biology',
+    topic: 'Cell biology',
     year: 2023,
     exam: 'NECO',
     question: 'Photosynthesis takes place mainly in the:',
@@ -371,6 +407,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eng-neco-001',
     subjectId: 'english',
+    topic: 'Lexis & structure',
     year: 2022,
     exam: 'NECO',
     question: 'Choose the word nearest in meaning to "benevolent":',
@@ -381,6 +418,7 @@ export const PAST_QUESTIONS: PastQuestion[] = [
   {
     id: 'eco-neco-001',
     subjectId: 'economics',
+    topic: 'Demand & supply',
     year: 2021,
     exam: 'NECO',
     question: 'A market with only one seller is called a:',

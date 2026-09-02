@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { encodeEvent, type TutorEvent } from '@/app/lib/tutorProtocol'
 import { TUTOR_TOOLS, WORK_TOOLS } from '@/app/lib/tutorTools'
+import { renderProfile, type LearnerProfile } from '@/app/lib/learnerProfile'
 
 export const maxDuration = 60
 
@@ -143,6 +144,7 @@ export async function POST(req: NextRequest) {
       documents,
       workKind,
       clarifyUsed,
+      profile,
     } = body as {
       subject?: string
       topic?: string
@@ -152,6 +154,7 @@ export async function POST(req: NextRequest) {
       documents?: { name: string; text: string }[]
       workKind?: string
       clarifyUsed?: boolean
+      profile?: LearnerProfile
     }
 
     if (!subject || typeof subject !== 'string') {
@@ -243,6 +246,8 @@ export async function POST(req: NextRequest) {
       !clarifyUsed &&
       (history.length <= 2 || lastStudentText.trim().length < 25)
 
+    const profileText = renderProfile(profile)
+
     const tools = isWork
       ? WORK_TOOLS
       : TUTOR_TOOLS.filter((t) => clarifyAllowed || t.name !== 'ask_clarifying')
@@ -253,11 +258,16 @@ export async function POST(req: NextRequest) {
       max_tokens: isWork ? 1200 : 900,
       temperature: 0.6,
       system: [
+        // Static half — cached, so the teaching rules and tool guidance are
+        // not re-billed on every turn of a conversation.
         {
           type: 'text',
           text: isWork ? WORK_RULES : TEACH_RULES,
           cache_control: { type: 'ephemeral' },
         },
+        // Volatile half — changes per student, so it must stay outside the
+        // cache boundary.
+        ...(profileText ? [{ type: 'text' as const, text: profileText }] : []),
       ],
       tools,
       messages: formatted,

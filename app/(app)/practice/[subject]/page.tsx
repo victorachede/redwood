@@ -11,7 +11,7 @@ import {
   type PastQuestion,
   type ExamBoard,
 } from '@/app/lib/questions'
-import { savePractice } from '@/app/lib/progress'
+import { savePractice, saveMisses } from '@/app/lib/progress'
 import { ExamBadge } from '@/components/ExamBadges'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { canAccessTimedMocks, isPro } from '@/app/lib/billing'
@@ -56,6 +56,21 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     return () => clearTimeout(t)
   }, [phase, timed, secondsLeft, revealed, q])
 
+  /** Records which questions were actually missed, so the tutor can reteach
+   *  them later. Aggregates alone could never support that. */
+  function persistMisses(list: PastQuestion[]) {
+    saveMisses(
+      list.map((m) => ({
+        subjectId: subject,
+        questionId: m.id,
+        question: m.question,
+        picked: m.options[m.answer] ? m.answer : '',
+        correct: m.answer,
+        topic: m.topic,
+      })),
+    )
+  }
+
   function start() {
     if (!bank.length) return
     setPhase('active')
@@ -84,6 +99,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
         total,
         at: Date.now(),
       })
+      persistMisses(misses)
       setPhase('done')
       return
     }
@@ -101,6 +117,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
       total: Math.max(attempted, 1),
       at: Date.now(),
     })
+    persistMisses(misses)
     setPhase('done')
   }
 
@@ -335,11 +352,17 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 Practice again
               </button>
               <Link
-                href={`/learn/${subject}`}
+                href={
+                  misses.length
+                    ? `/learn/${subject}?focus=${encodeURIComponent(misses[0].question)}${
+                        misses[0].topic ? `&topic=${encodeURIComponent(misses[0].topic)}` : ''
+                      }`
+                    : `/learn/${subject}`
+                }
                 className="rounded-xl px-5 py-2.5 text-[13.5px] font-medium text-white no-underline"
                 style={{ background: accent }}
               >
-                Learn with tutor
+                {misses.length ? 'Go over what I missed' : 'Learn with tutor'}
               </Link>
             </div>
           

@@ -13,6 +13,7 @@ import type {
   RecordMasteryInput,
 } from '@/app/lib/tutorProtocol'
 import { openWorkFromTutor } from '@/app/lib/workGate'
+import { buildLearnerProfile } from '@/app/lib/learnerProfile'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { SubjectIcon } from '@/components/SubjectIcon'
 
@@ -277,6 +278,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           focus: focusHint,
           documents: docs,
           clarifyUsed: clarifyUsedRef.current,
+          profile: buildLearnerProfile(subject),
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
@@ -328,6 +330,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           action: 'respond',
           documents: docsSnapshot,
           clarifyUsed: clarifyUsedRef.current,
+          profile: buildLearnerProfile(subject),
         }),
       })
       if (!res.ok) throw new Error(await readTutorError(res))
