@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Check, MessageSquareText, PenLine, Target } from 'lucide-react'
+import { ArrowRight, Check, MessageSquareText, PenLine, Target, X } from 'lucide-react'
 import { SUBJECTS } from '@/app/lib/subjects'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { ExamBadgeRow } from '@/components/ExamBadges'
@@ -10,40 +10,50 @@ import { formatNgn, PLANS } from '@/app/lib/billing'
 const STEPS = [
   {
     n: '1',
-    title: 'Pick a topic',
-    body: 'Six subjects, thirty topics. Start anywhere — Ewin meets you where you are.',
-    Icon: Target,
-  },
-  {
-    n: '2',
-    title: 'Learn one idea',
-    body: 'A short explanation, then a question. You answer in your own words, not multiple choice.',
+    title: 'It explains one idea',
+    body: 'Not a chapter. One idea, in a few sentences, in plain English — with an example you have actually seen before.',
     Icon: MessageSquareText,
   },
   {
+    n: '2',
+    title: 'Then it asks you',
+    body: 'You type the answer in your own words. Not A, B, C or D. Guessing a letter is how you find out you did not know it — in the hall.',
+    Icon: Target,
+  },
+  {
     n: '3',
-    title: 'Find out what was wrong',
-    body: 'Not "good try". Ewin names the exact step that broke, and remembers it next time.',
+    title: 'And it tells you what broke',
+    body: 'Not "good try". Ewin names the exact step that went wrong, why it went wrong, and asks you again.',
     Icon: PenLine,
   },
 ]
 
+const HONEST = [
+  'Give you answers to copy into your assignment',
+  'Replace your teacher, or your textbook',
+  'Help you in the exam hall — you are on your own there',
+]
+
 const FAQS = [
   {
-    q: 'Is Ewin free?',
-    a: 'Yes. Tutor sessions, study cards and practice are free. Pro adds timed mocks and unlimited drills, paid with Paystack.',
+    q: 'Is it really free?',
+    a: 'Yes. Tutor sessions, practice questions and study cards cost nothing, with no card and no trial that quietly ends. Pro adds timed full mocks and unlimited drills for ₦2,500 a month, paid with Paystack.',
+  },
+  {
+    q: 'How is this different from asking ChatGPT?',
+    a: 'A general chatbot answers your question and stops. Ewin makes you answer, marks what you wrote, and remembers next week which topic you got wrong. It is built around WAEC, NECO and JAMB phrasing, and it knows that a missing unit costs you marks.',
   },
   {
     q: 'Do I need an account?',
-    a: 'No. Open a subject and start. Sign up only when you want your progress saved across devices.',
+    a: 'No. Open a subject and start. Create an account only when you want your streak and progress to follow you to another phone.',
   },
   {
-    q: 'Which exams?',
-    a: 'WAEC, NECO and JAMB style. Ewin is not affiliated with the boards — materials are for learning only.',
+    q: 'Will it work on my phone?',
+    a: 'It is built for a phone first, and for a normal connection. You can add it to your home screen and open it like an app.',
   },
   {
-    q: 'Can I use it in the exam hall?',
-    a: 'No. Use it to prepare at home. In the hall you are on your own, which is the whole point of preparing properly.',
+    q: 'Is this cheating?',
+    a: 'It is the opposite. Ewin will not hand you an answer to copy — it makes you produce the answer yourself, which is the part that actually shows up in your score.',
   },
 ]
 
@@ -77,15 +87,21 @@ export default function Home() {
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-4 pb-10 pt-12 sm:pt-16">
+        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium text-ink-muted">
+          <span className="h-1.5 w-1.5 rounded-full bg-correct" />
+          Built for WAEC · NECO · JAMB
+        </p>
+
         <h1 className="font-display text-[clamp(2rem,8vw,3.25rem)] leading-[1.08] text-ink">
-          Learn one idea.
+          Stop cramming.
           <br />
-          Then prove you got it.
+          Start knowing.
         </h1>
 
         <p className="mt-4 max-w-md text-[16px] leading-[1.6] text-ink-muted">
-          Ewin explains a little, asks you a question, then tells you exactly what held up and
-          what did not — so you understand it before exam day.
+          Most study apps talk at you. Ewin explains one idea, then makes you answer a question
+          about it — and tells you exactly which step you got wrong. That is the whole difference
+          between reading a topic and actually knowing it.
         </p>
 
         <div className="mt-7 flex flex-wrap gap-2.5">
@@ -93,7 +109,7 @@ export default function Home() {
             href="/dashboard"
             className="press inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-[var(--on-primary)] no-underline"
           >
-            Start learning
+            Start learning — free
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
@@ -104,7 +120,9 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="mt-3 text-[13px] text-ink-muted">Free to start · no card needed</p>
+        <p className="mt-3 text-[13px] text-ink-muted">
+          No card. No account needed to start.
+        </p>
 
         {/* A still of the real thing, not an animation that moves the page */}
         <div className="mt-10 overflow-hidden rounded-2xl border border-line bg-surface shadow-[var(--shadow-md)]">
@@ -159,7 +177,10 @@ export default function Home() {
       {/* ── How it works ──────────────────────────────────────────────── */}
       <section className="border-y border-line bg-sunken">
         <div className="mx-auto max-w-3xl px-4 py-12">
-          <h2 className="font-display text-[26px] text-ink">How it works</h2>
+          <h2 className="font-display text-[26px] text-ink">How a session goes</h2>
+          <p className="mt-1.5 text-[14.5px] text-ink-muted">
+            About ten minutes. One idea at a time.
+          </p>
           <ul className="mt-6 space-y-4">
             {STEPS.map((s) => (
               <li key={s.n} className="flex gap-3.5">
@@ -178,9 +199,9 @@ export default function Home() {
 
       {/* ── Subjects ──────────────────────────────────────────────────── */}
       <section id="subjects" className="mx-auto max-w-3xl scroll-mt-16 px-4 py-12">
-        <h2 className="font-display text-[26px] text-ink">Subjects</h2>
+        <h2 className="font-display text-[26px] text-ink">What you can study</h2>
         <p className="mt-1.5 text-[14.5px] text-ink-muted">
-          Six subjects, thirty topics. Tutor or practice — your call.
+          Six subjects, thirty topics, and past-question practice in the style of each board.
         </p>
 
         <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
@@ -201,11 +222,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── What it won't do ──────────────────────────────────────────── */}
+      <section className="mx-auto max-w-3xl px-4 py-12">
+        <h2 className="font-display text-[26px] text-ink">What Ewin will not do</h2>
+        <p className="mt-1.5 text-[14.5px] text-ink-muted">
+          Worth saying plainly, so nobody is surprised.
+        </p>
+        <ul className="mt-5 space-y-2.5">
+          {HONEST.map((h) => (
+            <li
+              key={h}
+              className="flex items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3.5"
+            >
+              <X className="mt-0.5 h-4 w-4 shrink-0 text-wrong" />
+              <span className="min-w-0 text-[14.5px] leading-relaxed text-ink">{h}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-[14px] leading-relaxed text-ink-muted">
+          It makes you produce the answer yourself. That is the part that shows up in your score.
+        </p>
+      </section>
+
       {/* ── Pricing ───────────────────────────────────────────────────── */}
       <section className="border-y border-line bg-sunken">
         <div className="mx-auto max-w-3xl px-4 py-12">
-          <h2 className="font-display text-[26px] text-ink">Free to start</h2>
-          <p className="mt-1.5 text-[14.5px] text-ink-muted">Pro when you want timed mocks.</p>
+          <h2 className="font-display text-[26px] text-ink">Free covers real studying</h2>
+          <p className="mt-1.5 text-[14.5px] text-ink-muted">
+            Pro is for mock season — timed papers and unlimited drills.
+          </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-line bg-surface p-5">
@@ -261,7 +306,7 @@ export default function Home() {
 
       {/* ── FAQ ───────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-4 py-12">
-        <h2 className="font-display text-[26px] text-ink">Questions</h2>
+        <h2 className="font-display text-[26px] text-ink">Straight answers</h2>
         <div className="mt-5 space-y-2.5">
           {FAQS.map((f) => (
             <details
@@ -283,15 +328,15 @@ export default function Home() {
       {/* ── Close ─────────────────────────────────────────────────────── */}
       <section className="border-t border-line bg-sunken">
         <div className="mx-auto max-w-3xl px-4 py-14 text-center">
-          <h2 className="font-display text-[26px] text-ink">Ready when you are</h2>
+          <h2 className="font-display text-[26px] text-ink">Exam day is coming either way</h2>
           <p className="mx-auto mt-2 max-w-sm text-[14.5px] text-ink-muted">
-            Ten focused minutes beat a late-night cram.
+            Ten honest minutes tonight beat three hours of cramming the week before.
           </p>
           <Link
             href="/dashboard"
             className="press mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[15px] font-medium text-[var(--on-primary)] no-underline"
           >
-            Start learning
+            Start with one topic
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
