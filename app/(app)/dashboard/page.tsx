@@ -80,13 +80,13 @@ export default function TodayPage() {
           href={primary.href}
           className="press block rounded-2xl bg-hero p-5 no-underline shadow-[var(--shadow-md)]"
         >
-          <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--on-hero-dim)]">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-on-hero-dim">
             Pick up where you left off
           </p>
-          <p className="mt-2 font-display text-[22px] leading-tight text-[var(--on-hero)]">
+          <p className="mt-2 font-display text-[22px] leading-tight text-on-hero">
             {primary.label}
           </p>
-          <p className="mt-1 flex items-center gap-1.5 text-[13.5px] text-[var(--on-hero-dim)]">
+          <p className="mt-1 flex items-center gap-1.5 text-[13.5px] text-on-hero-dim">
             {primary.sub}
             <ArrowRight className="h-4 w-4" />
           </p>

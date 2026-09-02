@@ -26,7 +26,7 @@
   /* Ink */
   --ink: #1a1714;
   --ink-muted: #6b6355;
-  --ink-faint: #9a9081;
+  --ink-faint: #857c6d;
   --on-dark: #f7f3ea;
 
   /* Lines */
@@ -91,7 +91,7 @@
 
     --ink: #f5f1e8;
     --ink-muted: #a39b8b;
-    --ink-faint: #756d5f;
+    --ink-faint: #8d8474;
 
     --line: #302b23;
     --line-strong: #423b30;
@@ -129,7 +129,7 @@
 
   --ink: #f5f1e8;
   --ink-muted: #a39b8b;
-  --ink-faint: #756d5f;
+  --ink-faint: #8d8474;
 
   --line: #302b23;
   --line-strong: #423b30;
@@ -185,6 +185,7 @@
 
   --color-hero: var(--hero);
   --color-on-hero: var(--on-hero);
+  --color-on-hero-dim: var(--on-hero-dim);
 
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-bricolage);
@@ -215,17 +216,41 @@
   min-width: auto;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+/* These element resets MUST live in @layer base.
+   Unlayered CSS outranks every layered rule, so an unlayered
+   `a { color: inherit }` silently beats every Tailwind text-* utility —
+   which is exactly what was making button labels inherit body colour. */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-bricolage), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
 }
 
 /* Display face carries the personality; body stays quiet and legible */
@@ -233,24 +258,6 @@ body {
   font-family: var(--font-bricolage), Georgia, serif;
   font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-bricolage), Georgia, serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-}
-
-button {
-  font: inherit;
-  color: inherit;
 }
 
 :focus-visible {

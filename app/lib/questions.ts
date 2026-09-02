@@ -1,10 +1,15 @@
 /** Seed past questions — expand over time. Shape mirrors CardStack mock. */
 
+import type { DiagramSpec } from '@/app/lib/tutorProtocol'
+
 export type PastQuestion = {
   id: string
   subjectId: string
   /** Syllabus topic from subjects.ts, so a miss can be retaught in context. */
   topic?: string
+  /** Optional figure, rendered by components/Diagram — many real WAEC and
+   *  JAMB questions carry one. */
+  figure?: DiagramSpec
   year: number
   exam: 'JAMB' | 'WAEC' | 'NECO'
   question: string

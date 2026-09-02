@@ -37,20 +37,17 @@ export function ShareStreakCard() {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[var(--shadow-md)]">
-      {/* Navy + gold, not the old green — this card is the artefact students
-          screenshot and share, so it has to look like the brand. */}
+      {/* This is the card students screenshot and share, so it carries the
+          product's primary colour rather than a one-off treatment. */}
       <div
         className="relative overflow-hidden px-5 pb-5 pt-6 text-white"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 80% at 85% 110%, rgba(201,168,76,0.38), transparent 62%), linear-gradient(158deg, #0a1428 0%, #0e1b3a 48%, #16274d 100%)',
-        }}
+        style={{ background: 'var(--primary)' }}
       >
-        <div className="absolute inset-x-0 top-0 h-px" />
+        
 
         <div className="relative flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-on-primary opacity-70">
               Ewin · Study streak
             </p>
             <p className="mt-3 flex items-baseline gap-2">
@@ -61,7 +58,7 @@ export function ShareStreakCard() {
             </p>
             <p className="mt-1 text-[13px] text-ink-muted">{name}</p>
           </div>
-          <EwinAvatar size={40} className="ring-2 ring-gold-500/30" />
+          <EwinAvatar size={40} className="ring-2 ring-white/25" />
         </div>
 
         <p className="relative mt-4 text-[13px] leading-relaxed text-ink-muted">
@@ -73,7 +70,7 @@ export function ShareStreakCard() {
         <button
           type="button"
           onClick={() => void share()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 py-2.5 text-[13px] font-semibold text-primary shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100"
+          className="press flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-[13.5px] font-semibold text-on-primary"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
           {copied ? 'Copied' : 'Share streak'}

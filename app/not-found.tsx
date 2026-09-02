@@ -1,41 +1,35 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 
 export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col bg-paper text-ink">
-      <section className="relative flex flex-1 items-center overflow-hidden bg-primary">
-        <div className="absolute inset-x-0 bottom-0 h-px" />
+      <SiteHeader />
 
-        <div className="relative mx-auto w-full max-w-2xl px-5 py-24 text-center sm:px-8">
-          <p className="font-serif text-[clamp(4.5rem,14vw,8rem)] font-semibold leading-none tracking-[-0.04em]">
-            404
-          </p>
-
-          <h1 className="mt-4 font-serif text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-[-0.02em] text-white">
-            That page is not in the syllabus
-          </h1>
-
-          <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-ink-muted">
-            The link may be old or mistyped. Everything you can study is one tap away.
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 px-6 py-3 text-[14px] font-semibold text-primary no-underline shadow-[var(--shadow-md)]"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back home
-            </Link>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center rounded-xl border border-white/15 bg-surface/[0.07] px-6 py-3 text-[14px] font-medium text-white no-underline backdrop-blur-sm transition-colors hover:bg-surface/[0.13]"
-            >
-              Go to dashboard
-            </Link>
-          </div>
+      <section className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-16 text-center">
+        <p className="font-display text-[clamp(3.5rem,18vw,5.5rem)] leading-none text-primary opacity-30">
+          404
+        </p>
+        <h1 className="mt-3 font-display text-[24px] text-ink">
+          That page is not in the syllabus
+        </h1>
+        <p className="mx-auto mt-3 max-w-xs text-[15px] leading-relaxed text-ink-muted">
+          The link may be old or mistyped. Everything you can study is one tap away.
+        </p>
+        <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:justify-center">
+          <Link
+            href="/dashboard"
+            className="press rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-on-primary no-underline"
+          >
+            Go to Today
+          </Link>
+          <Link
+            href="/"
+            className="press rounded-full border border-line bg-surface px-6 py-3.5 text-[15px] font-medium text-ink no-underline"
+          >
+            Back home
+          </Link>
         </div>
       </section>
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, FileText, Plus, X, BookOpen } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, FileText, Plus, X, BookOpen } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
 import { saveSession, saveTutorMessages, recordMastery } from '@/app/lib/progress'
 import { addCard } from '@/app/lib/cards'
@@ -14,6 +14,9 @@ import type {
 } from '@/app/lib/tutorProtocol'
 import { openWorkFromTutor } from '@/app/lib/workGate'
 import { buildLearnerProfile } from '@/app/lib/learnerProfile'
+import { prepareImage, type PreparedImage } from '@/app/lib/image'
+import { Diagram } from '@/components/Diagram'
+import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { SubjectIcon } from '@/components/SubjectIcon'
 
@@ -22,6 +25,10 @@ type Message = {
   content: string
   type?: string
   attachments?: { name: string }[]
+  /** Photos the student sent, kept as previews for the transcript */
+  photos?: string[]
+  /** Figures the tutor drew during this reply */
+  diagrams?: ShowDiagramInput[]
 }
 
 type DocAttach = { name: string; text: string }
@@ -140,7 +147,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const subjectLabel =
     meta?.name ?? subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ')
   /** Subject accent drives the question block, topic numerals and header rule. */
-  const accent = meta?.accent ?? 'var(--navy-700)'
+  const accent = meta?.accent ?? 'var(--primary)'
 
   const [topic, setTopic] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -154,6 +161,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const clarifyUsedRef = useRef(false)
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const [docs, setDocs] = useState<DocAttach[]>([])
+  const [photos, setPhotos] = useState<PreparedImage[]>([])
+  const photoRef = useRef<HTMLInputElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -216,12 +225,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   async function runTurn(res: Response, base: Message[], type?: string) {
     let text = ''
     let failed: string | null = null
+    const figures: ShowDiagramInput[] = []
 
     await readTutorStream(res, (e: TutorEvent) => {
       switch (e.t) {
         case 'text': {
           text += e.v
-          setMessages([...base, { role: 'tutor', content: text, type }])
+          setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
           break
         }
         case 'tool': {
@@ -238,6 +248,12 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           } else if (e.name === 'record_mastery') {
             const m = e.input as RecordMasteryInput
             if (m?.topic && m?.level) recordMastery(subject, m.topic, m.level)
+          } else if (e.name === 'show_diagram') {
+            const d = e.input as ShowDiagramInput
+            if (d?.spec?.kind) {
+              figures.push(d)
+              setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
+            }
           }
           break
         }
@@ -251,7 +267,22 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     })
 
     if (failed && !text) throw new Error(failed)
-    return { text, failed }
+    return { text, failed, figures }
+  }
+
+  async function onPickPhotos(files: FileList | null) {
+    if (!files?.length) return
+    const room = 3 - photos.length
+    const next: PreparedImage[] = []
+    for (const file of Array.from(files).slice(0, Math.max(0, room))) {
+      try {
+        next.push(await prepareImage(file))
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Could not read that photo.')
+      }
+    }
+    if (next.length) setPhotos((p) => [...p, ...next].slice(0, 3))
+    if (photoRef.current) photoRef.current.value = ''
   }
 
   async function startSession(chosenTopic: string, opts?: { resume?: boolean; focus?: string }) {
@@ -302,20 +333,27 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   }
 
   async function send() {
-    if ((!input.trim() && docs.length === 0) || loading) return
+    if ((!input.trim() && docs.length === 0 && photos.length === 0) || loading) return
     const label =
       input.trim() ||
-      (docs.length ? `(Attached: ${docs.map((d) => d.name).join(', ')})` : '')
+      (photos.length
+        ? 'Here is my work — please check it.'
+        : docs.length
+          ? `(Attached: ${docs.map((d) => d.name).join(', ')})`
+          : '')
     const userMsg: Message = {
       role: 'student',
       content: label,
       attachments: docs.map((d) => ({ name: d.name })),
+      photos: photos.map((ph) => ph.preview),
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
     const docsSnapshot = [...docs]
+    const photoSnapshot = [...photos]
     setInput('')
     setDocs([])
+    setPhotos([])
     if (inputRef.current) inputRef.current.style.height = 'auto'
     setLoading(true)
     setError(null)
@@ -326,7 +364,17 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         body: JSON.stringify({
           subject: subjectLabel,
           topic,
-          messages: updated,
+          messages: updated.map((m, i) =>
+            i === updated.length - 1 && photoSnapshot.length
+              ? {
+                  ...m,
+                  images: photoSnapshot.map((ph) => ({
+                    mediaType: ph.mediaType,
+                    data: ph.data,
+                  })),
+                }
+              : m,
+          ),
           action: 'respond',
           documents: docsSnapshot,
           clarifyUsed: clarifyUsedRef.current,
@@ -348,6 +396,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       setMessages(messages)
       setInput(userMsg.content)
       setDocs(docsSnapshot)
+      setPhotos(photoSnapshot)
     } finally {
       setLoading(false)
     }
@@ -389,7 +438,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             {meta && <SubjectIcon icon={meta.icon} accent={accent} size={52} tone="solid" />}
             <div className="min-w-0 flex-1 pt-0.5">
               <h1 className="font-display text-[26px] leading-tight text-ink">{subjectLabel}</h1>
-              <p className="text-[12.5px] uppercase tracking-wide text-ink-faint">
+              <p className="text-[12.5px] uppercase tracking-wide text-ink-muted">
                 {meta?.exam ?? 'WAEC · JAMB'}
               </p>
             </div>
@@ -476,7 +525,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     )
   }
 
-  const canSend = Boolean(input.trim() || docs.length) && !loading
+  const canSend = Boolean(input.trim() || docs.length || photos.length) && !loading
 
   // ── Chat ──────────────────────────────────────────────────────────────────
   return (
@@ -528,7 +577,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                       {m.attachments.map((a) => (
                         <span
                           key={a.name}
-                          className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[11px] text-[var(--on-primary)]"
+                          className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[11px] text-on-primary"
                         >
                           <FileText className="h-3 w-3" />
                           {a.name}
@@ -536,7 +585,20 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                       ))}
                     </div>
                   )}
-                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-[var(--on-primary)]">
+                  {m.photos && m.photos.length > 0 && (
+                    <div className="mb-2 flex flex-wrap gap-1.5">
+                      {m.photos.map((src) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={src}
+                          src={src}
+                          alt="Your work"
+                          className="h-24 w-24 rounded-lg object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-on-primary">
                     {m.content}
                   </p>
                 </div>
@@ -544,8 +606,11 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             ) : (
               <div key={i} className="rise flex gap-2.5">
                 <EwinAvatar size={28} className="mt-0.5 shrink-0" />
-                <div className="min-w-0 flex-1 pt-0.5">
+                <div className="min-w-0 flex-1 space-y-3 pt-0.5">
                   <TutorBody text={m.content} accent={accent} streaming={streaming} />
+                  {m.diagrams?.map((d, k) => (
+                    <Diagram key={k} spec={d.spec} caption={d.caption} />
+                  ))}
                 </div>
               </div>
             )
@@ -622,7 +687,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                         })
                         setSuggestedCards((s) => s.filter((x) => x.front !== c.front))
                       }}
-                      className="press shrink-0 rounded-full bg-primary px-3 py-1 text-[11.5px] font-medium text-[var(--on-primary)]"
+                      className="press shrink-0 rounded-full bg-primary px-3 py-1 text-[11.5px] font-medium text-on-primary"
                     >
                       Save
                     </button>
@@ -667,6 +732,39 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             </div>
           )}
 
+          {photos.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {photos.map((ph, i) => (
+                <span key={ph.preview} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={ph.preview}
+                    alt=""
+                    className="h-16 w-16 rounded-lg border border-line object-cover"
+                  />
+                  <button
+                    type="button"
+                    aria-label="Remove photo"
+                    onClick={() => setPhotos((p) => p.filter((_, k) => k !== i))}
+                    className="press absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-paper"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <input
+            ref={photoRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            multiple
+            className="hidden"
+            onChange={(e) => void onPickPhotos(e.target.files)}
+          />
+
           <input
             ref={fileRef}
             type="file"
@@ -677,6 +775,16 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           />
 
           <div className="flex items-end gap-1.5 rounded-[22px] border border-line bg-surface p-1.5 focus-within:border-primary">
+            <button
+              type="button"
+              onClick={() => photoRef.current?.click()}
+              disabled={loading || photos.length >= 3}
+              className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-faint hover:bg-sunken hover:text-ink disabled:opacity-30"
+              aria-label="Take a photo of your work"
+            >
+              <Camera className="h-[19px] w-[19px]" />
+            </button>
+
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
@@ -693,7 +801,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
               onChange={onInputChange}
               onKeyDown={onKeyDown}
               rows={1}
-              placeholder="Answer, or ask anything…"
+              placeholder={photos.length ? "Add a note, or just send…" : "Answer, or ask anything…"}
               disabled={loading}
               className="max-h-[120px] min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-[16px] leading-snug text-ink outline-none placeholder:text-ink-faint disabled:opacity-50"
             />

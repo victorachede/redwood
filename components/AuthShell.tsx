@@ -37,7 +37,7 @@ export function AuthShell({
             <span className="text-[16px] font-semibold tracking-tight text-ink">Ewin</span>
           </Link>
 
-          <h1 className="font-serif text-[1.875rem] font-semibold tracking-[-0.025em]">{title}</h1>
+          <h1 className="font-display text-[1.875rem] font-semibold tracking-[-0.025em]">{title}</h1>
           <p className="mt-1.5 text-[14.5px] text-ink-muted">{subtitle}</p>
 
           {children}
@@ -58,22 +58,22 @@ export function AuthShell({
           />
 
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-on-primary">
               Ewin Academy
             </p>
-            <p className="mt-5 max-w-sm font-serif text-[2rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white">
+            <p className="mt-5 max-w-sm font-display text-[2rem] leading-[1.2] text-on-primary">
               Learn one idea.
               <br />
               <span className="">Then prove you got it.</span>
             </p>
-            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-ink-muted">
+            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-on-primary opacity-75">
               Short lessons, a real check after each one, and feedback that names exactly what
               held up and what did not.
             </p>
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-on-primary opacity-75">
               Built around
             </p>
             <ExamBadgeRow variant="dark" />
@@ -114,7 +114,7 @@ export function AuthField({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="mt-1.5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-streak focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
+        className="mt-1.5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-primary"
       />
     </label>
   )
@@ -134,7 +134,7 @@ export function AuthSubmit({
     <button
       type="submit"
       disabled={loading}
-      className="w-full rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14.5px] font-semibold text-[var(--on-primary)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
+      className="press w-full rounded-full bg-primary py-3.5 text-[15px] font-semibold text-on-primary disabled:opacity-60"
     >
       {loading ? (loadingLabel ?? 'Working…') : children}
     </button>
