@@ -1,67 +1,36 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
+import { Geist, Geist_Mono, Bricolage_Grotesque } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
+const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+/** Display face. Variable, so one file covers the whole weight range. */
+const bricolage = Bricolage_Grotesque({
+  variable: '--font-bricolage',
   subsets: ['latin'],
-})
-
-const sourceSerif = Source_Serif_4({
-  variable: '--font-source-serif',
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Ewin — AI tutor for WAEC, NECO & JAMB',
-    template: '%s · Ewin',
-  },
+  title: { default: 'Ewin — learn one idea, then prove it', template: '%s · Ewin' },
   description:
-    'An AI tutor that teaches one concept, then checks you understood — built for Nigerian secondary students preparing for WAEC, NECO and JAMB.',
+    'An AI tutor that teaches one idea, then checks you got it. Built for Nigerian secondary students preparing for WAEC, NECO and JAMB.',
   applicationName: 'Ewin',
-  keywords: [
-    'WAEC',
-    'JAMB',
-    'NECO',
-    'AI tutor',
-    'Nigeria',
-    'secondary school',
-    'exam prep',
-    'Ewin',
-  ],
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Ewin', statusBarStyle: 'default' },
+  keywords: ['WAEC', 'JAMB', 'NECO', 'AI tutor', 'Nigeria', 'exam prep', 'Ewin'],
   authors: [{ name: 'Ewin Academy' }],
-  creator: 'Ewin Academy',
-  metadataBase: new URL('https://ewin.vercel.app'),
+  metadataBase: new URL('https://redwood-sand.vercel.app'),
   openGraph: {
     type: 'website',
     locale: 'en_NG',
     siteName: 'Ewin',
-    title: 'Ewin — AI tutor for WAEC, NECO & JAMB',
-    description:
-      'Learn one idea. Then prove you got it. Free AI tutor built for Nigerian secondary students.',
-    images: [
-      {
-        url: '/og.png',
-        width: 1200,
-        height: 630,
-        alt: 'Ewin — AI tutor for WAEC, NECO & JAMB',
-      },
-    ],
+    title: 'Ewin — learn one idea, then prove it',
+    description: 'Free AI tutor for WAEC, NECO and JAMB.',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Ewin' }],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Ewin — AI tutor for WAEC, NECO & JAMB',
-    description:
-      'Learn one idea. Then prove you got it. Free AI tutor for Nigerian secondary students.',
-    images: ['/og.png'],
-  },
+  twitter: { card: 'summary_large_image', images: ['/og.png'] },
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
@@ -72,25 +41,32 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0a1428',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fbf8f2' },
+    { media: '(prefers-color-scheme: dark)', color: '#14120f' },
+  ],
 }
+
+/**
+ * Applies the saved theme before first paint. Without this the page renders
+ * light and then snaps to dark, which is worse than having no toggle at all.
+ */
+const THEME_BOOTSTRAP = `(function(){try{var t=localStorage.getItem('ewin-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})()`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable}`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable}`}
     >
       <head>
-        {/* Scroll-reveal is JS-driven. Without this, a no-JS visitor would see
-            every revealed section stranded at opacity 0. */}
-        <noscript>
-          <style>{`.reveal{opacity:1!important;animation:none!important}`}</style>
-        </noscript>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }

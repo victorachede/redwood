@@ -14,8 +14,6 @@ import {
 import { savePractice } from '@/app/lib/progress'
 import { ExamBadge } from '@/components/ExamBadges'
 import { SubjectIcon } from '@/components/SubjectIcon'
-import { Counter } from '@/components/Counter'
-import { Reveal } from '@/components/Reveal'
 import { canAccessTimedMocks, isPro } from '@/app/lib/billing'
 
 type Phase = 'idle' | 'active' | 'done'
@@ -110,7 +108,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     return (
       <main className="min-h-dvh bg-paper px-4 py-16 text-center text-ink">
         <p className="text-sm text-ink-muted">No practice questions for this subject yet.</p>
-        <Link href="/dashboard" className="mt-4 inline-block text-sm text-accent">
+        <Link href="/dashboard" className="mt-4 inline-block text-sm text-primary">
           ← Dashboard
         </Link>
       </main>
@@ -124,7 +122,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
           <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
             <Link
               href="/dashboard"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-paper-sunken hover:text-ink"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-sunken hover:text-ink"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -138,11 +136,11 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
         </header>
 
         <div className="mx-auto max-w-2xl px-4 py-10">
-          <Reveal>
+          
             <div className="flex items-center gap-3.5">
               {meta && <SubjectIcon icon={meta.icon} accent={accent} size={48} tone="solid" />}
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
                   {meta?.exam ?? 'WAEC · JAMB'}
                 </p>
                 <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.025em]">
@@ -150,14 +148,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 </h1>
               </div>
             </div>
-          </Reveal>
+          
 
-          <Reveal delay={70}>
+          
             <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">
               Exam board
             </p>
             {/* Segmented control */}
-            <div className="mt-3 inline-flex rounded-2xl border border-line bg-white p-1 shadow-[var(--shadow-sm)]">
+            <div className="mt-3 inline-flex rounded-2xl border border-line bg-surface p-1 shadow-[var(--shadow-sm)]">
               {(['ALL', 'JAMB', 'WAEC', 'NECO'] as ExamBoard[]).map((e) => (
                 <button
                   key={e}
@@ -175,10 +173,10 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 </button>
               ))}
             </div>
-          </Reveal>
+          
 
-          <Reveal delay={140}>
-            <div className="mt-7 rounded-2xl border border-line bg-white p-6 shadow-[var(--shadow-md)]">
+          
+            <div className="mt-7 rounded-2xl border border-line bg-surface p-6 shadow-[var(--shadow-md)]">
               <div className="flex flex-wrap items-center gap-2.5">
                 {exam !== 'ALL' && <ExamBadge exam={exam} />}
                 <h2 className="font-serif text-xl font-semibold">
@@ -192,7 +190,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               </p>
 
               {/* Timed toggle */}
-              <div className="mt-6 flex items-start justify-between gap-4 rounded-xl border border-line bg-paper-sunken p-4">
+              <div className="mt-6 flex items-start justify-between gap-4 rounded-xl border border-line bg-sunken p-4">
                 <div>
                   <p className="text-[14px] font-medium text-ink">Timed mode</p>
                   <p className="mt-0.5 text-[12px] text-ink-muted">
@@ -200,7 +198,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                     {!isPro() && (
                       <Link
                         href="/pricing"
-                        className="ml-1 font-medium text-gold-600 no-underline"
+                        className="ml-1 font-medium text-streak no-underline"
                       >
                         Pro
                       </Link>
@@ -223,7 +221,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                   style={{ background: timed ? accent : 'var(--line-strong)' }}
                 >
                   <span
-                    className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300"
+                    className="absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition-transform duration-300"
                     style={{ transform: timed ? 'translateX(22px)' : 'translateX(2px)' }}
                   />
                 </button>
@@ -233,13 +231,13 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 type="button"
                 onClick={start}
                 disabled={!total}
-                className="sheen mt-6 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-50"
+                className="mt-6 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-50"
                 style={{ background: accent }}
               >
                 Start practice
               </button>
             </div>
-          </Reveal>
+          
         </div>
       </main>
     )
@@ -254,9 +252,9 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     return (
       <main className="min-h-dvh bg-paper text-ink">
         <div className="mx-auto max-w-2xl px-4 py-16">
-          <Reveal variant="scale">
+          
             <div className="text-center">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-600">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
                 Session complete
               </p>
 
@@ -286,7 +284,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="tnum font-serif text-4xl font-semibold" style={{ color: ringColor }}>
-                    <Counter value={pct} />%
+                    {pct}%
                   </span>
                   <span className="tnum text-[12px] text-ink-muted">
                     {correctCount} of {total}
@@ -301,11 +299,11 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 </div>
               )}
             </div>
-          </Reveal>
+          
 
           {misses.length > 0 && (
-            <Reveal delay={100}>
-              <div className="mt-10 rounded-2xl border border-line bg-white p-5 text-left shadow-[var(--shadow-sm)]">
+            
+              <div className="mt-10 rounded-2xl border border-line bg-surface p-5 text-left shadow-[var(--shadow-sm)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                   Review misses
                 </p>
@@ -324,27 +322,27 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                   ))}
                 </ul>
               </div>
-            </Reveal>
+            
           )}
 
-          <Reveal delay={160}>
+          
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setPhase('idle')}
-                className="rounded-xl border border-line bg-white px-5 py-2.5 text-[13.5px] font-medium transition-colors hover:bg-paper-sunken"
+                className="rounded-xl border border-line bg-surface px-5 py-2.5 text-[13.5px] font-medium transition-colors hover:bg-sunken"
               >
                 Practice again
               </button>
               <Link
                 href={`/learn/${subject}`}
-                className="sheen rounded-xl px-5 py-2.5 text-[13.5px] font-medium text-white no-underline"
+                className="rounded-xl px-5 py-2.5 text-[13.5px] font-medium text-white no-underline"
                 style={{ background: accent }}
               >
                 Learn with tutor
               </Link>
             </div>
-          </Reveal>
+          
         </div>
       </main>
     )
@@ -357,7 +355,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
     <main className="min-h-dvh bg-paper text-ink">
       <header className="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur-md">
         {/* Progress rail */}
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-paper-sunken">
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-sunken">
           <div
             className="h-full transition-[width] duration-500 ease-out"
             style={{ width: `${progress}%`, background: accent }}
@@ -382,8 +380,8 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
             <span
               className={`tnum flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[13px] transition-colors ${
                 secondsLeft <= 10
-                  ? 'bg-danger-soft text-danger'
-                  : 'bg-paper-sunken text-ink'
+                  ? 'bg-wrong-soft text-wrong'
+                  : 'bg-sunken text-ink'
               }`}
             >
               <Clock className="h-3.5 w-3.5" />
@@ -398,7 +396,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
       <div className="mx-auto max-w-2xl px-4 py-8">
         {q && (
           <>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-ink-subtle">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-ink-faint">
               {q.exam} · {q.year}
             </p>
             <h2 className="mt-2.5 font-serif text-xl font-semibold leading-snug sm:text-2xl">
@@ -420,12 +418,12 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                     onClick={() => choose(key)}
                     className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left text-[14.5px] transition-all duration-200 ${
                       showCorrect
-                        ? 'border-green-500/50 bg-success-soft'
+                        ? 'border-green-500/50 bg-correct-soft'
                         : showWrong
-                          ? 'border-danger/40 bg-danger-soft'
+                          ? 'border-danger/40 bg-wrong-soft'
                           : revealed
-                            ? 'border-line bg-white opacity-55'
-                            : 'lift border-line bg-white shadow-[var(--shadow-sm)]'
+                            ? 'border-line bg-surface opacity-55'
+                            : 'press border-line bg-surface shadow-[var(--shadow-sm)]'
                     }`}
                   >
                     <span
@@ -445,14 +443,14 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                     </span>
                     <span className="flex-1 pt-0.5">{q.options[key]}</span>
                     {showCorrect && <Check className="mt-1 h-4 w-4 shrink-0 text-green-600" />}
-                    {showWrong && <X className="mt-1 h-4 w-4 shrink-0 text-danger" />}
+                    {showWrong && <X className="mt-1 h-4 w-4 shrink-0 text-wrong" />}
                   </button>
                 )
               })}
             </div>
 
             {revealed && (
-              <div className="animate-fade-up mt-6 rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-md)]">
+              <div className="rise mt-6 rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-md)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                   Explanation
                 </p>
@@ -460,7 +458,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
                 <button
                   type="button"
                   onClick={next}
-                  className="sheen mt-5 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 sm:w-auto sm:px-6"
+                  className="mt-5 w-full rounded-xl py-3 text-[14px] font-semibold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-100 sm:w-auto sm:px-6"
                   style={{ background: accent }}
                 >
                   {index + 1 >= total ? 'See results' : 'Next question'}

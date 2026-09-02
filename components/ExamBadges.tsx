@@ -50,8 +50,8 @@ export function ExamBadge({
     <span
       className={`group inline-flex items-center gap-2 rounded-xl px-2.5 py-1.5 transition-colors duration-300 ${
         dark
-          ? 'border border-white/10 bg-white/[0.07] backdrop-blur-sm hover:bg-white/[0.12]'
-          : 'border border-line bg-white hover:border-line-strong'
+          ? 'border border-white/10 bg-surface/[0.07] backdrop-blur-sm hover:bg-surface/[0.12]'
+          : 'border border-line bg-surface hover:border-line'
       }`}
       title={a.alt}
     >

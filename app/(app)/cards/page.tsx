@@ -54,11 +54,11 @@ export default function CardsPage() {
         </Link>
 
         <div className="mb-3 flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold-500/12">
-            <Layers className="h-5 w-5 text-gold-600" />
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-streak/12">
+            <Layers className="h-5 w-5 text-streak" />
           </span>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-600">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
               Spaced repetition
             </p>
             <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.025em]">
@@ -72,9 +72,9 @@ export default function CardsPage() {
         </p>
 
         {!current ? (
-          <div className="rounded-2xl border border-line bg-white p-10 text-center shadow-[var(--shadow-sm)]">
-            <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-navy-600 to-navy-800 shadow-[var(--shadow-navy)]">
-              <Layers className="h-6 w-6 text-gold-400" />
+          <div className="rounded-2xl border border-line bg-surface p-10 text-center shadow-[var(--shadow-sm)]">
+            <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-navy-600 to-navy-800 shadow-[var(--shadow-lg)]">
+              <Layers className="h-6 w-6 text-streak" />
             </span>
             <p className="font-serif text-xl font-semibold">
               {allCount === 0 ? 'No cards yet' : 'Caught up'}
@@ -86,7 +86,7 @@ export default function CardsPage() {
             </p>
             <Link
               href="/dashboard"
-              className="sheen mt-6 inline-block rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-6 py-3 text-[14px] font-medium text-[var(--on-accent)] no-underline shadow-[var(--shadow-md)]"
+              className="mt-6 inline-block rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-6 py-3 text-[14px] font-medium text-[var(--on-primary)] no-underline shadow-[var(--shadow-md)]"
             >
               Go learn
             </Link>
@@ -97,7 +97,7 @@ export default function CardsPage() {
               <p className="tnum text-[12px] text-ink-muted">
                 <span className="font-semibold text-ink">{queue.length}</span> due
               </p>
-              <p className="text-[12px] text-ink-subtle">tap to flip</p>
+              <p className="text-[12px] text-ink-faint">tap to flip</p>
             </div>
             <FlipCard
               key={current.id}

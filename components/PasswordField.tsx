@@ -49,12 +49,12 @@ export function PasswordField({
           required={required}
           minLength={minLength}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-line bg-white px-3.5 py-3 pr-11 text-[14.5px] outline-none transition-shadow focus:border-gold-500 focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
+          className="w-full rounded-xl border border-line bg-surface px-3.5 py-3 pr-11 text-[14.5px] outline-none transition-shadow focus:border-streak focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
         />
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
-          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted transition-all duration-200 hover:bg-paper-sunken hover:text-ink active:scale-90"
+          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted transition-all duration-200 hover:bg-sunken hover:text-ink active:scale-90"
           aria-label={show ? 'Hide password' : 'Show password'}
         >
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

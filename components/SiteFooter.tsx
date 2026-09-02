@@ -75,8 +75,8 @@ export function SiteFooter() {
   ]
 
   return (
-    <footer className="noise relative overflow-hidden bg-navy-900 text-[var(--on-accent)]">
-      <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+    <footer className="relative overflow-hidden bg-primary text-[var(--on-primary)]">
+      <div className="absolute inset-x-0 top-0 h-px" />
 
       <div className="relative mx-auto max-w-5xl px-5 py-16 sm:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -93,7 +93,7 @@ export function SiteFooter() {
               <span className="text-[15px] font-semibold tracking-tight text-white">Ewin</span>
             </Link>
 
-            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-[var(--on-accent-muted)]">
+            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-ink-muted">
               AI tutor for Nigerian secondary students. Learn one idea, then prove you got it —
               for WAEC, NECO and JAMB.
             </p>
@@ -109,7 +109,7 @@ export function SiteFooter() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-[var(--on-accent-muted)] transition-all duration-300 hover:border-gold-500/50 hover:bg-white/10 hover:text-gold-400"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-surface/[0.05] text-ink-muted transition-all duration-300 hover:border-streak/50 hover:bg-surface/10 hover:text-streak"
                   aria-label={s.label}
                 >
                   <s.Icon />
@@ -120,7 +120,7 @@ export function SiteFooter() {
 
           {columns.map((col) => (
             <div key={col.title}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
                 {col.title}
               </p>
               <ul className="mt-4 space-y-2.5">
@@ -131,14 +131,14 @@ export function SiteFooter() {
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[13px] text-[var(--on-accent-muted)] no-underline transition-colors hover:text-white"
+                        className="text-[13px] text-ink-muted no-underline transition-colors hover:text-white"
                       >
                         {l.label}
                       </a>
                     ) : (
                       <Link
                         href={l.href}
-                        className="text-[13px] text-[var(--on-accent-muted)] no-underline transition-colors hover:text-white"
+                        className="text-[13px] text-ink-muted no-underline transition-colors hover:text-white"
                       >
                         {l.label}
                       </Link>
@@ -151,10 +151,10 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] text-[var(--on-accent-muted)]">
+          <p className="text-[11px] text-ink-muted">
             © {new Date().getFullYear()} Ewin Academy · Not affiliated with WAEC, JAMB, or NECO
           </p>
-          <p className="text-[11px] text-[var(--on-accent-muted)]">
+          <p className="text-[11px] text-ink-muted">
             Built for students who want understanding, not shortcuts.
           </p>
         </div>

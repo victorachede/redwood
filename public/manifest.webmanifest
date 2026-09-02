@@ -1,0 +1,14 @@
+{
+  "name": "Ewin — AI tutor for WAEC, NECO & JAMB",
+  "short_name": "Ewin",
+  "description": "Learn one idea, then prove you got it.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf8f2",
+  "theme_color": "#fbf8f2",
+  "icons": [
+    { "src": "/logo-mark.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

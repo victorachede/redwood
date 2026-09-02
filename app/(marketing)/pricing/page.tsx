@@ -14,7 +14,6 @@ import {
 } from '@/app/lib/billing'
 import { getSession } from '@/app/lib/auth'
 import { SiteFooter } from '@/components/SiteFooter'
-import { Reveal } from '@/components/Reveal'
 
 export default function PricingPage() {
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly')
@@ -134,28 +133,28 @@ export default function PricingPage() {
       <SiteHeader overDark />
 
       {/* ═══ Hero band ═══════════════════════════════════════════════════ */}
-      <section className="aurora noise relative -mt-16 overflow-hidden bg-navy-800">
-        <div className="hairline-gold absolute inset-x-0 bottom-0 h-px" />
+      <section className="relative -mt-16 overflow-hidden bg-primary">
+        <div className="absolute inset-x-0 bottom-0 h-px" />
         <div className="relative mx-auto max-w-5xl px-5 pb-16 pt-28 text-center sm:px-8 sm:pt-32">
-          <Reveal>
+          
             <ExamBadgeRow className="justify-center" variant="dark" />
             <h1 className="mt-6 font-serif text-[clamp(2rem,4.4vw,3rem)] font-semibold tracking-[-0.03em] text-white">
               Simple pricing
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-[var(--on-accent-muted)]">
+            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink-muted">
               Free forever for serious daily practice. Pro when you want timed mocks and unlimited
               drills for JAMB, WAEC and NECO.
             </p>
 
             {/* Interval toggle */}
-            <div className="mt-8 inline-flex rounded-full border border-white/12 bg-white/[0.06] p-1 text-[13px] backdrop-blur-sm">
+            <div className="mt-8 inline-flex rounded-full border border-white/12 bg-surface/[0.06] p-1 text-[13px] backdrop-blur-sm">
               <button
                 type="button"
                 onClick={() => setInterval('monthly')}
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'monthly'
-                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-navy-800 shadow-[var(--shadow-gold)]'
-                    : 'text-[var(--on-accent-muted)] hover:text-white'
+                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-primary shadow-[var(--shadow-md)]'
+                    : 'text-ink-muted hover:text-white'
                 }`}
               >
                 Monthly
@@ -165,30 +164,30 @@ export default function PricingPage() {
                 onClick={() => setInterval('yearly')}
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'yearly'
-                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-navy-800 shadow-[var(--shadow-gold)]'
-                    : 'text-[var(--on-accent-muted)] hover:text-white'
+                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-primary shadow-[var(--shadow-md)]'
+                    : 'text-ink-muted hover:text-white'
                 }`}
               >
                 Yearly
                 <span className="ml-1.5 text-[11px] opacity-75">save ~33%</span>
               </button>
             </div>
-          </Reveal>
+          
         </div>
       </section>
 
       <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
         {msg && (
-          <p className="mx-auto mb-10 max-w-lg rounded-xl border border-gold-500/30 bg-gold-500/[0.08] px-4 py-3 text-center text-[13px] text-ink">
+          <p className="mx-auto mb-10 max-w-lg rounded-xl border border-streak/30 bg-streak/[0.08] px-4 py-3 text-center text-[13px] text-ink">
             {msg}
           </p>
         )}
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* ── Free ─────────────────────────────────────────────────── */}
-          <Reveal>
+          
             <div
-              className={`lift h-full rounded-2xl border bg-white p-7 shadow-[var(--shadow-sm)] sm:p-8 ${
+              className={`press h-full rounded-2xl border bg-surface p-7 shadow-[var(--shadow-sm)] sm:p-8 ${
                 plan === 'free' ? 'border-navy-700' : 'border-line'
               }`}
             >
@@ -203,7 +202,7 @@ export default function PricingPage() {
               <ul className="mt-7 space-y-3">
                 {PLANS.free.features.map((f) => (
                   <li key={f} className="flex gap-3 text-[13.5px] text-ink">
-                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-paper-sunken">
+                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-sunken">
                       <Check className="h-3 w-3 text-ink-muted" />
                     </span>
                     {f}
@@ -214,21 +213,21 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={stayFree}
-                className="mt-8 w-full rounded-xl border border-line py-3 text-[14px] font-medium transition-colors hover:bg-paper-sunken"
+                className="mt-8 w-full rounded-xl border border-line py-3 text-[14px] font-medium transition-colors hover:bg-sunken"
               >
                 {plan === 'free' ? 'Current plan' : PLANS.free.cta}
               </button>
             </div>
-          </Reveal>
+          
 
           {/* ── Pro ──────────────────────────────────────────────────── */}
-          <Reveal delay={100}>
-            <div className="ring-gradient lift relative h-full rounded-2xl bg-white p-7 shadow-[var(--shadow-gold)] sm:p-8">
-              <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-navy-800">
+          
+            <div className="press relative h-full rounded-2xl bg-surface p-7 shadow-[var(--shadow-md)] sm:p-8">
+              <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-primary">
                 Most popular
               </span>
 
-              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-gold-600">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-streak">
                 Pro
               </p>
               <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
@@ -242,8 +241,8 @@ export default function PricingPage() {
               <ul className="mt-7 space-y-3">
                 {PLANS.pro.features.map((f) => (
                   <li key={f} className="flex gap-3 text-[13.5px] text-ink">
-                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-gold-500/15">
-                      <Check className="h-3 w-3 text-gold-600" />
+                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-streak/15">
+                      <Check className="h-3 w-3 text-streak" />
                     </span>
                     {f}
                   </li>
@@ -260,7 +259,7 @@ export default function PricingPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@email.com"
-                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-gold-500 focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-streak focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
                   />
                 </label>
               )}
@@ -269,7 +268,7 @@ export default function PricingPage() {
                 type="button"
                 disabled={loading || plan === 'pro'}
                 onClick={upgrade}
-                className="sheen mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14px] font-semibold text-[var(--on-accent)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14px] font-semibold text-[var(--on-primary)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}
@@ -279,22 +278,22 @@ export default function PricingPage() {
                 Secured by Paystack · NGN · Cancel anytime when live billing is on
               </p>
             </div>
-          </Reveal>
+          
         </div>
 
-        <Reveal delay={140}>
+        
           <p className="mt-12 text-center text-[12px] text-ink-muted">
             Not affiliated with JAMB, WAEC, or NECO. Practice materials are for learning only.
           </p>
           <p className="mt-3 text-center">
             <Link
               href="/dashboard"
-              className="text-[14px] font-medium text-navy-700 no-underline hover:underline"
+              className="text-[14px] font-medium text-primary no-underline hover:underline"
             >
               ← Back to dashboard
             </Link>
           </p>
-        </Reveal>
+        
       </div>
 
       <SiteFooter />

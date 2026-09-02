@@ -34,9 +34,9 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   return (
     <div
       role="status"
-      className="animate-fade-up fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-[var(--shadow-xl)] ring-1 ring-gold-500/25"
+      className="rise fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-[var(--shadow-lg)] ring-1 ring-gold-500/25"
     >
-      <Check className="h-3.5 w-3.5 text-gold-400" />
+      <Check className="h-3.5 w-3.5 text-streak" />
       {message}
     </div>
   )
@@ -52,11 +52,11 @@ function Group({
   return (
     <div className="mb-7">
       {title && (
-        <p className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-600">
+        <p className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
           {title}
         </p>
       )}
-      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-sm)]">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[var(--shadow-sm)]">
         {children}
       </div>
     </div>
@@ -228,7 +228,7 @@ export default function SettingsPage() {
             </Link>
             <Link
               href="/signup"
-              className="rounded-full border border-line bg-[var(--paper-elevated)] px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-accent"
+              className="rounded-full border border-line bg-surface px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-primary"
             >
               Create account
             </Link>
@@ -255,7 +255,7 @@ export default function SettingsPage() {
           Back
         </Link>
 
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-600">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
           Your account
         </p>
         <h1 className="mb-7 mt-2 font-serif text-[1.875rem] font-semibold tracking-[-0.025em]">
@@ -264,19 +264,19 @@ export default function SettingsPage() {
 
         {/* Identity card */}
         <Group>
-          <div className="noise relative overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900 px-5 py-6">
-            <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+          <div className="relative overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900 px-5 py-6">
+            <div className="absolute inset-x-0 top-0 h-px" />
             <div className="relative flex items-center gap-4">
               <EwinAvatar size={52} className="ring-2 ring-gold-500/30" />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-serif text-lg font-semibold tracking-tight text-white">
                   {user?.displayName || 'Guest'}
                 </p>
-                <p className="truncate text-[13px] text-[var(--on-accent-muted)]">
+                <p className="truncate text-[13px] text-ink-muted">
                   {user?.email || 'Learning on this device only'}
                 </p>
                 {user && examFocus && (
-                  <span className="mt-2 inline-flex rounded-full border border-gold-500/30 bg-gold-500/10 px-2.5 py-0.5 text-[11px] font-medium text-gold-400">
+                  <span className="mt-2 inline-flex rounded-full border border-streak/30 bg-streak/10 px-2.5 py-0.5 text-[11px] font-medium text-streak">
                     {examFocus}
                   </span>
                 )}
@@ -309,7 +309,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-3 gap-2">
               {metrics.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-xl bg-paper px-2.5 py-3 text-center">
-                  <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-accent" />
+                  <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-primary" />
                   <p className="font-serif text-lg font-semibold leading-none tracking-tight">
                     {value}
                   </p>
@@ -456,7 +456,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setClearStep(0)}
-                    className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-paper-sunken"
+                    className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-sunken"
                   >
                     Cancel
                   </button>
@@ -501,7 +501,7 @@ export default function SettingsPage() {
                         setDelPass('')
                         setDelErr(null)
                       }}
-                      className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-paper-sunken"
+                      className="rounded-xl px-4 py-2 text-[13px] text-ink-muted transition-colors hover:bg-sunken"
                     >
                       Cancel
                     </button>

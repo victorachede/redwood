@@ -50,13 +50,13 @@ export default function ResetPasswordPage() {
           : 'Choose a new password for the account on this device.'
       }
       footer={
-        <Link href="/login" className="font-semibold text-navy-700 no-underline hover:underline">
+        <Link href="/login" className="font-semibold text-primary no-underline hover:underline">
           Back to sign in
         </Link>
       }
     >
       {done ? (
-        <p className="mt-8 rounded-xl border border-green-500/30 bg-success-soft px-4 py-3.5 text-[14px] text-green-800">
+        <p className="mt-8 rounded-xl border border-green-500/30 bg-correct-soft px-4 py-3.5 text-[14px] text-green-800">
           Password updated. Redirecting to sign in…
         </p>
       ) : (

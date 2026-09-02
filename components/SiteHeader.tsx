@@ -51,10 +51,10 @@ export function SiteHeader({
     ? 'bg-paper border-b border-line'
     : onDark
       ? 'bg-transparent border-b border-transparent'
-      : 'bg-paper/85 backdrop-blur-md border-b border-line shadow-[var(--shadow-xs)]'
+      : 'bg-paper/85 backdrop-blur-md border-b border-line shadow-[var(--shadow-sm)]'
 
   const linkBase = onDark
-    ? 'text-[var(--on-accent-muted)] hover:text-white'
+    ? 'text-ink-muted hover:text-white'
     : 'text-ink-muted hover:text-ink'
 
   return (
@@ -97,7 +97,7 @@ export function SiteHeader({
                 >
                   {item.label}
                   <span
-                    className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-gold-500 transition-transform duration-300 ${
+                    className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-streak transition-transform duration-300 ${
                       active ? 'scale-x-100' : 'scale-x-0'
                     }`}
                   />
@@ -135,7 +135,7 @@ export function SiteHeader({
                 </Link>
                 <Link
                   href="/signup"
-                  className="sheen rounded-lg bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-4 py-2 text-[13px] font-medium text-[var(--on-accent)] no-underline shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.02] active:scale-100"
+                  className="rounded-lg bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-4 py-2 text-[13px] font-medium text-[var(--on-primary)] no-underline shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.02] active:scale-100"
                 >
                   Sign up
                 </Link>
@@ -148,7 +148,7 @@ export function SiteHeader({
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
             className={`-mr-2 flex h-9 w-9 items-center justify-center rounded-lg transition-colors sm:hidden ${
-              onDark ? 'text-white/80 hover:bg-white/10' : 'text-ink-muted hover:bg-neutral-100'
+              onDark ? 'text-white/80 hover:bg-surface/10' : 'text-ink-muted hover:bg-neutral-100'
             }`}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
@@ -160,7 +160,7 @@ export function SiteHeader({
 
       {/* Mobile panel */}
       {menuOpen && (
-        <div className="animate-fade-up border-t border-line bg-paper/95 backdrop-blur-md sm:hidden">
+        <div className="rise border-t border-line bg-paper/95 backdrop-blur-md sm:hidden">
           <nav className="mx-auto flex max-w-5xl flex-col px-5 py-3">
             {NAV.map((item) => (
               <Link
@@ -203,7 +203,7 @@ export function SiteHeader({
                   </Link>
                   <Link
                     href="/signup"
-                    className="flex-1 rounded-lg bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-3 py-2.5 text-center text-[14px] font-medium text-[var(--on-accent)] no-underline"
+                    className="flex-1 rounded-lg bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-3 py-2.5 text-center text-[14px] font-medium text-[var(--on-primary)] no-underline"
                   >
                     Sign up
                   </Link>

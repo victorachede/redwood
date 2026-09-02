@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
           : 'Enter the email you used on this device to set a new password.'
       }
       footer={
-        <Link href="/login" className="font-semibold text-navy-700 no-underline hover:underline">
+        <Link href="/login" className="font-semibold text-primary no-underline hover:underline">
           Back to sign in
         </Link>
       }
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
 
         {error && <AuthError>{error}</AuthError>}
         {message && (
-          <p className="rounded-xl border border-line bg-paper-sunken px-3.5 py-2.5 text-[13px] text-ink">
+          <p className="rounded-xl border border-line bg-sunken px-3.5 py-2.5 text-[13px] text-ink">
             {message}
           </p>
         )}

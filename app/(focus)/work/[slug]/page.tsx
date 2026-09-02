@@ -148,30 +148,30 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
     return (
       <main className="min-h-dvh bg-paper text-ink">
         <div className="mx-auto flex min-h-dvh max-w-md items-center px-4 py-16">
-          <div className="noise relative w-full overflow-hidden rounded-[1.4rem] bg-gradient-to-br from-navy-700 to-navy-900 px-7 py-10 text-center shadow-[var(--shadow-navy)]">
-            <div className="hairline-gold absolute inset-x-0 top-0 h-px" />
+          <div className="relative w-full overflow-hidden rounded-[1.4rem] bg-gradient-to-br from-navy-700 to-navy-900 px-7 py-10 text-center shadow-[var(--shadow-lg)]">
+            <div className="absolute inset-x-0 top-0 h-px" />
 
-            <span className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold-500/30 bg-gold-500/10">
-              <Lock className="h-6 w-6 text-gold-400" />
+            <span className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-streak/30 bg-streak/10">
+              <Lock className="h-6 w-6 text-streak" />
             </span>
 
             <p className="font-serif text-xl font-semibold text-white">
               Ewin opens this when you are ready
             </p>
-            <p className="mx-auto mt-3 max-w-xs text-[13.5px] leading-relaxed text-[var(--on-accent-muted)]">
+            <p className="mx-auto mt-3 max-w-xs text-[13.5px] leading-relaxed text-ink-muted">
               Classwork and homework are not open menus. During a lesson, when Ewin decides you
               should practise or submit work, it will open this screen for you.
             </p>
 
             <Link
               href="/dashboard"
-              className="sheen mt-7 inline-flex rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 px-6 py-3 text-[14px] font-semibold text-navy-800 no-underline shadow-[var(--shadow-gold)]"
+              className="mt-7 inline-flex rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 px-6 py-3 text-[14px] font-semibold text-primary no-underline shadow-[var(--shadow-md)]"
             >
               Back to dashboard
             </Link>
-            <p className="mt-4 text-[12px] text-[var(--on-accent-muted)]">
+            <p className="mt-4 text-[12px] text-ink-muted">
               Or continue learning —{' '}
-              <Link href="/learn/mathematics" className="text-gold-400 no-underline">
+              <Link href="/learn/mathematics" className="text-streak no-underline">
                 start a tutor session
               </Link>
             </p>
@@ -199,13 +199,13 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
           {messages.length === 0 && (
-            <div className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
+            <div className="rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-sm)]">
               <p className="font-serif text-lg font-semibold">{meta.title}</p>
               <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{meta.blurb}</p>
 
               {ticketBrief && (
-                <div className="mt-4 rounded-xl border-l-[3px] border-gold-500 bg-gold-500/[0.07] px-3.5 py-3">
-                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-600">
+                <div className="mt-4 rounded-xl border-l-[3px] border-streak bg-streak/[0.07] px-3.5 py-3">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-streak">
                     What Ewin set
                   </p>
                   <p className="text-[13.5px] leading-relaxed text-ink">{ticketBrief}</p>
@@ -225,15 +225,15 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
               {m.role === 'tutor' ? (
                 <EwinAvatar size={28} className="mt-0.5" />
               ) : (
-                <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-line bg-white text-[10px] font-semibold text-ink-muted">
+                <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-[10px] font-semibold text-ink-muted">
                   You
                 </div>
               )}
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-[14.5px] leading-relaxed ${
                   m.role === 'student'
-                    ? 'rounded-tr-md bg-accent text-[var(--on-accent)]'
-                    : 'rounded-tl-md border border-line bg-white'
+                    ? 'rounded-tr-md bg-primary text-[var(--on-primary)]'
+                    : 'rounded-tl-md border border-line bg-surface'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{m.content}</p>
@@ -241,15 +241,15 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             </div>
           ))}
           {suggested.length > 0 && (
-            <div className="rounded-2xl border border-accent/30 bg-accent-soft p-4">
-              <p className="text-[12px] font-semibold text-accent">Study cards from this work</p>
+            <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
+              <p className="text-[12px] font-semibold text-primary">Study cards from this work</p>
               <ul className="mt-2 space-y-2">
                 {suggested.map((c) => (
                   <li key={c.front} className="flex items-start justify-between gap-2 text-[13px]">
                     <span className="text-ink">{c.front}</span>
                     <button
                       type="button"
-                      className="shrink-0 rounded-full bg-accent px-3 py-1 text-[11px] font-medium text-[var(--on-accent)]"
+                      className="shrink-0 rounded-full bg-primary px-3 py-1 text-[11px] font-medium text-[var(--on-primary)]"
                       onClick={() => {
                         addCard({ ...c, subject: meta.title, source: 'work' })
                         setSuggested((s) => s.filter((x) => x.front !== c.front))
@@ -296,7 +296,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
               type="button"
               onClick={() => void send()}
               disabled={loading || !input.trim()}
-              className="mb-0 flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#1a1a1e] disabled:bg-white/15 disabled:text-white/40"
+              className="mb-0 flex h-11 w-11 items-center justify-center rounded-full bg-surface text-[#1a1a1e] disabled:bg-surface/15 disabled:text-white/40"
               aria-label="Send"
             >
               <Send className="h-4 w-4" />
