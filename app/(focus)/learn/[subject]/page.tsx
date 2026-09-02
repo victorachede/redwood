@@ -4,7 +4,14 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Camera, FileText, Plus, X, BookOpen } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
-import { saveSession, saveTutorMessages, recordMastery } from '@/app/lib/progress'
+import {
+  saveSession,
+  saveTutorMessages,
+  recordMastery,
+  loadTutorMessages,
+  loadSessions,
+  type TutorMessage,
+} from '@/app/lib/progress'
 import { addCard } from '@/app/lib/cards'
 import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
 import type {
@@ -21,16 +28,8 @@ import { EwinAvatar } from '@/components/EwinAvatar'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
 
-type Message = {
-  role: 'tutor' | 'student'
-  content: string
-  type?: string
-  attachments?: { name: string }[]
-  /** Photos the student sent, kept as previews for the transcript */
-  photos?: string[]
-  /** Figures the tutor drew during this reply */
-  diagrams?: ShowDiagramInput[]
-}
+/** The transcript shape is owned by the data layer — see progress.ts. */
+type Message = TutorMessage
 
 type DocAttach = { name: string; text: string }
 
@@ -179,6 +178,12 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       map[tpc] = loadMessages(subject, tpc).length > 0
     }
     setSavedTopics(map)
+
+    // A conversation started on another device should show as resumable here.
+    void loadSessions().forEach((sess) => {
+      if (sess.subjectId === subject && sess.topic) map[sess.topic] = true
+    })
+    setSavedTopics({ ...map })
     try {
       const sp = new URLSearchParams(window.location.search)
       const q = sp.get('focus')
@@ -292,10 +297,22 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     setError(null)
     const focusHint = opts?.focus ?? focus ?? undefined
     const existing = loadMessages(subject, chosenTopic)
-    if (opts?.resume && !focusHint && existing.length > 0) {
-      setMessages(existing)
-      setLoading(false)
-      return
+    if (opts?.resume && !focusHint) {
+      // Show the local copy immediately, then reconcile with the cloud —
+      // the transcript may have been written on another device.
+      if (existing.length > 0) {
+        setMessages(existing)
+        setLoading(false)
+      }
+      const remote = await loadTutorMessages(subject, chosenTopic).catch(() => null)
+      if (remote && remote.length > existing.length) {
+        setMessages(remote)
+        persistMessages(subject, chosenTopic, remote)
+      }
+      if (existing.length > 0 || (remote && remote.length > 0)) {
+        setLoading(false)
+        return
+      }
     }
     setLoading(true)
     try {

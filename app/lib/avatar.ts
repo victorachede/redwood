@@ -52,7 +52,45 @@ export function saveAvatar(a: Avatar) {
   const uid = getSession()?.id
   if (uid && isSupabaseConfigured) {
     const sb = createBrowserClient()
-    void sb?.from('profiles').update({ avatar: a.photo ?? null, avatar_color: a.color ?? null }).eq('id', uid)
+    void sb
+      ?.from('profiles')
+      .update({ avatar_url: a.photo ?? null, avatar_color: a.color ?? null })
+      .eq('id', uid)
+      .then(({ error }) => {
+        if (error) console.warn('[sync] avatar failed', error)
+      })
+  }
+}
+
+/** Pulls the saved avatar down on sign-in, so it follows the student. */
+export async function hydrateAvatarFromCloud(): Promise<void> {
+  const uid = getSession()?.id
+  if (!uid || !isSupabaseConfigured) return
+  const sb = createBrowserClient()
+  if (!sb) return
+
+  const { data } = await sb
+    .from('profiles')
+    .select('avatar_url, avatar_color')
+    .eq('id', uid)
+    .maybeSingle()
+  if (!data) return
+
+  const local = loadAvatar()
+  // Only take the remote copy when this device has nothing, so a photo just
+  // set here is not clobbered by a slower round trip.
+  if (!local.photo && !local.color && (data.avatar_url || data.avatar_color)) {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(
+          KEY,
+          JSON.stringify({ photo: data.avatar_url ?? undefined, color: data.avatar_color ?? undefined }),
+        )
+      } catch {
+        /* ignore */
+      }
+      window.dispatchEvent(new Event('ewin-avatar'))
+    }
   }
 }
 

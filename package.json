@@ -6,15 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:layout": "node scripts/check-layout.js",
+    "check:contrast": "node scripts/check-contrast.js",
+    "check:ui": "npm run check:layout && npm run check:contrast"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
+    "@supabase/supabase-js": "^2.57.0",
     "lucide-react": "^1.37.0",
     "next": "16.3.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "@supabase/supabase-js": "^2.57.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -23,6 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "playwright-core": "^1.56.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

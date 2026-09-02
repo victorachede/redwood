@@ -9,7 +9,8 @@ import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
 import type { SaveStudyCardInput, RecordMasteryInput } from '@/app/lib/tutorProtocol'
 import { recordMastery } from '@/app/lib/progress'
 import { prepareImage, type PreparedImage } from '@/app/lib/image'
-import { consumeWorkTicket, type WorkKind } from '@/app/lib/workGate'
+import { consumeWorkTicket, clearWorkTicket, type WorkKind } from '@/app/lib/workGate'
+import { completeLatestOpen } from '@/app/lib/assignments'
 
 type Msg = { role: 'tutor' | 'student'; content: string; photos?: string[] }
 
@@ -31,11 +32,12 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
     blurb: 'Paste the assignment. Ewin reviews it with you in chat — grades, fixes, and next steps.',
   }
 
+  const kind = (slug === 'classwork' || slug === 'homework' ? slug : null) as WorkKind | null
+
   const [allowed, setAllowed] = useState<boolean | null>(null)
   const [ticketBrief, setTicketBrief] = useState<string | undefined>()
 
   useEffect(() => {
-    const kind = (slug === 'classwork' || slug === 'homework' ? slug : null) as WorkKind | null
     if (!kind) {
       setAllowed(false)
       return
@@ -47,7 +49,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
     }
     setTicketBrief(ticket.brief)
     setAllowed(true)
-  }, [slug])
+  }, [kind])
 
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
@@ -202,6 +204,17 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
 
   const canSend = Boolean(input.trim() || photos.length) && !loading
 
+  // The exit only appears once Ewin has actually marked something. Before
+  // that there is nothing to finish, and offering "Done" would invite the
+  // student to leave before getting the part they came for.
+  const marked = messages.some((m) => m.role === 'tutor')
+
+  function finish() {
+    if (kind) completeLatestOpen(kind)
+    clearWorkTicket()
+    window.location.href = '/dashboard'
+  }
+
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <header className="shrink-0 border-b border-line bg-paper">
@@ -220,6 +233,15 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             </p>
             <p className="truncate text-[12px] leading-tight text-ink-muted">Ewin marks your work</p>
           </div>
+          {marked && (
+            <button
+              type="button"
+              onClick={finish}
+              className="press shrink-0 rounded-full bg-primary px-4 py-2 text-[13.5px] font-semibold text-on-primary"
+            >
+              Done
+            </button>
+          )}
         </div>
       </header>
 

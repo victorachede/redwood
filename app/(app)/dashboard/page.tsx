@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Check, Flame, Layers, Play, Target } from 'lucide-react'
+import { ArrowRight, Check, ClipboardList, Flame, Layers, Play, Target } from 'lucide-react'
 import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { SubjectIcon } from '@/components/SubjectIcon'
@@ -19,6 +19,9 @@ import {
 } from '@/app/lib/progress'
 import { dueCards } from '@/app/lib/cards'
 import { getSession, type LocalUser } from '@/app/lib/auth'
+import { openAssignments, type Assignment } from '@/app/lib/assignments'
+import { reopenWork } from '@/app/lib/workGate'
+import { onSync } from '@/app/lib/sync'
 
 function greeting() {
   const h = new Date().getHours()
@@ -34,6 +37,7 @@ export default function TodayPage() {
   const [due, setDue] = useState(0)
   const [weak, setWeak] = useState<{ subjectId: string; topic: string }[]>([])
   const [user, setUser] = useState<LocalUser | null>(null)
+  const [work, setWork] = useState<Assignment[]>([])
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -42,6 +46,7 @@ export default function TodayPage() {
       setPractice(loadPractice())
       setStreak(getStreak())
       setDue(dueCards().length)
+      setWork(openAssignments())
       const misses = loadMisses()
       const struggling = loadMastery().filter((m) => m.level === 'struggling')
       setWeak([
@@ -55,6 +60,9 @@ export default function TodayPage() {
     setUser(getSession())
     setReady(true)
     void hydrateProgressFromCloud().then(load)
+    // Assignments and cards are pulled by CloudSync in the shell, not here;
+    // this re-reads once that lands so Today is not a frame behind.
+    return onSync(load)
   }, [])
 
   const last = sessions[0]
@@ -80,6 +88,46 @@ export default function TodayPage() {
       />
 
       <div className="mx-auto max-w-3xl px-4 py-5">
+        {/* ── Work Ewin set and the student has not finished ─────────────
+            Outranks "pick up where you left off": if there is homework
+            outstanding, that IS the next thing. Amber, not red — red means
+            "you got this wrong" everywhere else in this app, and unfinished
+            work is not a mistake. */}
+        {work.length > 0 && (
+          <section className="mb-3 rounded-2xl border border-line bg-surface p-4">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-[18px] w-[18px]" style={{ color: 'var(--streak)' }} />
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+                {work.length === 1 ? 'Work to finish' : `${work.length} pieces of work to finish`}
+              </span>
+            </div>
+            <ul className="mt-2.5 space-y-2">
+              {work.slice(0, 3).map((a) => (
+                <li key={a.id}>
+                  <button
+                    type="button"
+                    onClick={() => reopenWork(a)}
+                    className="press flex w-full items-center gap-3 rounded-xl bg-sunken px-3.5 py-3 text-left"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[14.5px] font-medium capitalize text-ink">
+                        {a.kind}
+                        {a.topic ? ` · ${a.topic}` : ''}
+                      </span>
+                      {a.brief && (
+                        <span className="mt-0.5 block truncate text-[13px] text-ink-muted">
+                          {a.brief}
+                        </span>
+                      )}
+                    </span>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-ink-faint" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* ── The one thing to do next ─────────────────────────────────── */}
         <Link
           href={primary.href}

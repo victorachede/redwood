@@ -142,11 +142,11 @@ export default function Home() {
             <div
               className="rounded-xl px-3.5 py-3"
               style={{
-                background: 'color-mix(in srgb, #3b6fd4 9%, transparent)',
-                borderLeft: '3px solid #3b6fd4',
+                background: 'var(--primary-soft)',
+                borderLeft: '3px solid var(--primary)',
               }}
             >
-              <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#3b6fd4]">
+              <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary">
                 Your turn
               </p>
               <p className="text-[14.5px] font-medium text-ink">

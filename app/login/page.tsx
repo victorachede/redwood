@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
-import { getSession, refreshSession, signIn, useAuthListener } from '@/app/lib/auth'
+import { getSession, refreshSession, signIn, subscribeToAuth } from '@/app/lib/auth'
 import { PasswordField } from '@/components/PasswordField'
 import { AuthShell, AuthField, AuthSubmit, AuthError } from '@/components/AuthShell'
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
     void refreshSession().then((u) => {
       if (u || getSession()) router.replace('/dashboard')
     })
-    return useAuthListener(() => {
+    return subscribeToAuth(() => {
       if (getSession()) router.replace('/dashboard')
     })
   }, [router])
