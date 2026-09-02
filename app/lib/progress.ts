@@ -302,3 +302,99 @@ export async function loadTutorMessages(subjectId: string, topic: string): Promi
     .maybeSingle()
   return (data?.messages as unknown[]) || null
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Topic mastery — the tutor's memory of where a student stands.
+
+   Written by the record_mastery tool, read back into the learner profile so
+   a later session can open on the right weakness instead of starting cold.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export type MasteryLevel = 'struggling' | 'developing' | 'solid'
+
+export type MasteryRecord = {
+  subjectId: string
+  topic: string
+  level: MasteryLevel
+  at: number
+}
+
+const MASTERY_KEY = 'ewin-mastery-v1'
+
+export function loadMastery(): MasteryRecord[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]') as MasteryRecord[]
+  } catch {
+    return []
+  }
+}
+
+/** Latest judgement per (subject, topic) wins. */
+export function recordMastery(subjectId: string, topic: string, level: MasteryLevel) {
+  if (typeof window === 'undefined') return
+  const prev = loadMastery().filter(
+    (m) => !(m.subjectId === subjectId && m.topic === topic),
+  )
+  const next = [{ subjectId, topic, level, at: Date.now() }, ...prev].slice(0, 120)
+  try {
+    localStorage.setItem(MASTERY_KEY, JSON.stringify(next))
+  } catch {
+    /* ignore */
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Practice misses — which questions were actually got wrong.
+
+   PracticeRecord only ever stored {correct, total} aggregates, so "what you
+   got wrong last time" was not recoverable from any store in the app.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export type MissRecord = {
+  subjectId: string
+  questionId: string
+  question: string
+  picked: string
+  correct: string
+  topic?: string
+  at: number
+}
+
+const MISS_KEY = 'ewin-misses-v1'
+
+export function loadMisses(): MissRecord[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(MISS_KEY) || '[]') as MissRecord[]
+  } catch {
+    return []
+  }
+}
+
+export function saveMisses(records: Omit<MissRecord, 'at'>[]) {
+  if (typeof window === 'undefined' || records.length === 0) return
+  const at = Date.now()
+  const stamped = records.map((r) => ({ ...r, at }))
+  // De-duplicate by question id, newest first, capped.
+  const seen = new Set(stamped.map((r) => r.questionId))
+  const prev = loadMisses().filter((m) => !seen.has(m.questionId))
+  try {
+    localStorage.setItem(MISS_KEY, JSON.stringify([...stamped, ...prev].slice(0, 60)))
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Clears a miss once the student has been retaught it. */
+export function clearMiss(questionId: string) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(
+      MISS_KEY,
+      JSON.stringify(loadMisses().filter((m) => m.questionId !== questionId)),
+    )
+  } catch {
+    /* ignore */
+  }
+}

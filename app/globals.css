@@ -1,207 +1,290 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Ewin design system
-   Navy + gold, taken from the brand crest. Depth, atmosphere and motion are
-   part of the system — not decoration bolted on afterwards.
+   Ewin — design system
+
+   Built for a 16-year-old on a mid-range Android at 10pm, revising for WAEC.
+   That single sentence decides everything below:
+
+   · Warm paper, never stark white — easier on the eyes at night
+   · Biro blue for actions, teacher's green/red for right and wrong.
+     Colour carries meaning here; it is not decoration.
+   · Dark mode is not an extra. Half the sessions happen after dark.
+   · Motion is capped and functional. Nothing decorative, nothing that
+     costs a frame on a cheap phone.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Surfaces: light ──────────────────────────────────────────────────── */
-  --paper: #fbfaf8;
-  --paper-card: #ffffff;
-  --paper-elevated: #ffffff;
-  --paper-sunken: #f4f2ee;
+  color-scheme: light;
 
-  /* ── Surfaces: navy ───────────────────────────────────────────────────── */
-  --navy-900: #070f22;
-  --navy-800: #0a1428;
-  --navy-700: #0e1b3a;
-  --navy-600: #16274d;
-  --navy-500: #1f3563;
+  /* Surfaces — warm, paper-like */
+  --paper: #fbf8f2;
+  --surface: #ffffff;
+  --sunken: #f3efe6;
+  --raised: #ffffff;
 
-  /* ── Ink ──────────────────────────────────────────────────────────────── */
-  --ink: #14161c;
-  --ink-muted: #6b7180;
-  --ink-subtle: #9aa0ad;
-  --on-accent: #f5f7fa;
-  --on-accent-muted: #9fb0cc;
+  /* Ink */
+  --ink: #1a1714;
+  --ink-muted: #6b6355;
+  --ink-faint: #9a9081;
+  --on-dark: #f7f3ea;
 
-  /* ── Brand gold ───────────────────────────────────────────────────────── */
-  --gold-300: #eddcaa;
-  --gold-400: #e0c579;
-  --gold-500: #c9a84c;
-  --gold-600: #a8862f;
+  /* Lines */
+  --line: #e6dfd1;
+  --line-strong: #d5cbb8;
 
-  /* ── Lines ────────────────────────────────────────────────────────────── */
-  --line: #e8e5e0;
-  --line-strong: #d6d2cb;
-  --line-inverse: rgba(255, 255, 255, 0.1);
+  /* Biro blue — every action, every link */
+  --primary: #22457f;
+  --primary-hover: #1a3765;
+  --primary-soft: #eaeff8;
+  --on-primary: #ffffff;
 
-  /* ── Status ───────────────────────────────────────────────────────────── */
-  --danger: #dc2626;
-  --danger-soft: #fef2f2;
-  --success: #15803d;
-  --success-soft: #f0fdf4;
-  --warning: #b45309;
-  --warning-soft: #fffbeb;
+  /* Teacher's pen — these mean right and wrong, nothing else */
+  --correct: #177245;
+  --correct-soft: #e8f5ed;
+  --wrong: #c4342b;
+  --wrong-soft: #fceceb;
 
-  /* ── Elevation ────────────────────────────────────────────────────────── */
-  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-md: 0 4px 12px -2px rgba(16, 24, 40, 0.08), 0 2px 6px -2px rgba(16, 24, 40, 0.05);
-  --shadow-lg: 0 12px 28px -6px rgba(16, 24, 40, 0.12), 0 4px 10px -4px rgba(16, 24, 40, 0.06);
-  --shadow-xl: 0 24px 56px -12px rgba(16, 24, 40, 0.18), 0 8px 20px -8px rgba(16, 24, 40, 0.08);
-  --shadow-navy: 0 20px 50px -14px rgba(14, 27, 58, 0.45);
-  --shadow-gold: 0 8px 28px -6px rgba(201, 168, 76, 0.35);
+  /* Streak / energy */
+  --streak: #d98a2b;
+  --streak-soft: #fdf3e6;
 
-  /* ── Motion ───────────────────────────────────────────────────────────── */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-fast: 160ms;
-  --dur-base: 280ms;
-  --dur-slow: 560ms;
+  /* Primary call-to-action surface */
+  --hero: #22457f;
+  --on-hero: #ffffff;
+  --on-hero-dim: rgba(255, 255, 255, 0.72);
 
-  /* ── Radii ────────────────────────────────────────────────────────────── */
+  /* Elevation — warm-tinted, never grey */
+  --shadow-sm: 0 1px 2px rgba(60, 48, 30, 0.06);
+  --shadow-md: 0 2px 6px -1px rgba(60, 48, 30, 0.08), 0 4px 12px -4px rgba(60, 48, 30, 0.06);
+  --shadow-lg: 0 8px 24px -6px rgba(60, 48, 30, 0.12), 0 2px 8px -2px rgba(60, 48, 30, 0.06);
+
+  /* Radii */
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
-  --r-xl: 22px;
-  --r-2xl: 28px;
+  --r-xl: 20px;
+  --r-full: 999px;
 
-  /* ── Back-compat aliases (existing class strings keep working) ─────────── */
-  --accent: var(--navy-700);
-  --accent-hover: var(--navy-600);
-  --accent-soft: #f0f3f8;
-  --brand: var(--gold-500);
+  /* Motion — capped at 200ms on purpose */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --fast: 120ms;
+  --base: 180ms;
+
+  /* Layout */
+  --tabbar-h: 60px;
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  /* placeholder so the cascade order is explicit; real values below */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --paper: #14120f;
+    --surface: #1e1b17;
+    --sunken: #100e0c;
+    --raised: #262119;
+
+    --ink: #f5f1e8;
+    --ink-muted: #a39b8b;
+    --ink-faint: #756d5f;
+
+    --line: #302b23;
+    --line-strong: #423b30;
+
+    --primary: #7ea3e0;
+    --primary-hover: #9bb8ea;
+    --primary-soft: #1b2233;
+    --on-primary: #10151f;
+
+    --correct: #4ec27f;
+    --correct-soft: #14241a;
+    --wrong: #f08078;
+    --wrong-soft: #2a1715;
+
+    --streak: #eda94f;
+    --streak-soft: #2a1f11;
+
+    --hero: #232c3d;
+    --on-hero: #eaf0fb;
+    --on-hero-dim: rgba(234, 240, 251, 0.66);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #14120f;
+  --surface: #1e1b17;
+  --sunken: #100e0c;
+  --raised: #262119;
+
+  --ink: #f5f1e8;
+  --ink-muted: #a39b8b;
+  --ink-faint: #756d5f;
+
+  --line: #302b23;
+  --line-strong: #423b30;
+
+  --primary: #7ea3e0;
+  --primary-hover: #9bb8ea;
+  --primary-soft: #1b2233;
+  --on-primary: #10151f;
+
+  --correct: #4ec27f;
+  --correct-soft: #14241a;
+  --wrong: #f08078;
+  --wrong-soft: #2a1715;
+
+  --streak: #eda94f;
+  --streak-soft: #2a1f11;
+
+  --hero: #232c3d;
+  --on-hero: #eaf0fb;
+  --on-hero-dim: rgba(234, 240, 251, 0.66);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
   --color-paper: var(--paper);
-  --color-paper-card: var(--paper-card);
-  --color-paper-elevated: var(--paper-elevated);
-  --color-paper-sunken: var(--paper-sunken);
-
-  --color-navy-900: var(--navy-900);
-  --color-navy-800: var(--navy-800);
-  --color-navy-700: var(--navy-700);
-  --color-navy-600: var(--navy-600);
-  --color-navy-500: var(--navy-500);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-raised: var(--raised);
 
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
-  --color-ink-subtle: var(--ink-subtle);
-  --color-on-accent: var(--on-accent);
-  --color-on-accent-muted: var(--on-accent-muted);
-
-  --color-gold-300: var(--gold-300);
-  --color-gold-400: var(--gold-400);
-  --color-gold-500: var(--gold-500);
-  --color-gold-600: var(--gold-600);
+  --color-ink-faint: var(--ink-faint);
+  --color-on-dark: var(--on-dark);
 
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
-  --color-line-inverse: var(--line-inverse);
 
-  --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-warning: var(--warning);
-  --color-warning-soft: var(--warning-soft);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
 
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-soft: var(--accent-soft);
-  --color-brand: var(--brand);
+  --color-correct: var(--correct);
+  --color-correct-soft: var(--correct-soft);
+  --color-wrong: var(--wrong);
+  --color-wrong-soft: var(--wrong-soft);
+
+  --color-streak: var(--streak);
+  --color-streak-soft: var(--streak-soft);
+
+  --color-hero: var(--hero);
+  --color-on-hero: var(--on-hero);
 
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-source-serif);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Base
    ═══════════════════════════════════════════════════════════════════════════ */
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+/* The bug that shipped last time: a grid/flex child defaults to
+   min-width:auto, so a track cannot shrink below its content's min-content
+   width. A long unbreakable row then inflates the column and an
+   overflow-hidden ancestor silently clips it. Defaulting children to
+   min-width:0 makes that class of bug structurally impossible. Opt back in
+   with .min-w-auto where intrinsic sizing is actually wanted. */
+:where(.flex, .grid) > * {
+  min-width: 0;
+}
+
+.min-w-auto {
+  min-width: auto;
+}
+
 html {
-  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  margin: 0;
   background: var(--paper);
   color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Display face carries the personality; body stays quiet and legible */
+.font-display {
+  font-family: var(--font-bricolage), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-bricolage), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold-500);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
-}
-
-input:not([type="file"]):focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--gold-500);
-  outline-offset: 1px;
-}
-
-.ewin-composer button:focus-visible,
-.ewin-composer textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+  border-radius: 4px;
 }
 
 ::selection {
-  background: var(--gold-300);
-  color: var(--navy-800);
+  background: var(--primary-soft);
+  color: var(--ink);
 }
 
-/* Scrollbars — thin, brand-neutral, no layout jump between pages */
-html {
-  scrollbar-gutter: stable;
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+/* Safe areas for the tab bar and composer on notched phones */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
-::-webkit-scrollbar {
-  width: 11px;
-  height: 11px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
-  border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #b9bcc2;
-  background-clip: content-box;
+.h-tabbar {
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Motion primitives
-   Every animation below drives only opacity / transform — never layout.
+   Motion — short, functional, and never driving layout
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@keyframes fade-up {
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -209,251 +292,72 @@ html {
   }
 }
 
-.animate-fade-up {
-  animation: fade-up 0.45s var(--ease-out) both;
+.rise {
+  animation: rise var(--base) var(--ease) both;
 }
 
-/* ── Scroll reveal (IntersectionObserver adds .is-visible) ───────────────── */
-
-@keyframes reveal-up {
-  from {
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
     opacity: 0;
-    transform: translateY(20px);
   }
-  to {
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
     opacity: 1;
-    transform: none;
   }
 }
 
-@keyframes reveal-scale {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.pop {
+  animation: pop 200ms var(--ease) both;
 }
 
-.reveal {
-  opacity: 0;
-}
-
-.reveal.is-visible {
-  animation: reveal-up var(--dur-slow) var(--ease-out) both;
-}
-
-.reveal[data-variant="scale"].is-visible {
-  animation-name: reveal-scale;
-}
-
-/* ── Atmosphere ─────────────────────────────────────────────────────────── */
-
-@keyframes aurora-drift {
+@keyframes shake {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translateX(0);
   }
-  50% {
-    transform: translate3d(2%, -2%, 0) scale(1.06);
+  25% {
+    transform: translateX(-4px);
   }
-}
-
-.aurora {
-  position: relative;
-  isolation: isolate;
-}
-
-.aurora::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(40% 50% at 20% 25%, rgba(201, 168, 76, 0.16), transparent 70%),
-    radial-gradient(45% 55% at 80% 70%, rgba(31, 53, 99, 0.35), transparent 70%);
-  animation: aurora-drift 18s ease-in-out infinite;
-}
-
-.noise {
-  position: relative;
-  isolation: isolate;
-}
-
-.noise::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* ── Surfaces & text treatments ─────────────────────────────────────────── */
-
-.text-gold-gradient {
-  background: linear-gradient(135deg, var(--gold-300), var(--gold-500) 55%, var(--gold-600));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.glass-dark {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--line-inverse);
-  backdrop-filter: blur(12px);
-}
-
-.hairline-gold {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--gold-500) 20%,
-    var(--gold-400) 50%,
-    var(--gold-500) 80%,
-    transparent
-  );
-}
-
-/* Gradient hairline border. The mask trick paints a 1px gradient ring
-   without a wrapper element or a second background layer. */
-.ring-gradient {
-  position: relative;
-}
-
-.ring-gradient::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: linear-gradient(
-    140deg,
-    rgba(201, 168, 76, 0.8) 0%,
-    rgba(201, 168, 76, 0) 38%,
-    rgba(31, 53, 99, 0.3) 78%,
-    rgba(201, 168, 76, 0.35) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-/* Light sweep across a button on hover */
-@keyframes sheen-sweep {
-  from {
-    transform: translateX(-130%);
-  }
-  to {
-    transform: translateX(240%);
+  75% {
+    transform: translateX(4px);
   }
 }
 
-.sheen {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
+.shake {
+  animation: shake 180ms var(--ease);
 }
 
-.sheen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    105deg,
-    transparent 32%,
-    rgba(255, 255, 255, 0.45) 50%,
-    transparent 68%
-  );
-  transform: translateX(-130%);
+@keyframes dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
 }
 
-.sheen:hover::after,
-.sheen:focus-visible::after {
-  animation: sheen-sweep 900ms var(--ease-out);
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  animation: dot 1.2s ease-in-out infinite;
 }
-
-.lift {
-  transition:
-    transform var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out);
+.dot:nth-child(2) {
+  animation-delay: 0.15s;
 }
-
-.lift:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+.dot:nth-child(3) {
+  animation-delay: 0.3s;
 }
-
-.lift:active {
-  transform: translateY(-1px);
-  transition-duration: var(--dur-fast);
-}
-
-/* Tabular figures — stops counters jittering as digits change */
-.tnum {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-/* Long-form copy on the legal and support pages */
-.prose-ewin {
-  max-width: 68ch;
-  color: var(--ink-muted);
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-.prose-ewin h2 {
-  margin-top: 2.75rem;
-  margin-bottom: 0.6rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-
-.prose-ewin p + p {
-  margin-top: 1.1rem;
-}
-
-.prose-ewin a {
-  color: var(--navy-700);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgba(201, 168, 76, 0.55);
-}
-
-.prose-ewin strong {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.surface-card {
-  background: var(--paper-elevated);
-  border: 1px solid var(--line);
-}
-
-.surface-card:hover {
-  border-color: var(--line-strong);
-}
-
-/* ── Loading ────────────────────────────────────────────────────────────── */
 
 @keyframes shimmer {
   to {
@@ -462,83 +366,31 @@ html {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--paper-sunken) 25%, #ffffff 50%, var(--paper-sunken) 75%);
+  background: linear-gradient(90deg, var(--sunken) 25%, var(--surface) 50%, var(--sunken) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  animation: shimmer 1.3s linear infinite;
   border-radius: var(--r-sm);
 }
 
-@keyframes typing-bounce {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.45;
-  }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
-}
-
-.typing-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ink-muted);
-  animation: typing-bounce 1.3s ease-in-out infinite;
-}
-.typing-dot:nth-child(2) {
-  animation-delay: 0.18s;
-}
-.typing-dot:nth-child(3) {
-  animation-delay: 0.36s;
-}
-
-/* ── Hero showcase message entrance ─────────────────────────────────────── */
-
-@keyframes msg-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.msg-in {
-  animation: msg-in 0.5s var(--ease-out) both;
-}
-
-/* Streaming caret shown while tutor chunks arrive */
-@keyframes caret-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-.stream-caret::after {
+/* Caret while tutor text is streaming in */
+.caret::after {
   content: "";
   display: inline-block;
   width: 2px;
   height: 1em;
   margin-left: 2px;
   vertical-align: -0.15em;
-  background: var(--ink-muted);
-  animation: caret-blink 1s step-end infinite;
+  background: var(--ink-faint);
+  animation: dot 1s step-end infinite;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Reduced motion
-   Animations stop, but nothing may be left invisible or mis-sized.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* Press feedback — the whole app should feel physical on touch */
+.press {
+  transition: transform var(--fast) var(--ease), background-color var(--fast) var(--ease);
+}
+.press:active {
+  transform: scale(0.97);
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -547,21 +399,9 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-
-  /* Reveal content must never be stranded at opacity 0 */
-  .reveal,
-  .reveal.is-visible {
-    opacity: 1 !important;
-    animation: none !important;
-    transform: none !important;
-  }
-
-  .lift:hover {
+  .press:active {
     transform: none;
-  }
-
-  html {
-    scroll-behavior: auto;
   }
 }

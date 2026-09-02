@@ -47,7 +47,7 @@ export function AuthShell({
       </div>
 
       {/* Brand side */}
-      <div className="aurora noise relative hidden overflow-hidden bg-navy-800 lg:block">
+      <div className="relative hidden overflow-hidden bg-primary lg:block">
         <div className="relative flex min-h-dvh flex-col justify-between px-12 py-14">
           <Image
             src="/logo-mark.png"
@@ -58,22 +58,22 @@ export function AuthShell({
           />
 
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-400">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
               Ewin Academy
             </p>
             <p className="mt-5 max-w-sm font-serif text-[2rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white">
               Learn one idea.
               <br />
-              <span className="text-gold-gradient">Then prove you got it.</span>
+              <span className="">Then prove you got it.</span>
             </p>
-            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-[var(--on-accent-muted)]">
+            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-ink-muted">
               Short lessons, a real check after each one, and feedback that names exactly what
               held up and what did not.
             </p>
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--on-accent-muted)]">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">
               Built around
             </p>
             <ExamBadgeRow variant="dark" />
@@ -114,7 +114,7 @@ export function AuthField({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="mt-1.5 w-full rounded-xl border border-line bg-white px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-gold-500 focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
+        className="mt-1.5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-[14.5px] outline-none transition-shadow focus:border-streak focus:shadow-[0_0_0_4px_rgba(201,168,76,0.15)]"
       />
     </label>
   )
@@ -134,7 +134,7 @@ export function AuthSubmit({
     <button
       type="submit"
       disabled={loading}
-      className="sheen w-full rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14.5px] font-semibold text-[var(--on-accent)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
+      className="w-full rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14.5px] font-semibold text-[var(--on-primary)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
     >
       {loading ? (loadingLabel ?? 'Working…') : children}
     </button>
@@ -144,7 +144,7 @@ export function AuthSubmit({
 /** Error banner. */
 export function AuthError({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-[13px] text-danger">
+    <p className="rounded-xl border border-danger/30 bg-wrong-soft px-3.5 py-2.5 text-[13px] text-wrong">
       {children}
     </p>
   )
