@@ -130,31 +130,31 @@ export default function PricingPage() {
 
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader overDark />
+      <SiteHeader />
 
       {/* ═══ Hero band ═══════════════════════════════════════════════════ */}
-      <section className="relative -mt-16 overflow-hidden bg-primary">
-        <div className="absolute inset-x-0 bottom-0 h-px" />
-        <div className="relative mx-auto max-w-5xl px-5 pb-16 pt-28 text-center sm:px-8 sm:pt-32">
+      <section className="relative overflow-hidden bg-primary">
+        
+        <div className="relative mx-auto max-w-5xl px-5 pb-14 pt-14 text-center sm:px-8">
           
             <ExamBadgeRow className="justify-center" variant="dark" />
-            <h1 className="mt-6 font-serif text-[clamp(2rem,4.4vw,3rem)] font-semibold tracking-[-0.03em] text-white">
+            <h1 className="mt-6 font-display text-[clamp(2rem,4.4vw,3rem)] font-semibold tracking-[-0.03em] text-on-primary">
               Simple pricing
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink-muted">
+            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-on-primary opacity-80">
               Free forever for serious daily practice. Pro when you want timed mocks and unlimited
               drills for JAMB, WAEC and NECO.
             </p>
 
             {/* Interval toggle */}
-            <div className="mt-8 inline-flex rounded-full border border-white/12 bg-surface/[0.06] p-1 text-[13px] backdrop-blur-sm">
+            <div className="mt-8 inline-flex rounded-full border border-white/25 bg-white/10 p-1 text-[13px]">
               <button
                 type="button"
                 onClick={() => setInterval('monthly')}
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'monthly'
-                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-primary shadow-[var(--shadow-md)]'
-                    : 'text-ink-muted hover:text-white'
+                    ? 'bg-primary text-on-primary'
+                    : 'text-on-primary opacity-70 hover:opacity-100'
                 }`}
               >
                 Monthly
@@ -164,8 +164,8 @@ export default function PricingPage() {
                 onClick={() => setInterval('yearly')}
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'yearly'
-                    ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-primary shadow-[var(--shadow-md)]'
-                    : 'text-ink-muted hover:text-white'
+                    ? 'bg-primary text-on-primary'
+                    : 'text-on-primary opacity-70 hover:opacity-100'
                 }`}
               >
                 Yearly
@@ -188,13 +188,13 @@ export default function PricingPage() {
           
             <div
               className={`press h-full rounded-2xl border bg-surface p-7 shadow-[var(--shadow-sm)] sm:p-8 ${
-                plan === 'free' ? 'border-navy-700' : 'border-line'
+                plan === 'free' ? 'border-primary' : 'border-line'
               }`}
             >
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 Free
               </p>
-              <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+              <p className="mt-3 font-display text-4xl font-semibold tracking-tight">
                 {formatNgn(0)}
               </p>
               <p className="mt-2 text-[14px] text-ink-muted">{PLANS.free.blurb}</p>
@@ -222,15 +222,15 @@ export default function PricingPage() {
 
           {/* ── Pro ──────────────────────────────────────────────────── */}
           
-            <div className="press relative h-full rounded-2xl bg-surface p-7 shadow-[var(--shadow-md)] sm:p-8">
-              <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-primary">
+            <div className="relative h-full rounded-2xl border-2 border-primary bg-surface p-6 sm:p-7">
+              <span className="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-on-primary">
                 Most popular
               </span>
 
-              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-streak">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
                 Pro
               </p>
-              <p className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+              <p className="mt-3 font-display text-4xl font-semibold tracking-tight">
                 {formatNgn(proPrice)}
                 <span className="ml-1 text-base font-normal text-ink-muted">
                   /{interval === 'yearly' ? 'year' : 'month'}
@@ -242,7 +242,7 @@ export default function PricingPage() {
                 {PLANS.pro.features.map((f) => (
                   <li key={f} className="flex gap-3 text-[13.5px] text-ink">
                     <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-streak/15">
-                      <Check className="h-3 w-3 text-streak" />
+                      <Check className="h-3 w-3 text-correct" />
                     </span>
                     {f}
                   </li>
@@ -268,7 +268,7 @@ export default function PricingPage() {
                 type="button"
                 disabled={loading || plan === 'pro'}
                 onClick={upgrade}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] py-3 text-[14px] font-semibold text-[var(--on-primary)] shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-[14px] font-semibold text-on-primary shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}

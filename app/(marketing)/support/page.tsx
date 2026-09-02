@@ -5,14 +5,14 @@ import { SiteFooter } from '@/components/SiteFooter'
 export default function SupportPage() {
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader solid />
+      <SiteHeader />
       <section className="relative overflow-hidden border-b border-line bg-sunken">
         <div className="absolute inset-x-0 bottom-0 h-px" />
         <div className="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-16">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             Help
           </p>
-          <h1 className="mt-3 font-serif text-[clamp(1.875rem,3.4vw,2.5rem)] font-semibold tracking-[-0.025em]">
+          <h1 className="mt-3 font-display text-[clamp(1.875rem,3.4vw,2.5rem)] font-semibold tracking-[-0.025em]">
             Support
           </h1>
           <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-muted">

@@ -2,33 +2,33 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Layers } from 'lucide-react'
+import { Layers } from 'lucide-react'
+import { AppHeader } from '@/components/ui/AppHeader'
 import { FlipCard } from '@/components/FlipCard'
-import {
-  dueCards,
-  gradeCard,
-  listCards,
-  hydrateCardsFromCloud,
-  type StudyCard,
-} from '@/app/lib/cards'
-import { SiteHeader } from '@/components/SiteHeader'
+import { dueCards, gradeCard, listCards, hydrateCardsFromCloud, type StudyCard } from '@/app/lib/cards'
+
+const GRADES = [
+  { g: 1 as const, label: 'Again', tone: 'var(--wrong)' },
+  { g: 3 as const, label: 'Hard', tone: 'var(--streak)' },
+  { g: 4 as const, label: 'Good', tone: 'var(--primary)' },
+  { g: 5 as const, label: 'Easy', tone: 'var(--correct)' },
+]
 
 export default function CardsPage() {
   const [queue, setQueue] = useState<StudyCard[]>([])
   const [allCount, setAllCount] = useState(0)
-  const [done, setDone] = useState(0)
   const [revealed, setRevealed] = useState(false)
-
-  function refresh() {
-    const due = dueCards()
-    setQueue(due)
-    setAllCount(listCards().length)
-    setRevealed(false)
-  }
+  const [done, setDone] = useState(0)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    refresh()
-    void hydrateCardsFromCloud().then(() => refresh())
+    const load = () => {
+      setQueue(dueCards())
+      setAllCount(listCards().length)
+    }
+    load()
+    setReady(true)
+    void hydrateCardsFromCloud?.().then(load).catch(() => {})
   }, [])
 
   const current = queue[0]
@@ -41,64 +41,60 @@ export default function CardsPage() {
     setRevealed(false)
   }
 
+  const total = done + queue.length
+  const progress = total ? (done / total) * 100 : 0
+
   return (
-    <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader solid />
-      <div className="mx-auto max-w-lg px-4 py-8">
-        <Link
-          href="/dashboard"
-          className="mb-5 inline-flex items-center gap-1 text-[13px] text-ink-muted no-underline hover:text-ink"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Dashboard
-        </Link>
+    <main className="bg-paper text-ink">
+      <AppHeader
+        title="Study cards"
+        subtitle={ready ? `${allCount} saved` : undefined}
+        back="/dashboard"
+      />
 
-        <div className="mb-3 flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-streak/12">
-            <Layers className="h-5 w-5 text-streak" />
-          </span>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
-              Spaced repetition
-            </p>
-            <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.025em]">
-              Study cards
-            </h1>
+      <div className="mx-auto max-w-lg px-4 py-5">
+        {!ready ? (
+          <div className="space-y-3">
+            <div className="skeleton h-2 w-full rounded-full" />
+            <div className="skeleton aspect-[4/5] w-full rounded-2xl" />
           </div>
-        </div>
-        <p className="mb-7 text-[14px] leading-relaxed text-ink-muted">
-          Flip to check yourself. Rate how it felt — Ewin brings hard ones back sooner.
-          {allCount > 0 && <span className="font-medium text-ink"> · {allCount} saved</span>}
-        </p>
-
-        {!current ? (
-          <div className="rounded-2xl border border-line bg-surface p-10 text-center shadow-[var(--shadow-sm)]">
-            <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-navy-600 to-navy-800 shadow-[var(--shadow-lg)]">
-              <Layers className="h-6 w-6 text-streak" />
+        ) : !current ? (
+          <div className="rounded-2xl border border-line bg-surface p-8 text-center">
+            <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft">
+              <Layers className="h-6 w-6 text-primary" />
             </span>
-            <p className="font-serif text-xl font-semibold">
-              {allCount === 0 ? 'No cards yet' : 'Caught up'}
+            <p className="font-display text-[20px] text-ink">
+              {allCount === 0 ? 'No cards yet' : 'All caught up'}
             </p>
-            <p className="mx-auto mt-2 max-w-xs text-[13.5px] leading-relaxed text-ink-muted">
+            <p className="mx-auto mt-2 max-w-xs text-[14px] leading-relaxed text-ink-muted">
               {allCount === 0
-                ? 'When you learn with the tutor, Ewin can suggest cards. Or finish a practice miss and add one.'
-                : `You reviewed ${done || 'your'} due cards. Come back later.`}
+                ? 'When Ewin spots a fact worth remembering during a lesson, it will offer to save it here.'
+                : done > 0
+                  ? `You reviewed ${done} ${done === 1 ? 'card' : 'cards'}. Come back tomorrow.`
+                  : 'Nothing is due right now. Come back tomorrow.'}
             </p>
             <Link
-              href="/dashboard"
-              className="mt-6 inline-block rounded-xl bg-gradient-to-br from-[#16274d] to-[#0e1b3a] px-6 py-3 text-[14px] font-medium text-[var(--on-primary)] no-underline shadow-[var(--shadow-md)]"
+              href={allCount === 0 ? '/learn/mathematics' : '/dashboard'}
+              className="press mt-6 inline-block rounded-full bg-primary px-6 py-3 text-[14.5px] font-medium text-on-primary no-underline"
             >
-              Go learn
+              {allCount === 0 ? 'Start a lesson' : 'Back to Today'}
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col items-center">
-            <div className="mb-4 flex w-full max-w-sm items-center justify-between">
-              <p className="tnum text-[12px] text-ink-muted">
-                <span className="font-semibold text-ink">{queue.length}</span> due
-              </p>
-              <p className="text-[12px] text-ink-faint">tap to flip</p>
+          <>
+            {/* Session progress */}
+            <div className="mb-4 flex items-center gap-3">
+              <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-sunken">
+                <span
+                  className="block h-full rounded-full bg-primary transition-[width] duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </span>
+              <span className="tnum shrink-0 text-[12.5px] text-ink-muted">
+                {queue.length} left
+              </span>
             </div>
+
             <FlipCard
               key={current.id}
               front={current.front}
@@ -106,24 +102,18 @@ export default function CardsPage() {
               subject={current.subject}
               onFlip={(f) => setRevealed(f)}
             />
-            {revealed && (
-              <div className="mt-5 grid w-full max-w-sm grid-cols-4 gap-2">
-                {(
-                  [
-                    [1, 'Again', '#c4485f'],
-                    [3, 'Hard', '#d4763b'],
-                    [4, 'Good', '#0e1b3a'],
-                    [5, 'Easy', '#2f9e5f'],
-                  ] as const
-                ).map(([g, label, tone]) => (
+
+            {revealed ? (
+              <div className="mt-5 grid grid-cols-4 gap-2">
+                {GRADES.map(({ g, label, tone }) => (
                   <button
                     key={g}
                     type="button"
                     onClick={() => onGrade(g)}
-                    className="rounded-xl border py-2.5 text-[12.5px] font-semibold transition-all duration-200 hover:scale-[1.03] active:scale-100"
+                    className="press rounded-xl border py-3 text-[13px] font-semibold"
                     style={{
-                      borderColor: `color-mix(in srgb, ${tone} 35%, transparent)`,
-                      background: `color-mix(in srgb, ${tone} 9%, transparent)`,
+                      borderColor: `color-mix(in srgb, ${tone} 40%, transparent)`,
+                      background: `color-mix(in srgb, ${tone} 10%, transparent)`,
                       color: tone,
                     }}
                   >
@@ -131,11 +121,12 @@ export default function CardsPage() {
                   </button>
                 ))}
               </div>
+            ) : (
+              <p className="mt-5 text-center text-[13.5px] text-ink-muted">
+                Tap the card, then say how it went
+              </p>
             )}
-            {!revealed && (
-              <p className="mt-4 text-[12px] text-ink-muted">Flip first, then rate</p>
-            )}
-          </div>
+          </>
         )}
       </div>
     </main>

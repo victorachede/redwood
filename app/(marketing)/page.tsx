@@ -78,7 +78,7 @@ export default function Home() {
           <ThemeToggle />
           <Link
             href="/dashboard"
-            className="press rounded-full bg-primary px-4 py-2 text-[13.5px] font-medium text-[var(--on-primary)] no-underline"
+            className="press rounded-full bg-primary px-4 py-2 text-[13.5px] font-medium text-on-primary no-underline"
           >
             Start
           </Link>
@@ -107,7 +107,7 @@ export default function Home() {
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
             href="/dashboard"
-            className="press inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-[var(--on-primary)] no-underline"
+            className="press inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-on-primary no-underline"
           >
             Start learning — free
             <ArrowRight className="h-4 w-4" />
@@ -155,7 +155,7 @@ export default function Home() {
             </div>
 
             <div className="flex justify-end">
-              <p className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5 text-[14.5px] text-[var(--on-primary)]">
+              <p className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5 text-[14.5px] text-on-primary">
                 Add 5 to both sides: 3x = 15, so x = 5.
               </p>
             </div>
@@ -295,7 +295,7 @@ export default function Home() {
               </ul>
               <Link
                 href="/pricing"
-                className="press mt-5 block rounded-full bg-primary py-3 text-center text-[14px] font-medium text-[var(--on-primary)] no-underline"
+                className="press mt-5 block rounded-full bg-primary py-3 text-center text-[14px] font-medium text-on-primary no-underline"
               >
                 {PLANS.pro.cta}
               </Link>
@@ -334,7 +334,7 @@ export default function Home() {
           </p>
           <Link
             href="/dashboard"
-            className="press mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[15px] font-medium text-[var(--on-primary)] no-underline"
+            className="press mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[15px] font-medium text-on-primary no-underline"
           >
             Start with one topic
             <ArrowRight className="h-4 w-4" />
@@ -351,7 +351,7 @@ export default function Home() {
             <Link href="/terms" className="no-underline hover:text-ink">Terms</Link>
             <Link href="/privacy" className="no-underline hover:text-ink">Privacy</Link>
           </div>
-          <p className="mt-4 text-[12px] text-ink-faint">
+          <p className="mt-4 text-[12px] text-ink-muted">
             © {new Date().getFullYear()} Ewin Academy · Not affiliated with WAEC, JAMB or NECO
           </p>
         </div>

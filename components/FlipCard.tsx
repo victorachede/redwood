@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+/** Question on the front, answer on the back. Tap to flip. */
 export function FlipCard({
   front,
   back,
@@ -28,58 +29,59 @@ export function FlipCard({
         })
       }}
       aria-pressed={flipped}
-      aria-label={flipped ? 'Showing answer' : 'Showing question'}
-      className={`group relative w-full max-w-sm aspect-[4/5] [perspective:1200px] cursor-pointer text-left ${className}`}
+      aria-label={flipped ? 'Showing the answer' : 'Showing the question'}
+      className={`relative aspect-[4/5] w-full cursor-pointer text-left [perspective:1200px] ${className}`}
     >
-      {/* Stacked-deck illusion — two cards peeking out behind the live one */}
+      {/* Cards waiting behind, so the deck reads as a deck */}
       <span
         aria-hidden
-        className="absolute inset-0 rounded-2xl border border-line bg-surface shadow-[var(--shadow-sm)]"
-        style={{ transform: 'translateY(10px) scale(0.94)' }}
+        className="absolute inset-0 rounded-2xl border border-line bg-surface"
+        style={{ transform: 'translateY(9px) scale(0.95)' }}
       />
       <span
         aria-hidden
-        className="absolute inset-0 rounded-2xl border border-line bg-surface shadow-[var(--shadow-sm)]"
-        style={{ transform: 'translateY(5px) scale(0.97)' }}
+        className="absolute inset-0 rounded-2xl border border-line bg-surface"
+        style={{ transform: 'translateY(4px) scale(0.975)' }}
       />
 
       <div
-        className="relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d]"
+        className="relative h-full w-full [transform-style:preserve-3d]"
         style={{
           transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          transitionTimingFunction: 'var(--ease-spring)',
+          transition: 'transform 420ms var(--ease)',
         }}
       >
         {/* Front */}
-        <div className="absolute inset-0 flex flex-col rounded-2xl border border-line bg-surface p-7 shadow-[var(--shadow-lg)] [backface-visibility:hidden]">
+        <div className="absolute inset-0 flex flex-col rounded-2xl border border-line bg-surface p-6 shadow-[var(--shadow-md)] [backface-visibility:hidden]">
           {subject && (
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-streak">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
               {subject}
             </span>
           )}
           <div className="flex flex-1 items-center">
-            <p className="font-serif text-xl leading-snug text-ink sm:text-2xl">{front}</p>
+            <p className="font-display text-[21px] leading-snug text-ink">{front}</p>
           </div>
-          <span className="text-[12px] text-ink-muted transition-colors group-hover:text-primary">
-            Tap to reveal →
-          </span>
+          <span className="text-[12.5px] text-ink-muted">Tap to reveal</span>
         </div>
 
         {/* Back */}
         <div
-          className="absolute inset-0 flex flex-col rounded-2xl border border-navy-600 bg-gradient-to-br from-navy-700 to-navy-900 p-7 shadow-[var(--shadow-lg)] [backface-visibility:hidden]"
-          style={{ transform: 'rotateY(180deg)' }}
+          className="absolute inset-0 flex flex-col rounded-2xl border p-6 shadow-[var(--shadow-md)] [backface-visibility:hidden]"
+          style={{
+            transform: 'rotateY(180deg)',
+            background: 'var(--primary)',
+            borderColor: 'var(--primary)',
+          }}
         >
-          <div className="absolute inset-x-0 top-0 h-px" />
           {subject && (
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-streak">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-primary opacity-65">
               {subject}
             </span>
           )}
           <div className="flex flex-1 items-center">
-            <p className="font-serif text-lg leading-snug text-white sm:text-xl">{back}</p>
+            <p className="font-display text-[19px] leading-snug text-on-primary">{back}</p>
           </div>
-          <span className="text-[12px] text-ink-muted">Tap to flip back →</span>
+          <span className="text-[12.5px] text-on-primary opacity-65">Tap to flip back</span>
         </div>
       </div>
     </button>

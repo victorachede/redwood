@@ -34,7 +34,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   return (
     <div
       role="status"
-      className="rise fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-[var(--shadow-lg)] ring-1 ring-gold-500/25"
+      className="rise fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[13px] font-medium text-on-primary shadow-[var(--shadow-lg)]"
     >
       <Check className="h-3.5 w-3.5 text-streak" />
       {message}
@@ -50,13 +50,13 @@ function Group({
   children: React.ReactNode
 }) {
   return (
-    <div className="mb-7">
+    <div className="mb-6">
       {title && (
-        <p className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-streak">
+        <p className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
           {title}
         </p>
       )}
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[var(--shadow-sm)]">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface">
         {children}
       </div>
     </div>
@@ -95,7 +95,7 @@ function Field({
 }
 
 const inputClass =
-  'w-full rounded-xl border-0 bg-paper px-3.5 py-2.5 text-[14px] text-ink outline-none ring-1 ring-line transition-shadow focus:ring-2 focus:ring-gold-500'
+  'w-full rounded-xl border border-line bg-paper px-3.5 py-3 text-[15px] text-ink outline-none transition-colors focus:border-primary'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -212,7 +212,7 @@ export default function SettingsPage() {
   if (hydrated && !user) {
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <SiteHeader solid />
+        <SiteHeader />
         <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center">
           <EwinAvatar size={56} />
           <h1 className="mt-6 font-serif text-2xl font-semibold tracking-tight">Sign in for settings</h1>
@@ -222,7 +222,7 @@ export default function SettingsPage() {
           <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
             <Link
               href="/login"
-              className="rounded-full bg-ink px-6 py-2.5 text-sm font-medium text-white no-underline hover:bg-neutral-700"
+              className="rounded-full bg-ink px-6 py-2.5 text-sm font-medium text-on-primary no-underline hover:bg-neutral-700"
             >
               Sign in
             </Link>
@@ -243,7 +243,7 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader solid />
+      <SiteHeader />
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       <div className="mx-auto max-w-lg px-4 py-8 sm:py-10">
@@ -264,19 +264,19 @@ export default function SettingsPage() {
 
         {/* Identity card */}
         <Group>
-          <div className="relative overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900 px-5 py-6">
+          <div className="relative overflow-hidden bg-gradient-to-br bg-primary bg-primary px-5 py-6">
             <div className="absolute inset-x-0 top-0 h-px" />
             <div className="relative flex items-center gap-4">
-              <EwinAvatar size={52} className="ring-2 ring-gold-500/30" />
+              <EwinAvatar size={52} className="ring-2 ring-white/25" />
               <div className="min-w-0 flex-1">
-                <p className="truncate font-serif text-lg font-semibold tracking-tight text-white">
+                <p className="truncate font-serif text-lg font-semibold tracking-tight text-on-primary">
                   {user?.displayName || 'Guest'}
                 </p>
                 <p className="truncate text-[13px] text-ink-muted">
                   {user?.email || 'Learning on this device only'}
                 </p>
                 {user && examFocus && (
-                  <span className="mt-2 inline-flex rounded-full border border-streak/30 bg-streak/10 px-2.5 py-0.5 text-[11px] font-medium text-streak">
+                  <span className="mt-2 inline-flex rounded-full border border-white/25 bg-white/15 px-2.5 py-0.5 text-[11px] font-medium text-on-primary">
                     {examFocus}
                   </span>
                 )}
@@ -288,7 +288,7 @@ export default function SettingsPage() {
               <div className="flex gap-2 pt-0.5">
                 <Link
                   href="/signup"
-                  className="flex-1 rounded-full bg-ink py-2.5 text-center text-[13px] font-medium text-white no-underline"
+                  className="flex-1 rounded-full bg-ink py-2.5 text-center text-[13px] font-medium text-on-primary no-underline"
                 >
                   Create account
                 </Link>
@@ -367,7 +367,7 @@ export default function SettingsPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-white disabled:opacity-60"
+                    className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-on-primary disabled:opacity-60"
                   >
                     {saving ? 'Saving…' : 'Save'}
                   </button>
@@ -449,7 +449,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={clearHistory}
-                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-on-primary transition-opacity hover:opacity-90"
                   >
                     Confirm
                   </button>
@@ -489,7 +489,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={removeAccount}
-                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-on-primary transition-opacity hover:opacity-90"
                   >
                     {delStep === 0 ? 'Delete' : delStep === 1 ? 'Continue' : 'Delete forever'}
                   </button>
