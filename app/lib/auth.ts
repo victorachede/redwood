@@ -388,8 +388,14 @@ export async function setNewPassword(
   return { ok: true }
 }
 
-/** Subscribe to auth changes (local + Supabase). */
-export function useAuthListener(onChange: () => void): () => void {
+/**
+ * Subscribe to auth changes (local + Supabase).
+ *
+ * Deliberately not a React hook despite living beside them — it takes no
+ * hook dependencies and is called from inside effects, so the `use` prefix
+ * would be a lie the lint rules rightly complain about.
+ */
+export function subscribeToAuth(onChange: () => void): () => void {
   if (typeof window === 'undefined') return () => {}
   const handler = () => onChange()
   window.addEventListener('ewin-auth', handler)

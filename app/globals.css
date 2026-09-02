@@ -25,8 +25,12 @@
 
   /* Ink */
   --ink: #1a1714;
-  --ink-muted: #6b6355;
-  --ink-faint: #857c6d;
+  /* Both muted steps are measured against the *darkest* light ground
+     (--sunken), not against white, so a de-emphasised label never drops
+     below AA just because it sits in a sunken row. scripts/check-contrast.js
+     enforces this — it is where these values came from. */
+  --ink-muted: #5c5449;
+  --ink-faint: #746c5f;
   --on-dark: #f7f3ea;
 
   /* Lines */
@@ -91,7 +95,7 @@
 
     --ink: #f5f1e8;
     --ink-muted: #a39b8b;
-    --ink-faint: #8d8474;
+    --ink-faint: #908776;
 
     --line: #302b23;
     --line-strong: #423b30;
@@ -129,7 +133,7 @@
 
   --ink: #f5f1e8;
   --ink-muted: #a39b8b;
-  --ink-faint: #8d8474;
+  --ink-faint: #908776;
 
   --line: #302b23;
   --line-strong: #423b30;

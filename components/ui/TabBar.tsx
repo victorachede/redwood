@@ -38,12 +38,12 @@ export function TabBar() {
                 >
                   <t.Icon
                     className="h-[22px] w-[22px] transition-colors"
-                    style={{ color: active ? 'var(--primary)' : 'var(--ink-faint)' }}
+                    style={{ color: active ? 'var(--primary)' : 'var(--ink-muted)' }}
                     strokeWidth={active ? 2.3 : 1.8}
                   />
                   <span
                     className="text-[10.5px] font-medium transition-colors"
-                    style={{ color: active ? 'var(--primary)' : 'var(--ink-faint)' }}
+                    style={{ color: active ? 'var(--primary)' : 'var(--ink-muted)' }}
                   >
                     {t.label}
                   </span>

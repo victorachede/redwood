@@ -19,7 +19,7 @@ import {
   getSession,
   signOutAndGoHome,
   updateProfile,
-  useAuthListener,
+  subscribeToAuth,
   type LocalUser,
 } from '@/app/lib/auth'
 import { clearStudyData, getUsageStats, type UsageStats } from '@/app/lib/progress'
@@ -134,7 +134,7 @@ export default function SettingsPage() {
   useEffect(() => {
     refresh()
     setHydrated(true)
-    return useAuthListener(refresh)
+    return subscribeToAuth(refresh)
   }, [])
 
   function saveProfile(e: React.FormEvent) {

@@ -73,6 +73,47 @@ export function setLocalPlan(state: LocalPlanState) {
   if (typeof window === 'undefined') return
   localStorage.setItem(PLAN_KEY, JSON.stringify(state))
   window.dispatchEvent(new Event('ewin-plan'))
+
+  // The profile row is the real record of what someone paid for. The local
+  // copy is a cache so gating does not wait on a round trip.
+  void (async () => {
+    const { getSession } = await import('@/app/lib/auth')
+    const { db, isCloud } = await import('@/app/lib/sync')
+    if (!isCloud()) return
+    const uid = getSession()!.id
+    const { error } = await db()!
+      .from('profiles')
+      .update({
+        plan: state.plan,
+        plan_interval: state.interval,
+        plan_updated_at: new Date(state.updatedAt || Date.now()).toISOString(),
+      })
+      .eq('id', uid)
+    if (error) console.warn('[sync] plan failed', error)
+  })()
+}
+
+/** Reads the authoritative plan from the profile on load. */
+export async function hydratePlanFromCloud(): Promise<void> {
+  if (typeof window === 'undefined') return
+  const { getSession } = await import('@/app/lib/auth')
+  const { db, isCloud } = await import('@/app/lib/sync')
+  if (!isCloud()) return
+
+  const { data } = await db()!
+    .from('profiles')
+    .select('plan, plan_interval, plan_updated_at')
+    .eq('id', getSession()!.id)
+    .maybeSingle()
+  if (!data) return
+
+  const next: LocalPlanState = {
+    plan: (data.plan as PlanId) || 'free',
+    interval: (data.plan_interval as 'monthly' | 'yearly') || 'monthly',
+    updatedAt: data.plan_updated_at ? new Date(data.plan_updated_at).getTime() : Date.now(),
+  }
+  localStorage.setItem(PLAN_KEY, JSON.stringify(next))
+  window.dispatchEvent(new Event('ewin-plan'))
 }
 
 export function isPro(): boolean {

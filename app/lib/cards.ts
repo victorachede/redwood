@@ -2,6 +2,7 @@
 
 import { getSession } from '@/app/lib/auth'
 import { createBrowserClient, isSupabaseConfigured } from '@/app/lib/supabase'
+import { db, push } from '@/app/lib/sync'
 
 export type StudyCard = {
   id: string
@@ -61,24 +62,38 @@ export function addCard(input: {
   }
   write([card, ...read().filter((c) => c.front !== card.front)])
 
-  const uid = userId()
-  if (uid && isSupabaseConfigured) {
-    const sb = createBrowserClient()
-    if (sb) {
-      void sb.from('study_cards').insert({
-        user_id: uid,
-        front: card.front,
-        back: card.back,
-        subject: card.subject ?? null,
-        source: card.source || 'manual',
-      })
-    }
-  }
-
+  pushCard(card)
   return card
 }
 
-/** grade: 1 again, 3 hard, 4 good, 5 easy — local scheduling only for now */
+/**
+ * Writes a card and its review schedule to Postgres.
+ *
+ * Upserts on (user_id, md5(front)) so the same card saved twice updates in
+ * place instead of accumulating rows.
+ */
+function pushCard(c: StudyCard) {
+  const uid = userId()
+  if (!uid) return
+  push('card', () =>
+    db()!.from('study_cards').upsert(
+      {
+        user_id: uid,
+        front: c.front,
+        back: c.back,
+        subject: c.subject ?? null,
+        source: c.source || 'manual',
+        ease: c.ease,
+        interval_days: c.interval,
+        due: new Date(c.due).toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,front_key' },
+    ),
+  )
+}
+
+/** grade: 1 again, 3 hard, 4 good, 5 easy */
 export function gradeCard(id: string, grade: 1 | 3 | 4 | 5) {
   const cards = read()
   const i = cards.findIndex((c) => c.id === id)
@@ -96,6 +111,9 @@ export function gradeCard(id: string, grade: 1 | 3 | 4 | 5) {
   }
   cards[i] = c
   write(cards)
+  // Review state used to be local-only, so a student's queue reset entirely
+  // on a new device. It now follows them.
+  pushCard(c)
 }
 
 export function parseTutorCards(text: string): { front: string; back: string }[] {
@@ -123,29 +141,35 @@ export async function hydrateCardsFromCloud(): Promise<void> {
 
   const { data } = await sb
     .from('study_cards')
-    .select('id, front, back, subject, source, created_at')
+    .select('id, front, back, subject, source, ease, interval_days, due, created_at, updated_at')
     .eq('user_id', uid)
     .order('created_at', { ascending: false })
-    .limit(150)
+    .limit(200)
 
   if (!data?.length) return
 
   const local = read()
-  const fronts = new Set(local.map((c) => c.front))
-  const extra: StudyCard[] = []
+  const byFront = new Map(local.map((c) => [c.front, c]))
+
   for (const row of data) {
-    if (fronts.has(row.front)) continue
-    extra.push({
+    const remote: StudyCard = {
       id: row.id,
       front: row.front,
       back: row.back,
       subject: row.subject || undefined,
       source: (row.source as StudyCard['source']) || 'tutor',
-      ease: 2.5,
-      interval: 0,
-      due: Date.now(),
+      ease: row.ease ?? 2.5,
+      interval: row.interval_days ?? 0,
+      due: row.due ? new Date(row.due).getTime() : Date.now(),
       createdAt: new Date(row.created_at).getTime(),
-    })
+    }
+    const mine = byFront.get(row.front)
+    // Last write wins on the schedule, so grading on a phone is not undone
+    // by an older copy sitting in a laptop's cache.
+    if (!mine || (row.updated_at && new Date(row.updated_at).getTime() >= mine.due - mine.interval * 86400000)) {
+      byFront.set(row.front, remote)
+    }
   }
-  if (extra.length) write([...extra, ...local].slice(0, 200))
+
+  write([...byFront.values()].sort((a, b) => b.createdAt - a.createdAt).slice(0, 200))
 }

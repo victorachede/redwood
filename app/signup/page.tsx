@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
-import { getSession, refreshSession, signUp, useAuthListener } from '@/app/lib/auth'
+import { getSession, refreshSession, signUp, subscribeToAuth } from '@/app/lib/auth'
 import { PasswordField } from '@/components/PasswordField'
 import { AuthShell, AuthField, AuthSubmit, AuthError } from '@/components/AuthShell'
 
@@ -19,7 +19,7 @@ export default function SignupPage() {
     void refreshSession().then((u) => {
       if (u || getSession()) router.replace('/dashboard')
     })
-    return useAuthListener(() => {
+    return subscribeToAuth(() => {
       if (getSession()) router.replace('/dashboard')
     })
   }, [router])
