@@ -6,6 +6,7 @@ import { ArrowRight, Check, Flame, Layers, Play, Target } from 'lucide-react'
 import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { SubjectIcon } from '@/components/SubjectIcon'
+import { Avatar } from '@/components/ui/Avatar'
 import {
   getStreak,
   loadPractice,
@@ -72,7 +73,11 @@ export default function TodayPage() {
 
   return (
     <main className="bg-paper text-ink">
-      <AppHeader title="Today" subtitle={user ? user.displayName : greeting()} />
+      <AppHeader
+        title="Today"
+        subtitle={user ? user.displayName : greeting()}
+        action={user ? <Avatar name={user.displayName} size={32} /> : undefined}
+      />
 
       <div className="mx-auto max-w-3xl px-4 py-5">
         {/* ── The one thing to do next ─────────────────────────────────── */}

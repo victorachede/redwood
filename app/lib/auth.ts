@@ -223,6 +223,18 @@ export async function signOut(): Promise<void> {
   cacheSession(null)
 }
 
+/**
+ * Signs out and returns the user to the homepage.
+ *
+ * Uses a full navigation rather than a client-side push: sign-out has to
+ * clear Supabase state, the local store and the session cache, and a soft
+ * navigation can leave stale auth state in memory on the page you land on.
+ */
+export async function signOutAndGoHome(): Promise<void> {
+  await signOut()
+  if (typeof window !== 'undefined') window.location.href = '/'
+}
+
 export function updateProfile(
   patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus'>>,
 ): { ok: true; user: LocalUser } | { ok: false; error: string } {

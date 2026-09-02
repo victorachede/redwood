@@ -12,19 +12,20 @@ import {
   BookOpen,
   Target,
 } from 'lucide-react'
-import { SiteHeader } from '@/components/SiteHeader'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import {
   changePassword,
   deleteAccount,
   getSession,
-  signOut,
+  signOutAndGoHome,
   updateProfile,
   useAuthListener,
   type LocalUser,
 } from '@/app/lib/auth'
 import { clearStudyData, getUsageStats, type UsageStats } from '@/app/lib/progress'
 import { PasswordField } from '@/components/PasswordField'
+import { AvatarPicker } from '@/components/ui/AvatarPicker'
+import { AppHeader } from '@/components/ui/AppHeader'
 
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => {
@@ -36,7 +37,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
       role="status"
       className="rise fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[13px] font-medium text-on-primary shadow-[var(--shadow-lg)]"
     >
-      <Check className="h-3.5 w-3.5 text-streak" />
+      <Check className="h-3.5 w-3.5 text-correct" />
       {message}
     </div>
   )
@@ -212,30 +213,28 @@ export default function SettingsPage() {
   if (hydrated && !user) {
     return (
       <main className="min-h-dvh bg-paper text-ink">
-        <SiteHeader />
-        <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center">
+        <AppHeader title="Me" />
+        <div className="mx-auto flex max-w-md flex-col items-center px-4 py-16 text-center">
           <EwinAvatar size={56} />
-          <h1 className="mt-6 font-serif text-2xl font-semibold tracking-tight">Sign in for settings</h1>
-          <p className="mt-2 text-[15px] text-ink-muted">
-            Profile, password, and account controls need an account. You can still learn without one.
+          <h1 className="mt-6 font-display text-[22px] text-ink">Sign in for settings</h1>
+          <p className="mx-auto mt-2 max-w-xs text-[14.5px] leading-relaxed text-ink-muted">
+            Your profile, photo and account controls need an account. You can still learn
+            without one.
           </p>
-          <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+          <div className="mt-7 flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
             <Link
               href="/login"
-              className="rounded-full bg-ink px-6 py-2.5 text-sm font-medium text-on-primary no-underline hover:bg-neutral-700"
+              className="press rounded-full bg-primary px-6 py-3 text-[14.5px] font-medium text-on-primary no-underline"
             >
               Sign in
             </Link>
             <Link
               href="/signup"
-              className="rounded-full border border-line bg-surface px-6 py-2.5 text-sm font-medium text-ink no-underline hover:border-primary"
+              className="press rounded-full border border-line bg-surface px-6 py-3 text-[14.5px] font-medium text-ink no-underline"
             >
               Create account
             </Link>
           </div>
-          <Link href="/dashboard" className="mt-6 text-[13px] text-ink-muted no-underline hover:text-ink">
-            Back to dashboard
-          </Link>
         </div>
       </main>
     )
@@ -243,44 +242,27 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-dvh bg-paper text-ink">
-      <SiteHeader />
+      <AppHeader title="Me" subtitle={user?.displayName} />
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
-      <div className="mx-auto max-w-lg px-4 py-8 sm:py-10">
-        <Link
-          href="/dashboard"
-          className="mb-5 inline-flex items-center gap-1 text-[13px] text-ink-muted no-underline hover:text-ink"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back
-        </Link>
-
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-streak">
-          Your account
-        </p>
-        <h1 className="mb-7 mt-2 font-serif text-[1.875rem] font-semibold tracking-[-0.025em]">
-          Settings
-        </h1>
+      <div className="mx-auto max-w-lg px-4 py-5">
 
         {/* Identity card */}
         <Group>
-          <div className="relative overflow-hidden bg-gradient-to-br bg-primary bg-primary px-5 py-6">
-            <div className="absolute inset-x-0 top-0 h-px" />
-            <div className="relative flex items-center gap-4">
-              <EwinAvatar size={52} className="ring-2 ring-white/25" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-serif text-lg font-semibold tracking-tight text-on-primary">
-                  {user?.displayName || 'Guest'}
-                </p>
-                <p className="truncate text-[13px] text-ink-muted">
-                  {user?.email || 'Learning on this device only'}
-                </p>
-                {user && examFocus && (
-                  <span className="mt-2 inline-flex rounded-full border border-white/25 bg-white/15 px-2.5 py-0.5 text-[11px] font-medium text-on-primary">
-                    {examFocus}
-                  </span>
-                )}
-              </div>
+          <div className="border-b border-line px-4 py-5">
+            <AvatarPicker name={user?.displayName || 'You'} onDone={(m) => setToast(m)} />
+            <div className="mt-4">
+              <p className="font-display text-[19px] leading-tight text-ink">
+                {user?.displayName || 'Guest'}
+              </p>
+              <p className="truncate text-[13px] text-ink-muted">
+                {user?.email || 'Learning on this device only'}
+              </p>
+              {user && examFocus && (
+                <span className="mt-2 inline-flex rounded-full bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                  {examFocus}
+                </span>
+              )}
             </div>
           </div>
           {!user && (
@@ -288,7 +270,7 @@ export default function SettingsPage() {
               <div className="flex gap-2 pt-0.5">
                 <Link
                   href="/signup"
-                  className="flex-1 rounded-full bg-ink py-2.5 text-center text-[13px] font-medium text-on-primary no-underline"
+                  className="flex-1 rounded-full bg-primary py-2.5 text-center text-[13px] font-medium text-on-primary no-underline"
                 >
                   Create account
                 </Link>
@@ -310,7 +292,7 @@ export default function SettingsPage() {
               {metrics.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-xl bg-paper px-2.5 py-3 text-center">
                   <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-primary" />
-                  <p className="font-serif text-lg font-semibold leading-none tracking-tight">
+                  <p className="font-display text-lg font-semibold leading-none tracking-tight">
                     {value}
                   </p>
                   <p className="mt-1 text-[11px] text-ink-muted">{label}</p>
@@ -367,7 +349,7 @@ export default function SettingsPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-on-primary disabled:opacity-60"
+                    className="rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-on-primary disabled:opacity-60"
                   >
                     {saving ? 'Saving…' : 'Save'}
                   </button>
@@ -414,8 +396,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => {
-                  signOut()
-                  router.push('/')
+                  void signOutAndGoHome()
                 }}
                 className="flex w-full items-center justify-between px-4 py-3.5 text-left text-[14px] font-medium text-ink hover:bg-paper/80"
               >
