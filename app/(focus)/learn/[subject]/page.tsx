@@ -19,6 +19,7 @@ import { Diagram } from '@/components/Diagram'
 import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { SubjectIcon } from '@/components/SubjectIcon'
+import { Avatar } from '@/components/ui/Avatar'
 
 type Message = {
   role: 'tutor' | 'student'
