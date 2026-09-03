@@ -33,7 +33,7 @@ const STEPS = [
     n: '02',
     title: 'Then it makes you answer.',
     body:
-      'In your own words. Not A, B, C or D. Guessing a letter is how you find out in the exam hall that you never knew it — and by then it is too late to fix.',
+      'In your own words, typed out — the tutor will not take a letter, because guessing one is how you find out in the exam hall that you never knew it. Practice is separate, and there you answer A, B, C or D against the clock, exactly like the real paper.',
   },
   {
     n: '03',

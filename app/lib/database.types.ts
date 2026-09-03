@@ -152,6 +152,7 @@ export type Database = {
           email: string | null
           exam_focus: string | null
           id: string
+          leaderboard_opt_in: boolean
           paystack_customer_code: string | null
           paystack_subscription_code: string | null
           plan: string
@@ -170,6 +171,7 @@ export type Database = {
           email?: string | null
           exam_focus?: string | null
           id: string
+          leaderboard_opt_in?: boolean
           paystack_customer_code?: string | null
           paystack_subscription_code?: string | null
           plan?: string
@@ -241,7 +243,20 @@ export type Database = {
       }
     }
     Views: Record<never, never>
-    Functions: Record<never, never>
+    Functions: {
+      leaderboard_week: {
+        Args: { limit_n?: number }
+        Returns: {
+          rank: number
+          display_name: string
+          correct: number
+          total: number
+          accuracy: number
+          streak: number
+          is_me: boolean
+        }[]
+      }
+    }
     Enums: Record<never, never>
     CompositeTypes: Record<never, never>
   }

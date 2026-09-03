@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Check, ClipboardList, Flame, Layers, Play, Target } from 'lucide-react'
+import { ArrowRight, Check, ClipboardList, Flame, Layers, Play, Target, Trophy } from 'lucide-react'
 import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { SubjectIcon } from '@/components/SubjectIcon'
@@ -309,6 +309,14 @@ export default function TodayPage() {
 
         {/* ── Quick actions ────────────────────────────────────────────── */}
         <section className="mt-6 grid grid-cols-2 gap-2.5">
+          <Link
+            href="/leaderboard"
+            className="press col-span-2 flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3 no-underline"
+          >
+            <Trophy className="h-[18px] w-[18px]" style={{ color: 'var(--streak)' }} />
+            <span className="flex-1 text-[13.5px] font-medium text-ink">This week&rsquo;s board</span>
+            <ArrowRight className="h-4 w-4 text-ink-faint" />
+          </Link>
           <Link
             href="/practice/mathematics"
             className="press flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3 no-underline"
