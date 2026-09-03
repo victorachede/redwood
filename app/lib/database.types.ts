@@ -41,6 +41,38 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['assignments']['Insert']>
         Relationships: []
       }
+      generated_questions: {
+        Row: {
+          answer: string
+          created_at: string
+          difficulty: number
+          exam: string
+          explanation: string
+          id: string
+          options: Json
+          question: string
+          /** Generated: md5(lower(question)). Never write it. */
+          question_key: string | null
+          subject_id: string
+          topic: string
+          verified: boolean
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          difficulty?: number
+          exam: string
+          explanation: string
+          id?: string
+          options: Json
+          question: string
+          subject_id: string
+          topic?: string
+          verified?: boolean
+        }
+        Update: Partial<Database['public']['Tables']['generated_questions']['Insert']>
+        Relationships: []
+      }
       mastery: {
         Row: {
           error_tags: Json

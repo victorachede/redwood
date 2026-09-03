@@ -9,7 +9,8 @@
     "lint": "eslint",
     "check:layout": "node scripts/check-layout.js",
     "check:contrast": "node scripts/check-contrast.js",
-    "check:ui": "npm run check:layout && npm run check:contrast"
+    "check:ui": "npm run check:layout && npm run check:contrast",
+    "test": "node --test --experimental-strip-types tests/*.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
