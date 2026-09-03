@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Check, Clock, X } from 'lucide-react'
+import { ArrowLeft, Check, Clock, Sparkles, X } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
 import {
   questionsForExam,
@@ -11,14 +11,29 @@ import {
   type PastQuestion,
   type ExamBoard,
 } from '@/app/lib/questions'
-import { savePractice, saveMisses } from '@/app/lib/progress'
+import { savePractice, saveMisses, loadMisses, loadMastery } from '@/app/lib/progress'
+import {
+  allCachedForSubject,
+  fetchBank,
+  topUpBank,
+} from '@/app/lib/generatedQuestions'
 import { ExamBadge } from '@/components/ExamBadges'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { Diagram } from '@/components/Diagram'
-import { canAccessTimedMocks, isPro } from '@/app/lib/billing'
+import { canAccessTimedMocks, canAccessUnlimitedPractice, isPro } from '@/app/lib/billing'
 
 type Phase = 'idle' | 'active' | 'done'
+
+/** Fisher-Yates. A fresh order each round so the seed bank never leads. */
+function shuffle<T>(list: T[]): T[] {
+  const a = [...list]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 export default function PracticePage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject } = use(params)
@@ -30,8 +45,77 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   const [timed, setTimed] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(0)
 
-  const bank = useMemo(() => questionsForExam(subject, exam), [subject, exam])
-  const counts = useMemo(() => countByExam(subject), [subject])
+  /** Questions written by the model, on top of the hand-written seed bank. */
+  const [generated, setGenerated] = useState<PastQuestion[]>([])
+  const [topping, setTopping] = useState(false)
+
+  const seed = useMemo(() => questionsForExam(subject, exam), [subject, exam])
+
+  const bank = useMemo(() => {
+    const gen = generated.filter((g) => exam === 'ALL' || g.exam === exam)
+    // Shuffled together rather than appended, so a student does not do the
+    // same six hand-written questions first every single time.
+    return shuffle([...seed, ...gen])
+  }, [seed, generated, exam])
+
+  const counts = useMemo(() => {
+    const base = countByExam(subject)
+    const out = { ...base }
+    for (const g of generated) {
+      out[g.exam] = (out[g.exam] ?? 0) + 1
+      out.ALL = (out.ALL ?? 0) + 1
+    }
+    return out
+  }, [subject, generated])
+
+  /** Topics this student has actually got wrong — what a drill should target. */
+  const weakTopics = useMemo(() => {
+    if (typeof window === 'undefined') return []
+    const fromMastery = loadMastery()
+      .filter((m) => m.subjectId === subject && m.level === 'struggling')
+      .map((m) => m.topic)
+    const fromMisses = loadMisses()
+      .filter((m) => m.subjectId === subject && m.topic)
+      .map((m) => m.topic as string)
+    return [...new Set([...fromMastery, ...fromMisses])]
+  }, [subject])
+
+  // The cached copy paints instantly and works with no signal; the shared
+  // bank then fills in whatever another student's generation has already
+  // produced. Neither step ever blocks starting a round.
+  useEffect(() => {
+    // Deliberately in an effect rather than a lazy useState initialiser:
+    // localStorage does not exist during SSR, so seeding state from it at
+    // render time gives the server an empty bank and the client a full one,
+    // which is a hydration mismatch. One extra render is the cheaper bug.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setGenerated(allCachedForSubject(subject, 'ALL'))
+    void fetchBank(subject, '', 'ALL').then((qs) => {
+      if (qs.length) setGenerated(qs)
+    })
+  }, [subject])
+
+  /** Asks the server for more, generating if the bank is thin. */
+  async function topUp(targetWeak: boolean) {
+    if (topping) return
+    setTopping(true)
+    try {
+      const more = await topUpBank({
+        subjectId: subject,
+        exam,
+        topic: targetWeak ? weakTopics[0] : undefined,
+        weakTopics,
+      })
+      if (more.length) {
+        setGenerated((prev) => {
+          const seen = new Set(prev.map((p) => p.id))
+          return [...prev, ...more.filter((m) => !seen.has(m.id))]
+        })
+      }
+    } finally {
+      setTopping(false)
+    }
+  }
 
   const [phase, setPhase] = useState<Phase>('idle')
   const [index, setIndex] = useState(0)
@@ -220,6 +304,61 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
           >
             Start practice
           </button>
+
+          {/* ── More questions ───────────────────────────────────────────
+              The hand-written bank is five to seven questions a subject,
+              which is not a mock paper. Ewin writes more in the style of the
+              board on request, and every one has been solved a second time
+              independently before it is served — a wrong answer taught
+              confidently is worse than no question at all. */}
+          <div className="mt-6 rounded-2xl border border-line bg-surface p-4">
+            <div className="flex items-start gap-3">
+              <Sparkles className="mt-0.5 h-[18px] w-[18px] shrink-0" style={{ color: accent }} />
+              <div className="min-w-0 flex-1">
+                <p className="text-[14.5px] font-medium text-ink">Run out of questions?</p>
+                <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+                  Ewin writes fresh ones in {exam === 'ALL' ? 'exam' : exam} style and checks
+                  each answer before you see it.
+                </p>
+
+                <div className="mt-3.5 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void topUp(false)}
+                    disabled={topping}
+                    className="press rounded-full border border-line-strong bg-surface px-4 py-2.5 text-[13.5px] font-semibold text-ink disabled:opacity-60"
+                  >
+                    {topping ? 'Writing…' : 'More questions'}
+                  </button>
+
+                  {weakTopics.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!canAccessUnlimitedPractice()) {
+                          window.location.href = '/pricing'
+                          return
+                        }
+                        void topUp(true)
+                      }}
+                      disabled={topping}
+                      className="press rounded-full px-4 py-2.5 text-[13.5px] font-semibold text-white disabled:opacity-60"
+                      style={{ background: accent }}
+                    >
+                      Drill {weakTopics[0]}
+                      {!isPro() && <span className="ml-1.5 opacity-75">Pro</span>}
+                    </button>
+                  )}
+                </div>
+
+                {topping && (
+                  <p className="mt-2.5 text-[12.5px] text-ink-faint">
+                    Writing and checking — this takes a few seconds.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     )
