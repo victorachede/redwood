@@ -1,0 +1,52 @@
+name: CI
+
+# Runs the same checks Vercel will, on every pull request — because a build
+# that only fails in production is a build nobody checked. This repo had no
+# CI, and a type error in a newly added test file reached prod as a red
+# deploy: it passed locally only because `next build` reused a warm .next and
+# tsconfig.tsbuildinfo, while Vercel always starts from nothing.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Deliberately not `npm run verify`: splitting the steps means the
+      # failing one is named in the UI instead of buried in one log.
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Reported, not blocking. The eleven remaining errors are all one
+      # pattern — reading localStorage in a mount effect, which is how a
+      # Next app hydrates client-only state without a server/client mismatch —
+      # and the rule does not model it. They are real debt worth clearing, but
+      # blocking every PR on pre-existing findings teaches people to ignore
+      # the whole pipeline. The three steps that actually catch broken
+      # deploys are blocking.
+      - name: Lint (reported)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build (cold)
+        run: npm run build
+        env:
+          # Build-time only. The app is built to run without these — every
+          # path degrades — so CI proves that rather than hiding it behind
+          # secrets that a fork's PR would not have anyway.
+          NEXT_PUBLIC_SUPABASE_URL: ''
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ''

@@ -22,17 +22,6 @@ export default function PricingPage() {
   const [msg, setMsg] = useState<string | null>(null)
   const [email, setEmail] = useState('')
 
-  useEffect(() => {
-    setPlan(getLocalPlan().plan)
-    const u = getSession()
-    if (u?.email) setEmail(u.email)
-
-    const params = new URLSearchParams(window.location.search)
-    const ref = params.get('reference') || params.get('trxref')
-    if (params.get('paid') === '1' || ref) {
-      void confirmPayment(ref)
-    }
-  }, [])
 
   async function confirmPayment(reference: string | null) {
     if (!reference) {
@@ -64,6 +53,19 @@ export default function PricingPage() {
       setMsg('Verification failed. Try again or contact support.')
     }
   }
+
+  useEffect(() => {
+    setPlan(getLocalPlan().plan)
+    const u = getSession()
+    if (u?.email) setEmail(u.email)
+
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('reference') || params.get('trxref')
+    if (params.get('paid') === '1' || ref) {
+      void confirmPayment(ref)
+    }
+  }, [])
+
 
   async function upgrade() {
     setLoading(true)
