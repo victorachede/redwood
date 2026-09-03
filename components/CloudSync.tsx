@@ -6,6 +6,7 @@ import { hydrateCardsFromCloud } from '@/app/lib/cards'
 import { hydrateAvatarFromCloud } from '@/app/lib/avatar'
 import { hydratePlanFromCloud } from '@/app/lib/billing'
 import { hydrateAssignmentsFromCloud } from '@/app/lib/assignments'
+import { hydrateOptInFromCloud } from '@/app/lib/leaderboard'
 import { isCloud } from '@/app/lib/sync'
 import { subscribeToAuth } from '@/app/lib/auth'
 
@@ -27,6 +28,7 @@ export function CloudSync() {
         hydrateAvatarFromCloud(),
         hydratePlanFromCloud(),
         hydrateAssignmentsFromCloud(),
+        hydrateOptInFromCloud(),
       ])
     }
 

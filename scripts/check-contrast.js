@@ -20,7 +20,7 @@ const { chromium } = require('playwright-core')
 
 const BASE = process.argv[2] || process.env.EWIN_BASE_URL || 'http://localhost:3000'
 const EXEC = process.env.PLAYWRIGHT_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
-const ROUTES = ['/', '/pricing', '/dashboard', '/cards', '/settings', '/login', '/support']
+const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/support']
 
 const PROBE = () => {
   const parse = (c) => {
