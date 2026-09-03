@@ -486,40 +486,40 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             </div>
           )}
 
-          <p className="mt-7 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+          <p className="mt-7 margin-label">
             Choose a topic
           </p>
 
-          <ul className="mt-2.5 space-y-2">
+          {/* A contents page, not a stack of cards. These are the numbered
+              topics of a syllabus, so they are set like one: hairline rules,
+              serif numerals in the margin colour, and no box around each row.
+              The card treatment made five topics look like five products. */}
+          <ul className="mt-3 border-t border-line">
             {(meta?.topics ?? ['General foundations']).map((t, idx) => {
               const saved = !!savedTopics[t]
               return (
-                <li
-                  key={t}
-                  className="overflow-hidden rounded-2xl border border-line bg-surface"
-                >
+                <li key={t} className="border-b border-line">
                   <button
                     type="button"
                     disabled={loading}
                     onClick={() => void startSession(t)}
-                    className="press flex w-full items-center gap-3.5 px-4 py-4 text-left disabled:opacity-60"
+                    className="press flex w-full items-baseline gap-4 py-4 text-left disabled:opacity-60"
                   >
                     <span
-                      className="tnum flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold"
-                      style={{
-                        background: `color-mix(in srgb, ${accent} 12%, transparent)`,
-                        color: accent,
-                      }}
+                      className="tnum shrink-0 font-display text-[22px] leading-none"
+                      style={{ color: accent }}
                     >
-                      {idx + 1}
+                      {String(idx + 1).padStart(2, '0')}
                     </span>
-                    <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{t}</span>
+                    <span className="min-w-0 flex-1 font-display text-[19px] leading-snug text-ink">
+                      {t}
+                    </span>
                     {saved && (
-                      <span className="shrink-0 rounded-full bg-correct-soft px-2 py-0.5 text-[10.5px] font-medium text-correct">
+                      <span className="shrink-0 self-center rounded-full bg-correct-soft px-2 py-0.5 text-[10.5px] font-medium text-correct">
                         In progress
                       </span>
                     )}
-                    <ArrowRight className="h-4 w-4 shrink-0 text-ink-faint" />
+                    <ArrowRight className="h-4 w-4 shrink-0 self-center text-ink-faint" />
                   </button>
 
                   {saved && (
@@ -527,7 +527,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                       type="button"
                       disabled={loading}
                       onClick={() => void startSession(t, { resume: true })}
-                      className="press flex w-full items-center gap-2 border-t border-line px-4 py-2.5 text-left text-[12.5px] font-medium disabled:opacity-60"
+                      className="press flex w-full items-center gap-2 pb-3 text-left text-[12.5px] font-medium disabled:opacity-60"
                       style={{ color: accent }}
                     >
                       <BookOpen className="h-3.5 w-3.5" />

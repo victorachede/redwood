@@ -12,7 +12,7 @@ export default function PrivacyPage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             Legal
           </p>
-          <h1 className="mt-3 font-display text-[clamp(1.875rem,3.4vw,2.5rem)] font-semibold tracking-[-0.025em]">
+          <h1 className="mt-3 font-display text-[clamp(1.875rem,3.4vw,2.5rem)]">
             Privacy
           </h1>
           

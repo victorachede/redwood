@@ -1,26 +1,12 @@
-import Image from 'next/image'
+import { Mark } from '@/components/Mark'
 
-/** Brand crest mark for Ewin */
-export function EwinAvatar({
-  size = 28,
-  className = '',
-}: {
-  size?: number
-  className?: string
-}) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md ${className}`}
-      style={{ width: size, height: size }}
-      aria-hidden
-    >
-      <Image
-        src="/logo-mark.png"
-        alt=""
-        width={size}
-        height={size}
-        className="h-full w-full object-contain"
-      />
-    </span>
-  )
+/**
+ * The tutor's face in a conversation.
+ *
+ * Same mark as the brand, on purpose: the thing talking to the student is the
+ * product, not a separate character. Kept as its own component so chat can
+ * change how the tutor is represented without touching the header logo.
+ */
+export function EwinAvatar({ size = 28, className = '' }: { size?: number; className?: string }) {
+  return <Mark size={size} className={`shrink-0 ${className}`} />
 }

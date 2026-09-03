@@ -75,8 +75,31 @@
   --fast: 120ms;
   --base: 180ms;
 
+  /* The margin rule.
+     A Nigerian exercise book is ruled with a red margin down the left, and
+     the date and topic get written into it. That margin is this site's
+     structural signature: on desktop it is a real vertical rule with section
+     labels living to its left, and on phones it collapses to a short stub on
+     each section head. It is the one device here that no other study app has,
+     because it comes from the object these students actually hold. */
+  --rule: #c56b64;
+  --rule-soft: #ecc9c5;
+
+  /* Type scale — geometric, ratio 1.25, with the display sizes deliberately
+     far out ahead of body. The old system topped out at 36px, so nothing on
+     the page could ever carry weight; every section read at the same volume. */
+  --t-xs: 0.75rem;      /* 12px  — labels, eyebrows */
+  --t-sm: 0.875rem;     /* 14px  — captions */
+  --t-base: 1rem;       /* 16px  — body */
+  --t-md: 1.125rem;     /* 18px  — lead paragraphs */
+  --t-lg: 1.5rem;       /* 24px  — card headings */
+  --t-xl: 2rem;         /* 32px  — sub-section */
+  --t-2xl: clamp(2rem, 5vw, 3rem);         /* section heads */
+  --t-3xl: clamp(2.5rem, 6.5vw, 4.25rem);  /* the hero, and only the hero */
+
   /* Layout */
   --tabbar-h: 60px;
+  --margin-w: 168px;   /* the ruled margin on desktop */
 }
 
 :root[data-theme="dark"],
@@ -117,6 +140,9 @@
     --on-hero: #eaf0fb;
     --on-hero-dim: rgba(234, 240, 251, 0.66);
 
+    --rule: #b8635c;
+    --rule-soft: #3d201d;
+
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
@@ -155,6 +181,9 @@
   --on-hero: #eaf0fb;
   --on-hero-dim: rgba(234, 240, 251, 0.66);
 
+  --rule: #b8635c;
+  --rule-soft: #3d201d;
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
@@ -187,13 +216,25 @@
   --color-streak: var(--streak);
   --color-streak-soft: var(--streak-soft);
 
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+
   --color-hero: var(--hero);
   --color-on-hero: var(--on-hero);
   --color-on-hero-dim: var(--on-hero-dim);
 
   --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-bricolage);
+  --font-display: var(--font-instrument);
   --font-mono: var(--font-geist-mono);
+
+  --text-xs: var(--t-xs);
+  --text-sm: var(--t-sm);
+  --text-base: var(--t-base);
+  --text-md: var(--t-md);
+  --text-lg: var(--t-lg);
+  --text-xl: var(--t-xl);
+  --text-2xl: var(--t-2xl);
+  --text-3xl: var(--t-3xl);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -230,6 +271,11 @@
   }
 
   body {
+    /* Instrument Serif ships a single weight. Without this, a stray
+       `font-semibold` on a display heading makes the browser synthesise a
+       bold — which on a high-contrast serif looks like a printing fault.
+       Refusing synthesis makes that mistake visible instead of ugly. */
+    font-synthesis-weight: none;
     margin: 0;
     background: var(--paper);
     color: var(--ink);
@@ -241,9 +287,10 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-bricolage), Georgia, serif;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: var(--font-instrument), Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.02;
     margin: 0;
   }
 
@@ -257,11 +304,81 @@
   }
 }
 
-/* Display face carries the personality; body stays quiet and legible */
+/* A high-contrast serif against a neutral grotesque.
+   The contrast between the two IS the design — a page set in one grotesque at
+   three sizes, which is what shipped before, cannot read as anything but a
+   component library. The serif is where the voice lives; Geist stays out of
+   the way and does the work. */
 .font-display {
-  font-family: var(--font-bricolage), Georgia, serif;
+  font-family: var(--font-instrument), Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+}
+
+/* ── The margin ──────────────────────────────────────────────────────────
+   A section's label lives in the ruled margin, its content to the right.
+   Below `lg` the margin has nowhere to go, so the rule becomes a stub above
+   the label — same idea, honest about the space. */
+
+.ruled {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .ruled {
+    display: grid;
+    grid-template-columns: var(--margin-w) minmax(0, 1fr);
+    column-gap: 3.5rem;
+  }
+  .ruled::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: calc(var(--margin-w) + 1.75rem);
+    width: 1px;
+    background: var(--rule);
+    opacity: 0.5;
+  }
+}
+
+/* The label that sits in the margin. */
+.margin-label {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: var(--t-xs);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.margin-label::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 2px;
+  margin-bottom: 0.75rem;
+  background: var(--rule);
+}
+
+@media (min-width: 1024px) {
+  .ruled > * > .margin-label,
+  .ruled > .margin-label {
+    text-align: right;
+  }
+  .ruled > * > .margin-label::before,
+  .ruled > .margin-label::before {
+    margin-left: auto;
+  }
+}
+
+/* Numerals in the margin — the "01 02 03" of a worked question. */
+.margin-num {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--rule);
+  font-variant-numeric: tabular-nums;
 }
 
 :focus-visible {

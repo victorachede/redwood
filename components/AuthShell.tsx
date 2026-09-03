@@ -1,5 +1,5 @@
-import Image from 'next/image'
 import Link from 'next/link'
+import { Mark, Wordmark } from '@/components/Mark'
 import type { ReactNode } from 'react'
 import { ExamBadgeRow } from './ExamBadges'
 
@@ -25,19 +25,11 @@ export function AuthShell({
       {/* Form side */}
       <div className="flex min-h-dvh flex-col justify-center px-5 py-12 sm:px-8">
         <div className="mx-auto w-full max-w-sm">
-          <Link href="/" className="mb-9 inline-flex items-center gap-2.5 no-underline">
-            <Image
-              src="/logo-mark.png"
-              alt="Ewin"
-              width={34}
-              height={34}
-              className="h-[34px] w-[34px] rounded-lg object-contain"
-              priority
-            />
-            <span className="text-[16px] font-semibold tracking-tight text-ink">Ewin</span>
+          <Link href="/" className="mb-9 inline-block no-underline">
+            <Wordmark size={28} />
           </Link>
 
-          <h1 className="font-display text-[1.875rem] font-semibold tracking-[-0.025em]">{title}</h1>
+          <h1 className="font-display text-[1.875rem]">{title}</h1>
           <p className="mt-1.5 text-[14.5px] text-ink-muted">{subtitle}</p>
 
           {children}
@@ -47,33 +39,27 @@ export function AuthShell({
       </div>
 
       {/* Brand side */}
-      <div className="relative hidden overflow-hidden bg-primary lg:block">
+      <div className="relative hidden overflow-hidden bg-hero lg:block">
         <div className="relative flex min-h-dvh flex-col justify-between px-12 py-14">
-          <Image
-            src="/logo-mark.png"
-            alt=""
-            width={52}
-            height={52}
-            className="h-[52px] w-[52px] rounded-xl object-contain opacity-90"
-          />
+          <Mark size={44} />
 
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-on-primary">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-on-hero">
               Ewin Academy
             </p>
-            <p className="mt-5 max-w-sm font-display text-[2rem] leading-[1.2] text-on-primary">
+            <p className="mt-5 max-w-sm font-display text-[2rem] leading-[1.2] text-on-hero">
               Learn one idea.
               <br />
               <span className="">Then prove you got it.</span>
             </p>
-            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-on-primary opacity-75">
+            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-on-hero opacity-75">
               Short lessons, a real check after each one, and feedback that names exactly what
               held up and what did not.
             </p>
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-on-primary opacity-75">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-on-hero opacity-75">
               Built around
             </p>
             <ExamBadgeRow variant="dark" />

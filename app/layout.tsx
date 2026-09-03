@@ -1,14 +1,23 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Bricolage_Grotesque } from 'next/font/google'
+import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
 import './globals.css'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
-/** Display face. Variable, so one file covers the whole weight range. */
-const bricolage = Bricolage_Grotesque({
-  variable: '--font-bricolage',
+/**
+ * Display face.
+ *
+ * A high-contrast serif against Geist's neutral grotesque. The pairing is the
+ * point: the previous system set the whole site in one grotesque at three
+ * sizes, which is why every section read at identical volume. One face for
+ * voice, one for work.
+ */
+const instrument = Instrument_Serif({
+  variable: '--font-instrument',
   subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
   display: 'swap',
 })
 
@@ -34,7 +43,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/logo-mark.png', sizes: '256x256', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: '/apple-touch-icon.png',
   },
@@ -61,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />

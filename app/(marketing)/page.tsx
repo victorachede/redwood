@@ -1,361 +1,365 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Check, MessageSquareText, PenLine, Target, X } from 'lucide-react'
+import { ArrowRight, Check, X } from 'lucide-react'
 import { SUBJECTS } from '@/app/lib/subjects'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { ExamBadgeRow } from '@/components/ExamBadges'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { SiteHeader } from '@/components/SiteHeader'
+import { SiteFooter } from '@/components/SiteFooter'
 import { formatNgn, PLANS } from '@/app/lib/billing'
+import { HeroLesson } from '@/components/marketing/HeroLesson'
+
+/**
+ * The landing page.
+ *
+ * Built on the ruled margin (see .ruled in globals.css): section labels live
+ * in the margin, content to the right of the rule. That does two things the
+ * previous page could not. It gives desktop a real structure instead of a
+ * 600px phone column floating in 1440px of nothing, and it breaks the
+ * six-identical-white-cards rhythm that made every section read at the same
+ * volume.
+ *
+ * Sections deliberately alternate weight: paper, then ink, then paper. A page
+ * that never changes texture cannot emphasise anything.
+ */
 
 const STEPS = [
   {
-    n: '1',
-    title: 'It explains one idea',
-    body: 'Not a chapter. One idea, in a few sentences, in plain English — with an example you have actually seen before.',
-    Icon: MessageSquareText,
+    n: '01',
+    title: 'One idea. Not a chapter.',
+    body:
+      'Ewin explains a single thing in a few sentences, in plain English, using an example you have actually seen — naira, danfo fares, a market scale. Then it stops.',
   },
   {
-    n: '2',
-    title: 'Then it asks you',
-    body: 'You type the answer in your own words. Not A, B, C or D. Guessing a letter is how you find out you did not know it — in the hall.',
-    Icon: Target,
+    n: '02',
+    title: 'Then it makes you answer.',
+    body:
+      'In your own words. Not A, B, C or D. Guessing a letter is how you find out in the exam hall that you never knew it — and by then it is too late to fix.',
   },
   {
-    n: '3',
-    title: 'And it tells you what broke',
-    body: 'Not "good try". Ewin names the exact step that went wrong, why it went wrong, and asks you again.',
-    Icon: PenLine,
+    n: '03',
+    title: 'And it names what broke.',
+    body:
+      'Not "good try". The exact step that went wrong, why it went wrong, and the same question again until it holds. That is the whole loop.',
   },
 ]
 
-const HONEST = [
+const NOTS = [
   'Give you answers to copy into your assignment',
   'Replace your teacher, or your textbook',
-  'Help you in the exam hall — you are on your own there',
+  'Sit the exam for you — that part is yours',
 ]
 
 const FAQS = [
   {
     q: 'Is it really free?',
-    a: 'Yes. Tutor sessions, practice questions and study cards cost nothing, with no card and no trial that quietly ends. Pro adds timed full mocks and unlimited drills for ₦2,500 a month, paid with Paystack.',
+    a: 'Yes. Six subjects, the tutor, and practice questions cost nothing and need no card. Pro exists for mock season — timed full papers and unlimited drills — and it is ₦2,500 a month, cancel whenever.',
   },
   {
     q: 'How is this different from asking ChatGPT?',
-    a: 'A general chatbot answers your question and stops. Ewin makes you answer, marks what you wrote, and remembers next week which topic you got wrong. It is built around WAEC, NECO and JAMB phrasing, and it knows that a missing unit costs you marks.',
+    a: 'ChatGPT answers you. Ewin refuses to, until you have tried. It remembers that ratios broke last Tuesday and opens there. It knows what a WAEC theory question looks like versus a JAMB objective. And it will not hand you a finished assignment.',
   },
   {
     q: 'Do I need an account?',
-    a: 'No. Open a subject and start. Create an account only when you want your streak and progress to follow you to another phone.',
+    a: 'Not to start. Open a subject and begin. Sign up when you want your streak, cards and progress on every device instead of just this phone.',
   },
   {
     q: 'Will it work on my phone?',
-    a: 'It is built for a phone first, and for a normal connection. You can add it to your home screen and open it like an app.',
+    a: 'It is built for a mid-range Android on mobile data, at night. You can install it to your home screen, and your cards and practice keep working offline.',
   },
   {
     q: 'Is this cheating?',
-    a: 'It is the opposite. Ewin will not hand you an answer to copy — it makes you produce the answer yourself, which is the part that actually shows up in your score.',
+    a: 'It would be, if it did your homework. It will not. It makes you produce the answer yourself — which is the only part that shows up in your score.',
   },
 ]
 
 export default function Home() {
+  const free = PLANS.free
+  const pro = PLANS.pro
+
   return (
-    <main className="min-h-dvh bg-paper text-ink">
-      {/* ── Header ────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-3xl items-center gap-3 px-4">
-          <Link href="/" className="flex items-center gap-2 no-underline">
-            <Image
-              src="/logo-mark.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 rounded-lg"
-              priority
-            />
-            <span className="font-display text-[17px] text-ink">Ewin</span>
-          </Link>
-          <div className="flex-1" />
-          <ThemeToggle />
-          <Link
-            href="/dashboard"
-            className="press rounded-full bg-primary px-4 py-2 text-[13.5px] font-medium text-on-primary no-underline"
-          >
-            Start
-          </Link>
-        </div>
-      </header>
+    <main className="bg-paper text-ink">
+      <SiteHeader />
 
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 pb-10 pt-12 sm:pt-16">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium text-ink-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-correct" />
-          Built for WAEC · NECO · JAMB
-        </p>
+      {/* ── Hero ──────────────────────────────────────────────────────────
+          The old hero put a static picture of the product beside the words.
+          This types out a real exchange instead: the whole pitch is "it makes
+          you answer", so the page should demonstrate that rather than assert
+          it. It reserves its own height, so nothing below it moves. */}
+      <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 lg:px-8 lg:pb-20 lg:pt-14">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          <div>
+            <p className="margin-label">For WAEC · NECO · JAMB</p>
 
-        <h1 className="font-display text-[clamp(2rem,8vw,3.25rem)] leading-[1.08] text-ink">
-          Stop cramming.
-          <br />
-          Start knowing.
-        </h1>
+            {/* Breaks are set by hand. Left to wrap, "idea" orphans onto its
+                own line at desktop width and the emphasis falls apart. */}
+            <h1 className="mt-6 font-display text-3xl">
+              You do not need
+              <br />
+              more hours.
+              <br />
+              <em className="not-italic text-primary">You need one idea</em>{' '}
+              to actually stick.
+            </h1>
 
-        <p className="mt-4 max-w-md text-[16px] leading-[1.6] text-ink-muted">
-          Most study apps talk at you. Ewin explains one idea, then makes you answer a question
-          about it — and tells you exactly which step you got wrong. That is the whole difference
-          between reading a topic and actually knowing it.
-        </p>
-
-        <div className="mt-7 flex flex-wrap gap-2.5">
-          <Link
-            href="/dashboard"
-            className="press inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-on-primary no-underline"
-          >
-            Start learning — free
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/pricing"
-            className="press inline-flex items-center rounded-full border border-line bg-surface px-6 py-3.5 text-[15px] font-medium text-ink no-underline"
-          >
-            See pricing
-          </Link>
-        </div>
-
-        <p className="mt-3 text-[13px] text-ink-muted">
-          No card. No account needed to start.
-        </p>
-
-        {/* A still of the real thing, not an animation that moves the page */}
-        <div className="mt-10 overflow-hidden rounded-2xl border border-line bg-surface shadow-[var(--shadow-md)]">
-          <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
-            <SubjectIcon icon="Sigma" accent="#3b6fd4" size={30} />
-            <div className="min-w-0">
-              <p className="truncate text-[13.5px] font-semibold text-ink">Mathematics</p>
-              <p className="truncate text-[11.5px] text-ink-muted">Algebraic processes</p>
-            </div>
-          </div>
-
-          <div className="space-y-3.5 p-4">
-            <p className="text-[14.5px] leading-[1.6] text-ink">
-              A linear equation is a balanced scale. Do the same to both sides and it stays true.
+            <p className="mt-6 max-w-lg text-md leading-relaxed text-ink-muted">
+              Ewin teaches one thing, then makes you prove you got it — and tells you exactly
+              which step you fumbled. Reading a topic and knowing it are different, and only
+              one of them shows up in your result.
             </p>
 
-            <div
-              className="rounded-xl px-3.5 py-3"
-              style={{
-                background: 'var(--primary-soft)',
-                borderLeft: '3px solid var(--primary)',
-              }}
-            >
-              <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary">
-                Your turn
-              </p>
-              <p className="text-[14.5px] font-medium text-ink">
-                If 3x − 5 = 10, what is x? Show each step.
-              </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/dashboard"
+                className="press inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-[15px] font-semibold text-on-primary no-underline"
+              >
+                Start learning — free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/pricing"
+                className="press inline-flex items-center justify-center rounded-full border border-line-strong bg-surface px-7 py-4 text-[15px] font-semibold text-ink no-underline"
+              >
+                See pricing
+              </Link>
             </div>
 
-            <div className="flex justify-end">
-              <p className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5 text-[14.5px] text-on-primary">
-                Add 5 to both sides: 3x = 15, so x = 5.
-              </p>
-            </div>
-
-            <p className="text-[14.5px] leading-[1.6] text-ink">
-              Correct, and you showed the step. That balance rule is the whole of algebra.
+            <p className="mt-4 text-sm text-ink-faint">
+              No card. No account needed to start.
             </p>
           </div>
+
+          <HeroLesson />
         </div>
 
-        <div className="mt-8">
-          <p className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-            Built around
-          </p>
+        <div className="mt-16 border-t border-line pt-7 lg:mt-24">
           <ExamBadgeRow />
         </div>
       </section>
 
-      {/* ── How it works ──────────────────────────────────────────────── */}
+      {/* ── How it works — set in the margin, numbered like worked steps ── */}
       <section className="border-y border-line bg-sunken">
-        <div className="mx-auto max-w-3xl px-4 py-12">
-          <h2 className="font-display text-[26px] text-ink">How a session goes</h2>
-          <p className="mt-1.5 text-[14.5px] text-ink-muted">
-            About ten minutes. One idea at a time.
+        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+          <div>
+            <p className="margin-label">How a session goes</p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-2xl">Ten minutes. One idea. Proof.</h2>
+            <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
+              Every session is the same three beats, because the loop is what makes it stick —
+              not the length.
+            </p>
+
+            <ol className="mt-12 space-y-11">
+              {STEPS.map((s) => (
+                <li key={s.n} className="flex gap-6 sm:gap-8">
+                  <span className="margin-num shrink-0">{s.n}</span>
+                  <div className="border-l border-line pl-6 sm:pl-8">
+                    <h3 className="font-display text-xl">{s.title}</h3>
+                    <p className="mt-2.5 max-w-xl text-[15.5px] leading-relaxed text-ink-muted">
+                      {s.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Subjects — the six accents finally used at full strength ─────
+          They were 24px tinted chips before, which wasted the one part of the
+          identity that was already doing work. */}
+      <section className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+        <div>
+          <p className="margin-label">What you can study</p>
+        </div>
+
+        <div>
+          <h2 className="font-display text-2xl">Six subjects. Thirty topics.</h2>
+          <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
+            Past-question practice written in the style of each board, so a WAEC theory question
+            reads like one and a JAMB objective reads like one.
           </p>
-          <ul className="mt-6 space-y-4">
-            {STEPS.map((s) => (
-              <li key={s.n} className="flex gap-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-[14px] font-bold text-primary">
-                  {s.n}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-[16px] font-semibold text-ink">{s.title}</h3>
-                  <p className="mt-1 text-[14.5px] leading-relaxed text-ink-muted">{s.body}</p>
+
+          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+            {SUBJECTS.map((s) => (
+              <Link
+                key={s.id}
+                href={`/learn/${s.id}`}
+                className="press group relative overflow-hidden rounded-2xl border border-line bg-surface p-5 no-underline"
+              >
+                {/* The accent as a real edge, not a decorative square. */}
+                <span
+                  aria-hidden
+                  className="absolute inset-y-0 left-0 w-1"
+                  style={{ background: s.accent }}
+                />
+                <div className="flex items-start gap-3.5 pl-2">
+                  <SubjectIcon icon={s.icon} accent={s.accent} size={34} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-lg leading-tight text-ink">{s.name}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-muted">{s.blurb}</p>
+                    <p className="mt-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-ink-faint">
+                      {s.topics.length} topics · {s.exam}
+                    </p>
+                  </div>
+                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5" />
                 </div>
-              </li>
+              </Link>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
-      {/* ── Subjects ──────────────────────────────────────────────────── */}
-      <section id="subjects" className="mx-auto max-w-3xl scroll-mt-16 px-4 py-12">
-        <h2 className="font-display text-[26px] text-ink">What you can study</h2>
-        <p className="mt-1.5 text-[14.5px] text-ink-muted">
-          Six subjects, thirty topics, and past-question practice in the style of each board.
-        </p>
+      {/* ── The refusal — full-bleed ink. The page's one hard cut. ──────── */}
+      <section className="bg-hero text-on-hero">
+        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+          <div>
+            <p className="margin-label" style={{ color: 'var(--on-hero-dim)' }}>
+              Where it stops
+            </p>
+          </div>
 
-        <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
-          {SUBJECTS.map((s) => (
-            <Link
-              key={s.id}
-              href={`/learn/${s.id}`}
-              className="press flex items-center gap-3.5 rounded-2xl border border-line bg-surface p-3.5 no-underline"
-            >
-              <SubjectIcon icon={s.icon} accent={s.accent} size={42} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-semibold text-ink">{s.name}</p>
-                <p className="truncate text-[13px] text-ink-muted">{s.blurb}</p>
-              </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-ink-faint" />
-            </Link>
-          ))}
+          <div>
+            <h2 className="font-display text-2xl" style={{ color: 'var(--on-hero)' }}>
+              Three things Ewin will not do.
+            </h2>
+            <p className="mt-4 max-w-xl text-md leading-relaxed" style={{ color: 'var(--on-hero-dim)' }}>
+              Worth saying plainly, so nobody has to find out the hard way.
+            </p>
+
+            <ul className="mt-10 space-y-px overflow-hidden rounded-2xl">
+              {NOTS.map((n) => (
+                <li
+                  key={n}
+                  className="flex items-center gap-4 bg-white/[0.06] px-5 py-5 text-[15.5px]"
+                  style={{ color: 'var(--on-hero)' }}
+                >
+                  <X className="h-4 w-4 shrink-0" style={{ color: 'var(--rule)' }} />
+                  {n}
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-7 max-w-xl text-[15px] leading-relaxed" style={{ color: 'var(--on-hero-dim)' }}>
+              It makes you produce the answer yourself. That is the part that shows up in your
+              score, and it is the only part worth paying for.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* ── What it won't do ──────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 py-12">
-        <h2 className="font-display text-[26px] text-ink">What Ewin will not do</h2>
-        <p className="mt-1.5 text-[14.5px] text-ink-muted">
-          Worth saying plainly, so nobody is surprised.
-        </p>
-        <ul className="mt-5 space-y-2.5">
-          {HONEST.map((h) => (
-            <li
-              key={h}
-              className="flex items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3.5"
-            >
-              <X className="mt-0.5 h-4 w-4 shrink-0 text-wrong" />
-              <span className="min-w-0 text-[14.5px] leading-relaxed text-ink">{h}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-4 text-[14px] leading-relaxed text-ink-muted">
-          It makes you produce the answer yourself. That is the part that shows up in your score.
-        </p>
-      </section>
+      {/* ── Pricing ─────────────────────────────────────────────────────── */}
+      <section className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+        <div>
+          <p className="margin-label">What it costs</p>
+        </div>
 
-      {/* ── Pricing ───────────────────────────────────────────────────── */}
-      <section className="border-y border-line bg-sunken">
-        <div className="mx-auto max-w-3xl px-4 py-12">
-          <h2 className="font-display text-[26px] text-ink">Free covers real studying</h2>
-          <p className="mt-1.5 text-[14.5px] text-ink-muted">
-            Pro is for mock season — timed papers and unlimited drills.
+        <div>
+          <h2 className="font-display text-2xl">Free covers real studying.</h2>
+          <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
+            Pro is for mock season — timed full papers and unlimited drills. If you are not
+            sitting mocks yet, stay on Free.
           </p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-line bg-surface p-5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-                Free
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-surface p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
+                {free.name}
               </p>
-              <p className="mt-2 font-display text-[30px] text-ink">
+              <p className="mt-4 font-display text-xl">
                 {formatNgn(0)}
-                <span className="ml-1 text-[14px] font-normal text-ink-muted">/mo</span>
+                <span className="ml-1.5 text-sm text-ink-muted">forever</span>
               </p>
-              <ul className="mt-4 space-y-2">
-                {PLANS.free.features.slice(0, 4).map((f) => (
-                  <li key={f} className="flex gap-2 text-[13.5px] text-ink">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
-                    <span className="min-w-0">{f}</span>
+              <ul className="mt-6 space-y-2.5">
+                {free.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-ink-muted">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-correct" />
+                    {f}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/dashboard"
-                className="press mt-5 block rounded-full border border-line py-3 text-center text-[14px] font-medium text-ink no-underline"
+                className="press mt-7 block rounded-full border border-line-strong bg-surface py-3.5 text-center text-[14.5px] font-semibold text-ink no-underline"
               >
                 Start free
               </Link>
             </div>
 
-            <div className="rounded-2xl border-2 border-primary bg-surface p-5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-primary">
-                Pro
+            <div className="relative rounded-2xl border-2 border-primary bg-surface p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                {pro.name}
               </p>
-              <p className="mt-2 font-display text-[30px] text-ink">
-                {formatNgn(PLANS.pro.priceMonthlyNgn)}
-                <span className="ml-1 text-[14px] font-normal text-ink-muted">/mo</span>
+              <p className="mt-4 font-display text-xl">
+                {formatNgn(pro.priceMonthlyNgn)}
+                <span className="ml-1.5 text-sm text-ink-muted">/month</span>
               </p>
-              <ul className="mt-4 space-y-2">
-                {PLANS.pro.features.slice(0, 4).map((f) => (
-                  <li key={f} className="flex gap-2 text-[13.5px] text-ink">
+              <ul className="mt-6 space-y-2.5">
+                {pro.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-ink-muted">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-correct" />
-                    <span className="min-w-0">{f}</span>
+                    {f}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/pricing"
-                className="press mt-5 block rounded-full bg-primary py-3 text-center text-[14px] font-medium text-on-primary no-underline"
+                className="press mt-7 block rounded-full bg-primary py-3.5 text-center text-[14.5px] font-semibold text-on-primary no-underline"
               >
-                {PLANS.pro.cta}
+                Go Pro
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 py-12">
-        <h2 className="font-display text-[26px] text-ink">Straight answers</h2>
-        <div className="mt-5 space-y-2.5">
-          {FAQS.map((f) => (
-            <details
-              key={f.q}
-              className="group rounded-2xl border border-line bg-surface px-4"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-4 text-[15px] font-medium text-ink [&::-webkit-details-marker]:hidden">
-                <span className="min-w-0">{f.q}</span>
-                <span className="shrink-0 text-ink-faint transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="pb-4 text-[14.5px] leading-relaxed text-ink-muted">{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Close ─────────────────────────────────────────────────────── */}
+      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
       <section className="border-t border-line bg-sunken">
-        <div className="mx-auto max-w-3xl px-4 py-14 text-center">
-          <h2 className="font-display text-[26px] text-ink">Exam day is coming either way</h2>
-          <p className="mx-auto mt-2 max-w-sm text-[14.5px] text-ink-muted">
-            Ten honest minutes tonight beat three hours of cramming the week before.
-          </p>
-          <Link
-            href="/dashboard"
-            className="press mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[15px] font-medium text-on-primary no-underline"
-          >
-            Start with one topic
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+          <div>
+            <p className="margin-label">Straight answers</p>
+          </div>
+
+          <div className="max-w-2xl">
+            {FAQS.map((f) => (
+              <details key={f.q} className="group border-b border-line py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                  <span className="font-display text-lg leading-snug text-ink">{f.q}</span>
+                  <span
+                    aria-hidden
+                    className="shrink-0 text-ink-muted transition-transform group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-[15.5px] leading-relaxed text-ink-muted">{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────────────── */}
-      <footer className="border-t border-line">
-        <div className="mx-auto max-w-3xl px-4 py-8">
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-ink-muted">
-            <Link href="/pricing" className="no-underline hover:text-ink">Pricing</Link>
-            <Link href="/support" className="no-underline hover:text-ink">Support</Link>
-            <Link href="/terms" className="no-underline hover:text-ink">Terms</Link>
-            <Link href="/privacy" className="no-underline hover:text-ink">Privacy</Link>
-          </div>
-          <p className="mt-4 text-[12px] text-ink-muted">
-            © {new Date().getFullYear()} Ewin Academy · Not affiliated with WAEC, JAMB or NECO
-          </p>
-        </div>
-      </footer>
+      {/* ── Close ───────────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-5 py-20 text-center lg:px-8 lg:py-28">
+        <h2 className="mx-auto max-w-2xl font-display text-2xl">
+          The exam is coming either way.
+        </h2>
+        <p className="mx-auto mt-5 max-w-md text-md leading-relaxed text-ink-muted">
+          Ten honest minutes tonight will beat three hours of cramming the week before. Pick one
+          topic and find out what you actually know.
+        </p>
+        <Link
+          href="/dashboard"
+          className="press mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-[15px] font-semibold text-on-primary no-underline"
+        >
+          Start with one topic
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
+
+      <SiteFooter />
     </main>
   )
 }

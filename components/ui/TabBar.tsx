@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Mark } from '@/components/Mark'
 import { usePathname } from 'next/navigation'
 import { BookOpen, Home, Layers, Target, User } from 'lucide-react'
 
@@ -63,8 +64,7 @@ export function TabBar() {
           href="/dashboard"
           className="mb-5 flex items-center gap-2.5 no-underline lg:px-2"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-mark.png" alt="" width={30} height={30} className="h-[30px] w-[30px] rounded-lg" />
+          <Mark size={30} />
           <span className="font-display hidden text-[17px] text-ink lg:inline">Ewin</span>
         </Link>
 

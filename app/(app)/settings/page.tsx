@@ -292,7 +292,7 @@ export default function SettingsPage() {
               {metrics.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-xl bg-paper px-2.5 py-3 text-center">
                   <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-primary" />
-                  <p className="font-display text-lg font-semibold leading-none tracking-tight">
+                  <p className="font-display text-lg leading-none">
                     {value}
                   </p>
                   <p className="mt-1 text-[11px] text-ink-muted">{label}</p>

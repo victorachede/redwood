@@ -151,7 +151,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
           </div>
 
           {/* Board filter */}
-          <p className="mt-7 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+          <p className="mt-7 margin-label">
             Exam board
           </p>
           <div className="mt-2.5 flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -274,7 +274,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
 
           {misses.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+              <h2 className="margin-label">
                 What you missed
               </h2>
               <ul className="mt-2.5 space-y-2.5">
@@ -431,7 +431,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
 
               {revealed && (
                 <div className="rise mt-5 rounded-2xl border border-line bg-surface p-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+                  <p className="margin-label">
                     Why
                   </p>
                   <p className="mt-1.5 text-[14.5px] leading-relaxed text-ink">{q.explanation}</p>
