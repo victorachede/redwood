@@ -133,15 +133,18 @@ export default function PricingPage() {
       <SiteHeader />
 
       {/* ═══ Hero band ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-primary">
+      {/* An inverted surface, so --hero. Using --primary here put white
+          text on a light blue band in dark mode, where the action colour
+          inverts and the surface pair does not. */}
+      <section className="relative overflow-hidden bg-hero text-on-hero">
         
         <div className="relative mx-auto max-w-5xl px-5 pb-14 pt-14 text-center sm:px-8">
           
             <ExamBadgeRow className="justify-center" variant="dark" />
-            <h1 className="mt-6 font-display text-[clamp(2rem,4.4vw,3rem)] font-semibold tracking-[-0.03em] text-on-primary">
+            <h1 className="mt-6 font-display text-[clamp(2rem,4.4vw,3rem)] text-on-hero">
               Simple pricing
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-on-primary opacity-80">
+            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-on-hero opacity-80">
               Free forever for serious daily practice. Pro when you want timed mocks and unlimited
               drills for JAMB, WAEC and NECO.
             </p>
@@ -154,7 +157,7 @@ export default function PricingPage() {
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'monthly'
                     ? 'bg-primary text-on-primary'
-                    : 'text-on-primary opacity-70 hover:opacity-100'
+                    : 'text-on-hero opacity-70 hover:opacity-100'
                 }`}
               >
                 Monthly
@@ -165,7 +168,7 @@ export default function PricingPage() {
                 className={`rounded-full px-5 py-2 font-medium transition-all duration-300 ${
                   interval === 'yearly'
                     ? 'bg-primary text-on-primary'
-                    : 'text-on-primary opacity-70 hover:opacity-100'
+                    : 'text-on-hero opacity-70 hover:opacity-100'
                 }`}
               >
                 Yearly
@@ -194,7 +197,7 @@ export default function PricingPage() {
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 Free
               </p>
-              <p className="mt-3 font-display text-4xl font-semibold tracking-tight">
+              <p className="mt-3 font-display text-4xl">
                 {formatNgn(0)}
               </p>
               <p className="mt-2 text-[14px] text-ink-muted">{PLANS.free.blurb}</p>
@@ -230,7 +233,7 @@ export default function PricingPage() {
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
                 Pro
               </p>
-              <p className="mt-3 font-display text-4xl font-semibold tracking-tight">
+              <p className="mt-3 font-display text-4xl">
                 {formatNgn(proPrice)}
                 <span className="ml-1 text-base font-normal text-ink-muted">
                   /{interval === 'yearly' ? 'year' : 'month'}

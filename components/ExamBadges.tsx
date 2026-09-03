@@ -76,6 +76,14 @@ export function ExamBadge({
   )
 }
 
+/**
+ * The board credential line.
+ *
+ * Presented as one row of marks at a consistent optical height rather than
+ * three coloured chips — as chips they read as clip art, which undercut the
+ * exact thing they are there to establish. The lead-in is typographic so the
+ * claim is made in words and the logos only identify.
+ */
 export function ExamBadgeRow({
   className = '',
   variant = 'light',
@@ -83,11 +91,43 @@ export function ExamBadgeRow({
   className?: string
   variant?: BadgeVariant
 }) {
+  const dark = variant === 'dark'
   return (
-    <div className={`flex flex-wrap items-center gap-2.5 ${className}`}>
-      <ExamBadge exam="JAMB" variant={variant} />
-      <ExamBadge exam="WAEC" variant={variant} />
-      <ExamBadge exam="NECO" variant={variant} />
+    <div className={`flex flex-wrap items-center gap-x-7 gap-y-4 ${className}`}>
+      <p
+        className="text-xs font-semibold uppercase tracking-[0.16em]"
+        style={{ color: dark ? 'var(--on-hero-dim)' : 'var(--ink-faint)' }}
+      >
+        Written for
+      </p>
+      <div className="flex items-center gap-6">
+        {(['WAEC', 'NECO', 'JAMB'] as ExamBoard[]).map((exam) => {
+          const a = ASSETS[exam]
+          return (
+            <span key={exam} className="inline-flex items-center gap-2.5" title={a.alt}>
+              <Image
+                src={a.src}
+                alt={a.alt}
+                width={30}
+                height={30}
+                className="h-[30px] w-[30px] object-contain"
+              />
+              <span
+                className="text-[13.5px] font-semibold tracking-wide"
+                style={{ color: dark ? 'var(--on-hero)' : 'var(--ink)' }}
+              >
+                {a.label}
+              </span>
+            </span>
+          )
+        })}
+      </div>
+      <p
+        className="text-sm"
+        style={{ color: dark ? 'var(--on-hero-dim)' : 'var(--ink-faint)' }}
+      >
+        Not affiliated with any board.
+      </p>
     </div>
   )
 }

@@ -23,6 +23,15 @@ import { openAssignments, type Assignment } from '@/app/lib/assignments'
 import { reopenWork } from '@/app/lib/workGate'
 import { onSync } from '@/app/lib/sync'
 
+/** "Tuesday, 3 September" — the date a student would write in the margin. */
+function todayLabel() {
+  return new Date().toLocaleDateString('en-NG', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
 function greeting() {
   const h = new Date().getHours()
   if (h < 12) return 'Good morning'
@@ -83,11 +92,28 @@ export default function TodayPage() {
     <main className="bg-paper text-ink">
       <AppHeader
         title="Today"
-        subtitle={user ? user.displayName : greeting()}
         action={user ? <Avatar name={user.displayName} size={32} /> : undefined}
       />
 
-      <div className="mx-auto max-w-3xl px-4 py-5">
+      <div className="mx-auto max-w-3xl px-4 pb-5 pt-6">
+        {/* An opener in the display face, sized like a page and not a toolbar.
+            The sticky bar above is chrome; this is the page actually greeting
+            the student by name. */}
+        <header className="mb-7">
+          <p className="margin-label">{todayLabel()}</p>
+          <h2 className="mt-4 font-display text-[clamp(2rem,8vw,2.75rem)] leading-[1.05] text-ink">
+            {greeting()}
+            {user ? (
+              <>
+                ,<br />
+                <span className="text-primary">{user.displayName.split(' ')[0]}</span>.
+              </>
+            ) : (
+              '.'
+            )}
+          </h2>
+        </header>
+
         {/* ── Work Ewin set and the student has not finished ─────────────
             Outranks "pick up where you left off": if there is homework
             outstanding, that IS the next thing. Amber, not red — red means
@@ -97,7 +123,7 @@ export default function TodayPage() {
           <section className="mb-3 rounded-2xl border border-line bg-surface p-4">
             <div className="flex items-center gap-2">
               <ClipboardList className="h-[18px] w-[18px]" style={{ color: 'var(--streak)' }} />
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 {work.length === 1 ? 'Work to finish' : `${work.length} pieces of work to finish`}
               </span>
             </div>
@@ -145,40 +171,57 @@ export default function TodayPage() {
           </p>
         </Link>
 
-        {/* ── Streak + due, the two numbers that drive returning ───────── */}
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-line bg-surface p-4">
-            <div className="flex items-center gap-2">
+        {/* ── Streak + due ───────────────────────────────────────────────
+            One rule, not two boxes. A brand new student used to get two cards
+            both reading "0", which is the emptiest possible welcome; a zero
+            here now says what to do about it instead of just being a zero. */}
+        <div className="mt-3 flex items-stretch gap-3 rounded-2xl border border-line bg-surface px-4 py-3.5">
+          <div className="flex-1">
+            <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink-muted">
               <Flame
-                className="h-[18px] w-[18px]"
+                className="h-[15px] w-[15px]"
                 style={{ color: streak > 0 ? 'var(--streak)' : 'var(--ink-faint)' }}
               />
-              <span className="text-[12px] font-medium text-ink-muted">Streak</span>
-            </div>
+              Streak
+            </span>
             {ready ? (
-              <p className="tnum mt-1.5 font-display text-[26px] leading-none text-ink">
-                {streak}
-                <span className="ml-1 text-[13px] font-normal text-ink-muted">
-                  {streak === 1 ? 'day' : 'days'}
-                </span>
+              <p className="mt-1 text-[14.5px] text-ink">
+                {streak > 0 ? (
+                  <>
+                    <span className="tnum font-display text-[22px] leading-none">{streak}</span>
+                    <span className="ml-1.5 text-ink-muted">
+                      {streak === 1 ? 'day' : 'days'} running
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-ink-muted">Starts with today</span>
+                )}
               </p>
             ) : (
-              <div className="skeleton mt-2 h-6 w-14" />
+              <div className="skeleton mt-2 h-5 w-20" />
             )}
           </div>
 
-          <Link
-            href="/cards"
-            className="press rounded-2xl border border-line bg-surface p-4 no-underline"
-          >
-            <div className="flex items-center gap-2">
-              <Layers className="h-[18px] w-[18px] text-ink-faint" />
-              <span className="text-[12px] font-medium text-ink-muted">Cards due</span>
-            </div>
+          <span aria-hidden className="w-px shrink-0 self-stretch bg-line" />
+
+          <Link href="/cards" className="press flex-1 no-underline">
+            <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink-muted">
+              <Layers className="h-[15px] w-[15px] text-ink-faint" />
+              Cards
+            </span>
             {ready ? (
-              <p className="tnum mt-1.5 font-display text-[26px] leading-none text-ink">{due}</p>
+              <p className="mt-1 text-[14.5px] text-ink">
+                {due > 0 ? (
+                  <>
+                    <span className="tnum font-display text-[22px] leading-none">{due}</span>
+                    <span className="ml-1.5 text-ink-muted">due now</span>
+                  </>
+                ) : (
+                  <span className="text-ink-muted">Nothing due</span>
+                )}
+              </p>
             ) : (
-              <div className="skeleton mt-2 h-6 w-10" />
+              <div className="skeleton mt-2 h-5 w-20" />
             )}
           </Link>
         </div>
@@ -186,9 +229,7 @@ export default function TodayPage() {
         {/* ── What tripped you up — the memory made visible ─────────────── */}
         {weak.length > 0 && (
           <section className="mt-6">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              Worth another look
-            </h2>
+            <h2 className="margin-label">Worth another look</h2>
             <ul className="mt-2.5 space-y-2">
               {weak.map((w, i) => {
                 const s = getSubject(w.subjectId)
@@ -219,9 +260,7 @@ export default function TodayPage() {
 
         {/* ── Subjects ─────────────────────────────────────────────────── */}
         <section className="mt-6">
-          <h2 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-            Subjects
-          </h2>
+          <h2 className="margin-label">Subjects</h2>
           <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
             {SUBJECTS.map((s) => {
               const pr = practice.find((p) => p.subjectId === s.id)
@@ -231,8 +270,15 @@ export default function TodayPage() {
                 <Link
                   key={s.id}
                   href={`/learn/${s.id}`}
-                  className="press flex items-center gap-3.5 rounded-2xl border border-line bg-surface p-3.5 no-underline"
+                  className="press relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-line bg-surface p-3.5 pl-5 no-underline"
                 >
+                  {/* Same accent edge as the landing page, so a subject is
+                      recognisable by colour before it is read. */}
+                  <span
+                    aria-hidden
+                    className="absolute inset-y-0 left-0 w-1"
+                    style={{ background: s.accent }}
+                  />
                   <SubjectIcon icon={s.icon} accent={s.accent} size={42} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
