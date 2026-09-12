@@ -34,29 +34,30 @@ export function Motion() {
         if (cancelled) return
         gsap.registerPlugin(ScrollTrigger)
 
-        // Only now is it safe to let the CSS hide anything.
+        // Anything already on screen when the library finally arrives must be
+        // shown in the same task that hides it, or the student watches the
+        // paragraph they are reading disappear and fade back. The class and
+        // the reveal below happen without yielding to the browser, so the
+        // hidden state is never painted.
         document.documentElement.classList.add('js-reveal-ready')
 
-        ctx = gsap.context(() => {
-          // Hero: the one entrance that plays on load rather than on scroll.
-          gsap.from('[data-hero-item]', {
-            y: 26,
-            opacity: 0,
-            duration: 0.62,
-            ease: 'power3.out',
-            stagger: 0.09,
-          })
-          gsap.from('[data-hero-cast]', {
-            y: 40,
-            opacity: 0,
-            scale: 0.86,
-            duration: 0.8,
-            ease: 'back.out(1.5)',
-            delay: 0.25,
-          })
+        /** Already in view, or scrolled past — nothing to animate in. */
+        const alreadySeen = (el: Element) =>
+          el.getBoundingClientRect().top < window.innerHeight * 0.95
 
-          // Everything else reveals as it arrives.
+        ctx = gsap.context(() => {
+          // The hero is animated in CSS, not here. gsap.from() paints the
+          // element in place and only then snaps it to the start state on the
+          // next frame, so the headline dropped 26px and the card 68px about
+          // 900ms in and slid back — the jump. Above the fold, nothing may
+          // wait on a dynamic import before it settles.
+
+          // Everything below the fold reveals as it arrives.
           for (const el of gsap.utils.toArray<HTMLElement>('[data-reveal]')) {
+            if (alreadySeen(el)) {
+              gsap.set(el, { opacity: 1, y: 0 })
+              continue
+            }
             gsap.to(el, {
               y: 0,
               opacity: 1,
@@ -69,6 +70,10 @@ export function Motion() {
 
           // Grouped items come in one after another rather than all at once.
           for (const group of gsap.utils.toArray<HTMLElement>('[data-reveal-group]')) {
+            if (alreadySeen(group)) {
+              gsap.set(group.children, { opacity: 1, y: 0 })
+              continue
+            }
             gsap.to(group.children, {
               y: 0,
               opacity: 1,
