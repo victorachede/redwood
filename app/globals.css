@@ -97,6 +97,26 @@
   --t-2xl: clamp(2rem, 5vw, 3rem);         /* section heads */
   --t-3xl: clamp(2.5rem, 6.5vw, 4.25rem);  /* the hero, and only the hero */
 
+  /* ── The play palette ────────────────────────────────────────────────
+     Flat, saturated blocks with a heavy ink outline — the language the
+     characters are drawn in, so sections and cast belong to each other.
+     Each pairs with --ink for text, so the same swatch works in both
+     themes without a second set of values; scripts/check-contrast.js is
+     what keeps that claim honest. */
+  --play-amber: #F6C35C;
+  --play-amber-deep: #E8A33D;
+  --play-blue: #8E9AF2;
+  --play-blue-deep: #5B6BE8;
+  --play-teal: #6ED0C4;
+  --play-teal-deep: #19A394;
+  --play-coral: #F5A08F;
+  --play-coral-deep: #E36A5C;
+  --play-lilac: #C7A9F0;
+  --play-lime: #BFE07A;
+  /* A card sitting on a play block. Fixed like the block it sits on — a card
+     that inverts inside a surface that does not becomes dark-on-dark. */
+  --play-card: #FFFCF4;
+
   /* Layout */
   --tabbar-h: 60px;
   --margin-w: 168px;   /* the ruled margin on desktop */
@@ -215,6 +235,18 @@
 
   --color-streak: var(--streak);
   --color-streak-soft: var(--streak-soft);
+
+  --color-play-amber: var(--play-amber);
+  --color-play-amber-deep: var(--play-amber-deep);
+  --color-play-blue: var(--play-blue);
+  --color-play-blue-deep: var(--play-blue-deep);
+  --color-play-teal: var(--play-teal);
+  --color-play-teal-deep: var(--play-teal-deep);
+  --color-play-coral: var(--play-coral);
+  --color-play-coral-deep: var(--play-coral-deep);
+  --color-play-lilac: var(--play-lilac);
+  --color-play-lime: var(--play-lime);
+  --color-play-card: var(--play-card);
 
   --color-rule: var(--rule);
   --color-rule-soft: var(--rule-soft);
@@ -533,3 +565,74 @@
     transform: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Play surfaces
+
+   Flat colour, thick ink border, hard offset shadow — no gradients and no
+   blur, both because they read as cheap at speed and because they cost
+   frames on the mid-range Android this is built for.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Play blocks are fixed-colour surfaces: the amber stays amber in dark mode,
+   because the characters drawn on it do not invert either. So the ink on them
+   must be fixed too — using --ink there put near-white text on a light amber
+   block at 1.45:1, the same mistake as the pricing band using --primary as a
+   surface.
+
+   Rather than hand-correcting every child, this rebinds the tokens locally.
+   text-ink, border-ink, ink-card's shadow and everything else downstream then
+   resolve to the fixed values with no further thought. */
+.on-play {
+  --ink: #1a1714;
+  --ink-muted: #4a4239;
+  --ink-faint: #5f5649;
+  --line: rgba(26, 23, 20, 0.22);
+  --line-strong: rgba(26, 23, 20, 0.4);
+  color: var(--ink);
+}
+
+.ink-card {
+  border: 3px solid var(--ink);
+  border-radius: 22px;
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.ink-card-sm {
+  border: 2.5px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* Buttons press into their own shadow rather than scaling — it reads as a
+   physical key on a touchscreen. */
+.ink-btn {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.ink-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* Idle bob for the cast. Paused under reduced motion by the global rule
+   below, which zeroes every animation duration. */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.bob { animation: bob 3.2s ease-in-out infinite; }
+.bob-slow { animation: bob 4.6s ease-in-out infinite; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: .25; transform: scale(.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(35deg); }
+}
+.twinkle { animation: twinkle 2.6s ease-in-out infinite; }
+
+/* Anything GSAP is going to reveal starts hidden, but only once the script
+   has confirmed it will run — otherwise a failed chunk leaves a blank page. */
+.js-reveal-ready [data-reveal],
+.js-reveal-ready [data-reveal-group] > * { opacity: 0; }
