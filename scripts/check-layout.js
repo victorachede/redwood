@@ -30,6 +30,38 @@ const VIEWPORTS = [
   [414, 896],
 ]
 
+/**
+ * Seeds a signed-in session before each page load.
+ *
+ * The app shell requires an account, so without this every app route would
+ * redirect to /login and both gates would quietly be testing the login page
+ * instead of the screens they name.
+ *
+ * This writes the local auth store, which is only consulted when Supabase is
+ * not configured — so gate runs must use `npm run dev:gates`, which starts
+ * the same app with those env vars blank. A real Supabase session cannot be
+ * forged from here, and faking one would be testing the fake.
+ */
+const SEED_SESSION = () => {
+  try {
+    const user = {
+      id: 'gate-runner',
+      email: 'gate@ewin.test',
+      displayName: 'Gate Runner',
+      password: 'gate',
+      plan: 'free',
+      examFocus: 'WAEC & JAMB',
+      createdAt: Date.now(),
+    }
+    localStorage.setItem(
+      'ewin-auth-v1',
+      JSON.stringify({ users: [user], sessionUserId: user.id }),
+    )
+    const { password, ...pub } = user
+    localStorage.setItem('ewin-session-cache', JSON.stringify(pub))
+  } catch {}
+}
+
 const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/signup', '/support']
 
 async function main() {
@@ -43,6 +75,7 @@ async function main() {
       isMobile: true,
       hasTouch: true,
     })
+    await ctx.addInitScript(SEED_SESSION)
 
     for (const route of ROUTES) {
       const page = await ctx.newPage()

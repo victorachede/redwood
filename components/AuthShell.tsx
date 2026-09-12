@@ -110,7 +110,7 @@ export function AuthField({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-xl border-[2.5px] border-ink bg-surface px-4 py-3.5 text-[15.5px] font-medium outline-none transition-shadow placeholder:text-ink-faint focus:shadow-[3px_3px_0_var(--ink)]"
+        className="mt-2 w-full rounded-xl border-2 border-line-strong bg-surface px-4 py-3.5 text-[15.5px] font-medium outline-none transition-colors placeholder:text-ink-faint focus:border-primary"
       />
     </label>
   )
@@ -167,7 +167,7 @@ export function AuthPassword({
             setFocused(false)
             report(shown, false)
           }}
-          className="w-full rounded-xl border-[2.5px] border-ink bg-surface px-4 py-3.5 pr-12 text-[15.5px] font-medium outline-none transition-shadow placeholder:text-ink-faint focus:shadow-[3px_3px_0_var(--ink)]"
+          className="w-full rounded-xl border-2 border-line-strong bg-surface px-4 py-3.5 pr-12 text-[15.5px] font-medium outline-none transition-colors placeholder:text-ink-faint focus:border-primary"
         />
         <button
           type="button"

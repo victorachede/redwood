@@ -56,7 +56,7 @@ const NOTS = [
 const FAQS = [
   {
     q: 'Is it really free?',
-    a: 'Yes. Six subjects, the tutor and practice questions cost nothing and need no card. Pro exists for mock season — timed full papers and unlimited drills — at ₦2,500 a month, cancel whenever.',
+    a: 'Yes. Six subjects, the tutor and practice questions cost nothing and never ask for a card. Pro exists for mock season — timed full papers and unlimited drills — at ₦2,500 a month, cancel whenever.',
   },
   {
     q: 'How is this different from asking ChatGPT?',
@@ -64,7 +64,7 @@ const FAQS = [
   },
   {
     q: 'Do I need an account?',
-    a: 'Not to start. Open a subject and go. Sign up when you want your streak, cards and progress on every device instead of just this phone.',
+    a: 'Yes, and it takes about twenty seconds — email and a password, or one tap with Google. It is what keeps your streak, your cards and everything the tutor remembers about you, on every device you sign in from.',
   },
   {
     q: 'Will it work on my phone?',
@@ -123,7 +123,7 @@ export default function Home() {
 
               <div data-hero-item className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/dashboard"
+                  href="/signup"
                   className="ink-btn inline-flex items-center justify-center gap-2 bg-primary px-7 py-4 text-[16px] font-bold text-on-primary no-underline"
                 >
                   Start learning — free
@@ -138,7 +138,7 @@ export default function Home() {
               </div>
 
               <p data-hero-item className="mt-4 text-[14px] font-semibold text-ink opacity-70">
-                No card. No account needed to start.
+                Free forever. No card, ever.
               </p>
             </div>
 
@@ -222,7 +222,7 @@ export default function Home() {
             {SUBJECTS.map((s) => (
               <Link
                 key={s.id}
-                href={`/learn/${s.id}`}
+                href="/signup"
                 className="ink-card group block bg-play-card p-5 no-underline"
               >
                 <span className="mb-4 inline-block">
@@ -313,7 +313,7 @@ export default function Home() {
                 ))}
               </ul>
               <Link
-                href="/dashboard"
+                href="/signup"
                 className="ink-btn mt-7 block bg-play-card py-3.5 text-center text-[15px] font-bold text-ink no-underline"
               >
                 Start free
@@ -395,7 +395,7 @@ export default function Home() {
           </p>
           <Link
             data-reveal
-            href="/dashboard"
+            href="/signup"
             className="ink-btn mt-9 inline-flex items-center gap-2 bg-primary px-8 py-4 text-[16px] font-bold text-on-primary no-underline"
           >
             Start with one topic
