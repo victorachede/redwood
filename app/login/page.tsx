@@ -13,7 +13,6 @@ import {
   GoogleButton,
   AuthDivider,
 } from '@/components/AuthShell'
-import type { AyoPose } from '@/components/mascots/Mascots'
 
 function safeNext(raw: string | null): string {
   // Only same-origin paths: a `next` that accepts anything is an open
@@ -30,8 +29,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  /** What Ayo is doing — driven by the password field. */
-  const [pose, setPose] = useState<AyoPose>('wave')
 
   useEffect(() => {
     void refreshSession().then((u) => {
@@ -59,7 +56,6 @@ export default function LoginPage() {
     <AuthShell
       title="Welcome back."
       subtitle="Pick up where you left off."
-      pose={pose}
       footer={
         <>
           No account?{' '}
@@ -89,7 +85,6 @@ export default function LoginPage() {
             value={password}
             onChange={setPassword}
             autoComplete="current-password"
-            onPoseChange={setPose}
           />
           <div className="mt-2 flex justify-end">
             <Link

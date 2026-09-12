@@ -13,7 +13,6 @@ import {
   GoogleButton,
   AuthDivider,
 } from '@/components/AuthShell'
-import type { AyoPose } from '@/components/mascots/Mascots'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -22,7 +21,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [pose, setPose] = useState<AyoPose>('wave')
 
   useEffect(() => {
     void refreshSession().then((u) => {
@@ -50,7 +48,6 @@ export default function SignupPage() {
     <AuthShell
       title="Start for free."
       subtitle="Twenty seconds. Six subjects, the tutor and practice, all free."
-      pose={pose}
       footer={
         <>
           Already have an account?{' '}
@@ -85,7 +82,6 @@ export default function SignupPage() {
           value={password}
           onChange={setPassword}
           autoComplete="new-password"
-          onPoseChange={setPose}
           placeholder="At least 6 characters"
         />
 
