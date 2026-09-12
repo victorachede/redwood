@@ -13,16 +13,16 @@ import { Wordmark } from '@/components/Mark'
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5 lg:px-8">
         <Link href="/" className="no-underline">
-          <Wordmark size={26} />
+          <Wordmark size={28} />
         </Link>
         <div className="flex-1" />
         <ThemeToggle />
         <Link
           href="/dashboard"
-          className="press rounded-full bg-primary px-5 py-2.5 text-[13.5px] font-semibold text-on-primary no-underline"
+          className="ink-btn bg-primary px-5 py-2.5 text-[14px] font-bold text-on-primary no-underline"
         >
           Start free
         </Link>

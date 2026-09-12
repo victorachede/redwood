@@ -81,12 +81,18 @@ export function HeroLesson() {
 
   return (
     <div
-      className="relative rounded-2xl border border-line bg-surface shadow-[var(--shadow-lg)]"
+      className="ink-card relative z-10 bg-play-card"
       /* Reserved so the page never reflows as lines land. */
-      style={{ minHeight: 396 }}
+      style={
+        {
+          minHeight: 396,
+          '--primary-soft': '#E9EEF9',
+          '--correct-soft': '#E6F4EC',
+        } as React.CSSProperties
+      }
       aria-label="A short example of an Ewin lesson"
     >
-      <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
+      <div className="flex items-center gap-2.5 border-b-[3px] border-ink px-4 py-3">
         <Mark size={22} />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold leading-tight text-ink">Mathematics</p>

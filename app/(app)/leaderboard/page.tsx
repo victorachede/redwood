@@ -39,7 +39,6 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const load = () => {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRows(cachedBoard())
       setOpted(isOptedIn())
       setJoinable(canJoin())

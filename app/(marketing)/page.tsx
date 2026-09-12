@@ -6,20 +6,21 @@ import { ExamBadgeRow } from '@/components/ExamBadges'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { formatNgn, PLANS } from '@/app/lib/billing'
+import { Ayo, Kito, Zuri, Sparkle } from '@/components/mascots/Mascots'
+import { Motion } from '@/components/marketing/Motion'
 import { HeroLesson } from '@/components/marketing/HeroLesson'
 
 /**
  * The landing page.
  *
- * Built on the ruled margin (see .ruled in globals.css): section labels live
- * in the margin, content to the right of the rule. That does two things the
- * previous page could not. It gives desktop a real structure instead of a
- * 600px phone column floating in 1440px of nothing, and it breaks the
- * six-identical-white-cards rhythm that made every section read at the same
- * volume.
+ * Loud on purpose. The audience is sixteen, on a phone, and has three other
+ * apps open — a quiet editorial page loses that fight before the first
+ * sentence. So: flat saturated blocks, a heavy ink outline, hard offset
+ * shadows, and three drawn characters carrying the argument.
  *
- * Sections deliberately alternate weight: paper, then ink, then paper. A page
- * that never changes texture cannot emphasise anything.
+ * What it deliberately keeps from the restrained version underneath it: real
+ * sentences rather than slogans, no invented statistics, and no testimonials
+ * from students who do not exist yet.
  */
 
 const STEPS = [
@@ -27,19 +28,22 @@ const STEPS = [
     n: '01',
     title: 'One idea. Not a chapter.',
     body:
-      'Ewin explains a single thing in a few sentences, in plain English, using an example you have actually seen — naira, danfo fares, a market scale. Then it stops.',
+      'A few sentences, plain English, with an example you have actually seen — naira, danfo fares, a market scale. Then it stops and waits for you.',
+    bg: 'var(--play-amber)',
   },
   {
     n: '02',
     title: 'Then it makes you answer.',
     body:
-      'In your own words, typed out — the tutor will not take a letter, because guessing one is how you find out in the exam hall that you never knew it. Practice is separate, and there you answer A, B, C or D against the clock, exactly like the real paper.',
+      'Typed out, in your own words. Guessing a letter is how you find out in the exam hall that you never really knew it — and by then it is too late.',
+    bg: 'var(--play-blue)',
   },
   {
     n: '03',
     title: 'And it names what broke.',
     body:
-      'Not "good try". The exact step that went wrong, why it went wrong, and the same question again until it holds. That is the whole loop.',
+      'Not "good try". The exact step that went wrong, why it went wrong, and the same question again until it holds.',
+    bg: 'var(--play-teal)',
   },
 ]
 
@@ -52,23 +56,23 @@ const NOTS = [
 const FAQS = [
   {
     q: 'Is it really free?',
-    a: 'Yes. Six subjects, the tutor, and practice questions cost nothing and need no card. Pro exists for mock season — timed full papers and unlimited drills — and it is ₦2,500 a month, cancel whenever.',
+    a: 'Yes. Six subjects, the tutor and practice questions cost nothing and need no card. Pro exists for mock season — timed full papers and unlimited drills — at ₦2,500 a month, cancel whenever.',
   },
   {
     q: 'How is this different from asking ChatGPT?',
-    a: 'ChatGPT answers you. Ewin refuses to, until you have tried. It remembers that ratios broke last Tuesday and opens there. It knows what a WAEC theory question looks like versus a JAMB objective. And it will not hand you a finished assignment.',
+    a: 'ChatGPT answers you. Ewin refuses to, until you have tried. It remembers that ratios broke last Tuesday and opens there. It knows a WAEC theory question from a JAMB objective. And it will not hand you a finished assignment.',
   },
   {
     q: 'Do I need an account?',
-    a: 'Not to start. Open a subject and begin. Sign up when you want your streak, cards and progress on every device instead of just this phone.',
+    a: 'Not to start. Open a subject and go. Sign up when you want your streak, cards and progress on every device instead of just this phone.',
   },
   {
     q: 'Will it work on my phone?',
-    a: 'It is built for a mid-range Android on mobile data, at night. You can install it to your home screen, and your cards and practice keep working offline.',
+    a: 'It is built for a mid-range Android on mobile data, at night. Install it to your home screen, and your cards and practice keep working with no signal.',
   },
   {
     q: 'Is this cheating?',
-    a: 'It would be, if it did your homework. It will not. It makes you produce the answer yourself — which is the only part that shows up in your score.',
+    a: 'It would be, if it did your homework. It will not. It makes you produce the answer yourself — the only part that shows up in your score.',
   },
 ]
 
@@ -78,203 +82,231 @@ export default function Home() {
 
   return (
     <main className="bg-paper text-ink">
+      <Motion />
       <SiteHeader />
 
-      {/* ── Hero ──────────────────────────────────────────────────────────
-          The old hero put a static picture of the product beside the words.
-          This types out a real exchange instead: the whole pitch is "it makes
-          you answer", so the page should demonstrate that rather than assert
-          it. It reserves its own height, so nothing below it moves. */}
-      <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 lg:px-8 lg:pb-20 lg:pt-14">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-          <div>
-            <p className="margin-label">For WAEC · NECO · JAMB</p>
-
-            {/* Breaks are set by hand. Left to wrap, "idea" orphans onto its
-                own line at desktop width and the emphasis falls apart. */}
-            <h1 className="mt-6 font-display text-3xl">
-              You do not need
-              <br />
-              more hours.
-              <br />
-              <em className="not-italic text-primary">You need one idea</em>{' '}
-              to actually stick.
-            </h1>
-
-            <p className="mt-6 max-w-lg text-md leading-relaxed text-ink-muted">
-              Ewin teaches one thing, then makes you prove you got it — and tells you exactly
-              which step you fumbled. Reading a topic and knowing it are different, and only
-              one of them shows up in your result.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/dashboard"
-                className="press inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-[15px] font-semibold text-on-primary no-underline"
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="on-play relative overflow-hidden" style={{ background: 'var(--play-amber)' }}>
+        <div className="relative mx-auto max-w-6xl px-5 pb-14 pt-12 lg:px-8 lg:pb-20 lg:pt-16">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.08fr_1fr] lg:gap-14">
+            <div>
+              <p
+                data-hero-item
+                className="ink-card-sm inline-block bg-play-card px-3.5 py-1.5 text-[12px] font-bold uppercase tracking-[0.12em] text-ink"
               >
-                Start learning — free
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/pricing"
-                className="press inline-flex items-center justify-center rounded-full border border-line-strong bg-surface px-7 py-4 text-[15px] font-semibold text-ink no-underline"
+                Free · WAEC · NECO · JAMB
+              </p>
+
+              <h1
+                data-hero-item
+                className="mt-5 font-display text-[clamp(2.6rem,9vw,4.5rem)] leading-[0.98] text-ink"
               >
-                See pricing
-              </Link>
+                You don&rsquo;t need
+                <br />
+                more hours.
+                <br />
+                <span className="relative inline-block">
+                  You need it to stick.
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 -bottom-1 h-2.5 rounded-full"
+                    style={{ background: 'var(--play-coral-deep)' }}
+                  />
+                </span>
+              </h1>
+
+              <p data-hero-item className="mt-7 max-w-lg text-[17px] font-medium leading-relaxed text-ink">
+                Ewin teaches one thing, makes you prove you got it, then tells you exactly which
+                step you fumbled. Reading a topic and knowing it are different — and only one of
+                them shows up in your result.
+              </p>
+
+              <div data-hero-item className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/dashboard"
+                  className="ink-btn inline-flex items-center justify-center gap-2 bg-primary px-7 py-4 text-[16px] font-bold text-on-primary no-underline"
+                >
+                  Start learning — free
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="ink-btn inline-flex items-center justify-center bg-play-card px-7 py-4 text-[16px] font-bold text-ink no-underline"
+                >
+                  See pricing
+                </Link>
+              </div>
+
+              <p data-hero-item className="mt-4 text-[14px] font-semibold text-ink opacity-70">
+                No card. No account needed to start.
+              </p>
             </div>
 
-            <p className="mt-4 text-sm text-ink-faint">
-              No card. No account needed to start.
-            </p>
+            <div data-hero-cast className="relative">
+              <Sparkle
+                size={26}
+                color="var(--play-coral-deep)"
+                className="twinkle absolute -left-1 top-2 hidden sm:block"
+              />
+              <Sparkle
+                size={20}
+                color="var(--primary)"
+                className="twinkle absolute right-2 top-0 hidden sm:block"
+                />
+              <HeroLesson />
+              {/* Behind the card, peeking out of a corner — in front of it, Ayo
+                  covered the very exchange the card exists to show. Present on
+                  phones too: this is a phone-first audience, and hiding the
+                  character on the device most of them use defeats the point.
+                  CSS sizing overrides the SVG's own width/height attributes. */}
+              <Ayo
+                size={126}
+                className="bob pointer-events-none absolute -bottom-7 -right-3 z-0 h-[86px] w-[86px] lg:-bottom-9 lg:-left-24 lg:right-auto lg:h-[126px] lg:w-[126px]"
+              />
+            </div>
           </div>
-
-          <HeroLesson />
         </div>
+      </section>
 
-        <div className="mt-16 border-t border-line pt-7 lg:mt-24">
+      {/* ── Boards ───────────────────────────────────────────────────── */}
+      <section className="border-y-[3px] border-ink bg-paper">
+        <div className="mx-auto max-w-6xl px-5 py-6 lg:px-8">
           <ExamBadgeRow />
         </div>
       </section>
 
-      {/* ── How it works — set in the margin, numbered like worked steps ── */}
-      <section className="border-y border-line bg-sunken">
-        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+      {/* ── How it works ─────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+        <div data-reveal className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="margin-label">How a session goes</p>
-          </div>
-
-          <div>
-            <h2 className="font-display text-2xl">Ten minutes. One idea. Proof.</h2>
-            <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
-              Every session is the same three beats, because the loop is what makes it stick —
-              not the length.
+            <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
+              How a session goes
             </p>
-
-            <ol className="mt-12 space-y-11">
-              {STEPS.map((s) => (
-                <li key={s.n} className="flex gap-6 sm:gap-8">
-                  <span className="margin-num shrink-0">{s.n}</span>
-                  <div className="border-l border-line pl-6 sm:pl-8">
-                    <h3 className="font-display text-xl">{s.title}</h3>
-                    <p className="mt-2.5 max-w-xl text-[15.5px] leading-relaxed text-ink-muted">
-                      {s.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <h2 className="mt-3 font-display text-[clamp(2rem,5.5vw,3.25rem)] leading-[1.02]">
+              Ten minutes. One idea. Proof.
+            </h2>
           </div>
+          <Kito size={96} className="bob-slow hidden shrink-0 sm:block" />
+        </div>
+
+        <div data-reveal-group className="mt-10 grid gap-4 md:grid-cols-3">
+          {STEPS.map((s) => (
+            <div key={s.n} className="on-play ink-card p-6" style={{ background: s.bg }}>
+              <span className="font-display text-[2.75rem] leading-none text-ink opacity-45">
+                {s.n}
+              </span>
+              <h3 className="mt-3 font-display text-[1.6rem] leading-tight text-ink">{s.title}</h3>
+              <p className="mt-2.5 text-[15px] font-medium leading-relaxed text-ink">{s.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── Subjects — the six accents finally used at full strength ─────
-          They were 24px tinted chips before, which wasted the one part of the
-          identity that was already doing work. */}
-      <section className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-        <div>
-          <p className="margin-label">What you can study</p>
-        </div>
+      {/* ── Subjects ─────────────────────────────────────────────────── */}
+      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-lilac)' }}>
+        <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+          <div data-reveal>
+            <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink opacity-70">
+              What you can study
+            </p>
+            <h2 className="mt-3 font-display text-[clamp(2rem,5.5vw,3.25rem)] leading-[1.02] text-ink">
+              Six subjects. Thirty topics.
+            </h2>
+            <p className="mt-4 max-w-xl text-[16px] font-medium leading-relaxed text-ink">
+              Practice written in the style of each board, so a WAEC theory question reads like one
+              and a JAMB objective reads like one.
+            </p>
+          </div>
 
-        <div>
-          <h2 className="font-display text-2xl">Six subjects. Thirty topics.</h2>
-          <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
-            Past-question practice written in the style of each board, so a WAEC theory question
-            reads like one and a JAMB objective reads like one.
-          </p>
-
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+          <div data-reveal-group className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SUBJECTS.map((s) => (
               <Link
                 key={s.id}
                 href={`/learn/${s.id}`}
-                className="press group relative overflow-hidden rounded-2xl border border-line bg-surface p-5 no-underline"
+                className="ink-card group block bg-play-card p-5 no-underline"
               >
-                {/* The accent as a real edge, not a decorative square. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-y-0 left-0 w-1"
-                  style={{ background: s.accent }}
-                />
-                <div className="flex items-start gap-3.5 pl-2">
-                  <SubjectIcon icon={s.icon} accent={s.accent} size={34} />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-display text-lg leading-tight text-ink">{s.name}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-ink-muted">{s.blurb}</p>
-                    <p className="mt-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-ink-faint">
-                      {s.topics.length} topics · {s.exam}
-                    </p>
-                  </div>
-                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5" />
-                </div>
+                <span className="mb-4 inline-block">
+                  <SubjectIcon icon={s.icon} accent={s.accent} size={52} tone="solid" />
+                </span>
+                <p className="font-display text-[1.5rem] leading-tight text-ink">{s.name}</p>
+                <p className="mt-1.5 text-[14.5px] font-medium leading-relaxed text-ink-muted">
+                  {s.blurb}
+                </p>
+                <p className="mt-3 flex items-center gap-1.5 text-[13px] font-bold uppercase tracking-[0.1em] text-ink">
+                  {s.topics.length} topics
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── The refusal — full-bleed ink. The page's one hard cut. ──────── */}
-      <section className="bg-hero text-on-hero">
-        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-          <div>
-            <p className="margin-label" style={{ color: 'var(--on-hero-dim)' }}>
-              Where it stops
-            </p>
-          </div>
+      {/* ── Where it stops ───────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+        <div className="on-play ink-card overflow-hidden" style={{ background: 'var(--play-coral)' }}>
+          <div className="grid gap-8 p-7 sm:p-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+            <div data-reveal>
+              <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink opacity-70">
+                Where it stops
+              </p>
+              <h2 className="mt-3 font-display text-[clamp(1.9rem,5vw,3rem)] leading-[1.02] text-ink">
+                Three things Ewin will not do.
+              </h2>
 
-          <div>
-            <h2 className="font-display text-2xl" style={{ color: 'var(--on-hero)' }}>
-              Three things Ewin will not do.
-            </h2>
-            <p className="mt-4 max-w-xl text-md leading-relaxed" style={{ color: 'var(--on-hero-dim)' }}>
-              Worth saying plainly, so nobody has to find out the hard way.
-            </p>
+              <ul className="mt-7 space-y-3">
+                {NOTS.map((n) => (
+                  <li
+                    key={n}
+                    className="ink-card-sm flex items-center gap-3 bg-play-card px-4 py-3.5 text-[15px] font-semibold text-ink"
+                  >
+                    <X className="h-4 w-4 shrink-0" style={{ color: 'var(--play-coral-deep)' }} />
+                    {n}
+                  </li>
+                ))}
+              </ul>
 
-            <ul className="mt-10 space-y-px overflow-hidden rounded-2xl">
-              {NOTS.map((n) => (
-                <li
-                  key={n}
-                  className="flex items-center gap-4 bg-white/[0.06] px-5 py-5 text-[15.5px]"
-                  style={{ color: 'var(--on-hero)' }}
-                >
-                  <X className="h-4 w-4 shrink-0" style={{ color: 'var(--rule)' }} />
-                  {n}
-                </li>
-              ))}
-            </ul>
+              <p className="mt-6 max-w-lg text-[15.5px] font-medium leading-relaxed text-ink">
+                It makes you produce the answer yourself. That is the part that shows up in your
+                score, and the only part worth paying for.
+              </p>
+            </div>
 
-            <p className="mt-7 max-w-xl text-[15px] leading-relaxed" style={{ color: 'var(--on-hero-dim)' }}>
-              It makes you produce the answer yourself. That is the part that shows up in your
-              score, and it is the only part worth paying for.
-            </p>
+            <div data-reveal className="flex justify-center lg:justify-end">
+              <Zuri size={200} className="bob" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Pricing ─────────────────────────────────────────────────────── */}
-      <section className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-        <div>
-          <p className="margin-label">What it costs</p>
-        </div>
+      {/* ── Pricing ──────────────────────────────────────────────────── */}
+      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-lime)' }}>
+        <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+          <div data-reveal>
+            <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink opacity-70">
+              What it costs
+            </p>
+            <h2 className="mt-3 font-display text-[clamp(2rem,5.5vw,3.25rem)] leading-[1.02] text-ink">
+              Free covers real studying.
+            </h2>
+            <p className="mt-4 max-w-xl text-[16px] font-medium leading-relaxed text-ink">
+              Pro is for mock season — timed full papers and unlimited drills. Not sitting mocks
+              yet? Stay on Free.
+            </p>
+          </div>
 
-        <div>
-          <h2 className="font-display text-2xl">Free covers real studying.</h2>
-          <p className="mt-4 max-w-xl text-md leading-relaxed text-ink-muted">
-            Pro is for mock season — timed full papers and unlimited drills. If you are not
-            sitting mocks yet, stay on Free.
-          </p>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-line bg-surface p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
+          <div data-reveal-group className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="ink-card bg-play-card p-6">
+              <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
                 {free.name}
               </p>
-              <p className="mt-4 font-display text-xl">
+              <p className="mt-3 font-display text-[2.5rem] leading-none">
                 {formatNgn(0)}
-                <span className="ml-1.5 text-sm text-ink-muted">forever</span>
+                <span className="ml-2 text-[15px] font-medium text-ink-muted">forever</span>
               </p>
               <ul className="mt-6 space-y-2.5">
                 {free.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-ink-muted">
+                  <li key={f} className="flex items-start gap-2.5 text-[15px] font-medium text-ink">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-correct" />
                     {f}
                   </li>
@@ -282,31 +314,31 @@ export default function Home() {
               </ul>
               <Link
                 href="/dashboard"
-                className="press mt-7 block rounded-full border border-line-strong bg-surface py-3.5 text-center text-[14.5px] font-semibold text-ink no-underline"
+                className="ink-btn mt-7 block bg-play-card py-3.5 text-center text-[15px] font-bold text-ink no-underline"
               >
                 Start free
               </Link>
             </div>
 
-            <div className="relative rounded-2xl border-2 border-primary bg-surface p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            <div className="on-play ink-card p-6" style={{ background: 'var(--play-amber)' }}>
+              <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink">
                 {pro.name}
               </p>
-              <p className="mt-4 font-display text-xl">
+              <p className="mt-3 font-display text-[2.5rem] leading-none text-ink">
                 {formatNgn(pro.priceMonthlyNgn)}
-                <span className="ml-1.5 text-sm text-ink-muted">/month</span>
+                <span className="ml-2 text-[15px] font-medium text-ink opacity-70">/month</span>
               </p>
               <ul className="mt-6 space-y-2.5">
                 {pro.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-ink-muted">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-correct" />
+                  <li key={f} className="flex items-start gap-2.5 text-[15px] font-medium text-ink">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-ink" />
                     {f}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/pricing"
-                className="press mt-7 block rounded-full bg-primary py-3.5 text-center text-[14.5px] font-semibold text-on-primary no-underline"
+                className="ink-btn mt-7 block bg-primary py-3.5 text-center text-[15px] font-bold text-on-primary no-underline"
               >
                 Go Pro
               </Link>
@@ -315,48 +347,61 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
-      <section className="border-t border-line bg-sunken">
-        <div className="ruled mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-          <div>
-            <p className="margin-label">Straight answers</p>
-          </div>
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
+        <div data-reveal className="flex flex-wrap items-end justify-between gap-6">
+          <h2 className="font-display text-[clamp(2rem,5.5vw,3.25rem)] leading-[1.02]">
+            Straight answers.
+          </h2>
+          <Kito size={80} className="bob hidden shrink-0 sm:block" />
+        </div>
 
-          <div className="max-w-2xl">
-            {FAQS.map((f) => (
-              <details key={f.q} className="group border-b border-line py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-                  <span className="font-display text-lg leading-snug text-ink">{f.q}</span>
-                  <span
-                    aria-hidden
-                    className="shrink-0 text-ink-muted transition-transform group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="mt-3 text-[15.5px] leading-relaxed text-ink-muted">{f.a}</p>
-              </details>
-            ))}
-          </div>
+        <div data-reveal-group className="mt-8 max-w-3xl space-y-3">
+          {FAQS.map((f) => (
+            <details key={f.q} className="ink-card group bg-surface p-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                <span className="font-display text-[1.35rem] leading-snug text-ink">{f.q}</span>
+                <span
+                  aria-hidden
+                  className="shrink-0 text-[1.6rem] leading-none text-ink transition-transform group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-[15.5px] font-medium leading-relaxed text-ink-muted">{f.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 
-      {/* ── Close ───────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-5 py-20 text-center lg:px-8 lg:py-28">
-        <h2 className="mx-auto max-w-2xl font-display text-2xl">
-          The exam is coming either way.
-        </h2>
-        <p className="mx-auto mt-5 max-w-md text-md leading-relaxed text-ink-muted">
-          Ten honest minutes tonight will beat three hours of cramming the week before. Pick one
-          topic and find out what you actually know.
-        </p>
-        <Link
-          href="/dashboard"
-          className="press mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-[15px] font-semibold text-on-primary no-underline"
-        >
-          Start with one topic
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+      {/* ── Close ────────────────────────────────────────────────────── */}
+      <section className="on-play border-t-[3px] border-ink" style={{ background: 'var(--play-teal)' }}>
+        <div className="mx-auto max-w-3xl px-5 py-16 text-center lg:py-24">
+          <div data-reveal className="flex items-end justify-center gap-3">
+            <Ayo size={92} className="bob" />
+            <Zuri size={110} className="bob-slow" />
+            <Kito size={92} className="bob" />
+          </div>
+
+          <h2
+            data-reveal
+            className="mt-8 font-display text-[clamp(2.1rem,7vw,3.5rem)] leading-[1.02] text-ink"
+          >
+            The exam is coming either way.
+          </h2>
+          <p data-reveal className="mx-auto mt-5 max-w-lg text-[16.5px] font-medium leading-relaxed text-ink">
+            Ten honest minutes tonight beat three hours of cramming the week before. Pick one topic
+            and find out what you actually know.
+          </p>
+          <Link
+            data-reveal
+            href="/dashboard"
+            className="ink-btn mt-9 inline-flex items-center gap-2 bg-primary px-8 py-4 text-[16px] font-bold text-on-primary no-underline"
+          >
+            Start with one topic
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </section>
 
       <SiteFooter />
