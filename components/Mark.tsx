@@ -69,11 +69,14 @@ export function Wordmark({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <Mark size={size} />
+      {/* Set as EWIN. At caps the wordmark holds its own beside the mark
+          instead of trailing off, and the serif's capitals are the best part
+          of the face. Tracking is opened up because caps need the air. */}
       <span
         className="font-display leading-none text-ink"
-        style={{ fontSize: size * 0.82, letterSpacing: '-0.02em' }}
+        style={{ fontSize: size * 0.8, letterSpacing: '0.04em' }}
       >
-        Ewin
+        EWIN
       </span>
     </span>
   )

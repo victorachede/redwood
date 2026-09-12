@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Wordmark } from '@/components/Mark'
 
 /**
@@ -19,7 +18,6 @@ export function SiteHeader() {
           <Wordmark size={28} />
         </Link>
         <div className="flex-1" />
-        <ThemeToggle />
         <Link
           href="/dashboard"
           className="ink-btn bg-primary px-5 py-2.5 text-[14px] font-bold text-on-primary no-underline"

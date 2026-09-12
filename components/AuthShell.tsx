@@ -45,7 +45,7 @@ export function AuthShell({
 
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-on-hero">
-              Ewin Academy
+              EWIN ACADEMY
             </p>
             <p className="mt-5 max-w-sm font-display text-[2rem] leading-[1.2] text-on-hero">
               Learn one idea.

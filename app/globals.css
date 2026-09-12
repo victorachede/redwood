@@ -15,6 +15,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* Light only, on purpose — see AGENTS.md. */
   color-scheme: light;
 
   /* Surfaces — warm, paper-like */
@@ -98,115 +99,27 @@
   --t-3xl: clamp(2.5rem, 6.5vw, 4.25rem);  /* the hero, and only the hero */
 
   /* ── The play palette ────────────────────────────────────────────────
-     Flat, saturated blocks with a heavy ink outline — the language the
-     characters are drawn in, so sections and cast belong to each other.
-     Each pairs with --ink for text, so the same swatch works in both
-     themes without a second set of values; scripts/check-contrast.js is
-     what keeps that claim honest. */
-  --play-amber: #F6C35C;
-  --play-amber-deep: #E8A33D;
-  --play-blue: #8E9AF2;
-  --play-blue-deep: #5B6BE8;
-  --play-teal: #6ED0C4;
-  --play-teal-deep: #19A394;
-  --play-coral: #F5A08F;
-  --play-coral-deep: #E36A5C;
-  --play-lilac: #C7A9F0;
-  --play-lime: #BFE07A;
-  /* A card sitting on a play block. Fixed like the block it sits on — a card
-     that inverts inside a surface that does not becomes dark-on-dark. */
+     Four hues, not six. The previous set had a lilac and a lime in it; a
+     yellow-green is very hard to make look anything but cheap, and the candy
+     purple pulled the whole page toward primary-school. Four confident
+     colours used with discipline read more designed than six pastels.
+
+     Each is a flat block that carries dark ink at well past AA, which is what
+     lets the whole page be colour without a single low-contrast run. */
+  --play-marigold: #F8C049;
+  --play-marigold-deep: #E5A31F;
+  --play-sky: #7CB8F7;
+  --play-sky-deep: #2F7FD9;
+  --play-mint: #6FD3B4;
+  --play-mint-deep: #17A67F;
+  --play-coral: #FF9478;
+  --play-coral-deep: #F2603A;
+  /* A card sitting on a play block. */
   --play-card: #FFFCF4;
 
   /* Layout */
   --tabbar-h: 60px;
   --margin-w: 168px;   /* the ruled margin on desktop */
-}
-
-:root[data-theme="dark"],
-:root:not([data-theme="light"]) {
-  /* placeholder so the cascade order is explicit; real values below */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    --paper: #14120f;
-    --surface: #1e1b17;
-    --sunken: #100e0c;
-    --raised: #262119;
-
-    --ink: #f5f1e8;
-    --ink-muted: #a39b8b;
-    --ink-faint: #908776;
-
-    --line: #302b23;
-    --line-strong: #423b30;
-
-    --primary: #7ea3e0;
-    --primary-hover: #9bb8ea;
-    --primary-soft: #1b2233;
-    --on-primary: #10151f;
-
-    --correct: #4ec27f;
-    --correct-soft: #14241a;
-    --wrong: #f08078;
-    --wrong-soft: #2a1715;
-
-    --streak: #eda94f;
-    --streak-soft: #2a1f11;
-
-    --hero: #232c3d;
-    --on-hero: #eaf0fb;
-    --on-hero-dim: rgba(234, 240, 251, 0.66);
-
-    --rule: #b8635c;
-    --rule-soft: #3d201d;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  --paper: #14120f;
-  --surface: #1e1b17;
-  --sunken: #100e0c;
-  --raised: #262119;
-
-  --ink: #f5f1e8;
-  --ink-muted: #a39b8b;
-  --ink-faint: #908776;
-
-  --line: #302b23;
-  --line-strong: #423b30;
-
-  --primary: #7ea3e0;
-  --primary-hover: #9bb8ea;
-  --primary-soft: #1b2233;
-  --on-primary: #10151f;
-
-  --correct: #4ec27f;
-  --correct-soft: #14241a;
-  --wrong: #f08078;
-  --wrong-soft: #2a1715;
-
-  --streak: #eda94f;
-  --streak-soft: #2a1f11;
-
-  --hero: #232c3d;
-  --on-hero: #eaf0fb;
-  --on-hero-dim: rgba(234, 240, 251, 0.66);
-
-  --rule: #b8635c;
-  --rule-soft: #3d201d;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 6px -1px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
@@ -236,16 +149,14 @@
   --color-streak: var(--streak);
   --color-streak-soft: var(--streak-soft);
 
-  --color-play-amber: var(--play-amber);
-  --color-play-amber-deep: var(--play-amber-deep);
-  --color-play-blue: var(--play-blue);
-  --color-play-blue-deep: var(--play-blue-deep);
-  --color-play-teal: var(--play-teal);
-  --color-play-teal-deep: var(--play-teal-deep);
+  --color-play-marigold: var(--play-marigold);
+  --color-play-marigold-deep: var(--play-marigold-deep);
+  --color-play-sky: var(--play-sky);
+  --color-play-sky-deep: var(--play-sky-deep);
+  --color-play-mint: var(--play-mint);
+  --color-play-mint-deep: var(--play-mint-deep);
   --color-play-coral: var(--play-coral);
   --color-play-coral-deep: var(--play-coral-deep);
-  --color-play-lilac: var(--play-lilac);
-  --color-play-lime: var(--play-lime);
   --color-play-card: var(--play-card);
 
   --color-rule: var(--rule);

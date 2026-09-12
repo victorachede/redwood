@@ -89,21 +89,21 @@ export function Kito({ size = 160, className, title }: MascotProps) {
       <ellipse cx="100" cy="184" rx="40" ry="7.5" fill={INK} opacity=".12" data-part="shadow" />
       <g data-part="body">
         <path d="M100 28 C105 41 114 45 109 55" stroke={INK} strokeWidth="5.5" strokeLinecap="round" />
-        <ellipse cx="80" cy="175" rx="14" ry="9" fill="#4A57C4" stroke={INK} strokeWidth="5" />
-        <ellipse cx="120" cy="175" rx="14" ry="9" fill="#4A57C4" stroke={INK} strokeWidth="5" />
+        <ellipse cx="80" cy="175" rx="14" ry="9" fill="#3A6FB5" stroke={INK} strokeWidth="5" />
+        <ellipse cx="120" cy="175" rx="14" ry="9" fill="#3A6FB5" stroke={INK} strokeWidth="5" />
         <path
           d="M100 44 C132 44 152 72 152 110 C152 150 128 172 100 172 C72 172 48 150 48 110 C48 72 68 44 100 44 Z"
-          fill="#5B6BE8"
+          fill="#4E8FE0"
           stroke={INK}
           strokeWidth="5.5"
         />
-        <ellipse cx="100" cy="134" rx="30" ry="24" fill="#98A4F5" opacity=".75" />
+        <ellipse cx="100" cy="134" rx="30" ry="24" fill="#8FB9EE" opacity=".75" />
         <path d="M50 126 C36 132 32 146 41 152" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-        <path d="M50 126 C36 132 32 146 41 152" stroke="#5B6BE8" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="42" cy="154" r="10" fill="#5B6BE8" stroke={INK} strokeWidth="5" />
+        <path d="M50 126 C36 132 32 146 41 152" stroke="#4E8FE0" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="42" cy="154" r="10" fill="#4E8FE0" stroke={INK} strokeWidth="5" />
         <path d="M150 126 C160 136 150 146 136 144" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-        <path d="M150 126 C160 136 150 146 136 144" stroke="#5B6BE8" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="132" cy="142" r="10" fill="#5B6BE8" stroke={INK} strokeWidth="5" />
+        <path d="M150 126 C160 136 150 146 136 144" stroke="#4E8FE0" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="132" cy="142" r="10" fill="#4E8FE0" stroke={INK} strokeWidth="5" />
         <path d="M66 84 C72 78 84 78 90 82" stroke={INK} strokeWidth="5" strokeLinecap="round" data-part="brow" />
         <g data-part="eyes">
           <circle cx="79" cy="108" r="14" fill="#fff" stroke={INK} strokeWidth="4" />

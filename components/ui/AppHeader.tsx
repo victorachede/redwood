@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { ThemeToggle } from './ThemeToggle'
 
 /** Page header inside the app shell. Title is display-face; actions sit right. */
 export function AppHeader({
@@ -34,7 +33,6 @@ export function AppHeader({
           )}
         </div>
         {action}
-        <ThemeToggle />
       </div>
     </header>
   )

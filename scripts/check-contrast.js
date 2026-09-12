@@ -4,14 +4,12 @@
  *
  *   node scripts/check-contrast.js [baseUrl]
  *
- * Walks every text node on the main routes in BOTH themes and checks the
- * rendered foreground against its effective background — resolving up the
- * ancestor chain past transparent backgrounds, because the failure this
- * catches is a colour that only breaks once it lands on a surface it was
- * never designed for.
+ * Walks every text node on the main routes and checks the rendered foreground
+ * against its effective background — resolving up the ancestor chain past
+ * transparent backgrounds, because the failure this catches is a colour that
+ * only breaks once it lands on a surface it was never designed for.
  *
- * Dark mode is not an afterthought here: half the sessions are after dark,
- * so a theme is only shipped when both pass.
+ * The app is light-only (see AGENTS.md), so there is one pass, not two.
  *
  * Exits non-zero below the WCAG AA threshold for the text's own size.
  */
@@ -97,21 +95,14 @@ async function main() {
   const browser = await chromium.launch({ executablePath: EXEC, args: ['--no-sandbox'] })
   let failures = 0
 
-  for (const theme of ['light', 'dark']) {
+  {
+    const theme = 'light'
     const ctx = await browser.newContext({
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 2,
       isMobile: true,
       colorScheme: theme,
     })
-    // The app also honours an explicit data-theme, so pin it as well as the
-    // media preference — a bug can hide in either path alone.
-    await ctx.addInitScript((t) => {
-      try {
-        localStorage.setItem('ewin-theme', t)
-      } catch {}
-    }, theme)
-
     for (const route of ROUTES) {
       const page = await ctx.newPage()
       try {
@@ -138,7 +129,7 @@ async function main() {
   }
 
   await browser.close()
-  console.log(failures ? `\n${failures} contrast failure(s)` : '\nall text meets WCAG AA in both themes')
+  console.log(failures ? `\n${failures} contrast failure(s)` : '\nall text meets WCAG AA')
   process.exit(failures ? 1 : 0)
 }
 

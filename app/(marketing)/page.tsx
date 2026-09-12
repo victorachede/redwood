@@ -29,21 +29,21 @@ const STEPS = [
     title: 'One idea. Not a chapter.',
     body:
       'A few sentences, plain English, with an example you have actually seen — naira, danfo fares, a market scale. Then it stops and waits for you.',
-    bg: 'var(--play-amber)',
+    bg: 'var(--play-marigold)',
   },
   {
     n: '02',
     title: 'Then it makes you answer.',
     body:
       'Typed out, in your own words. Guessing a letter is how you find out in the exam hall that you never really knew it — and by then it is too late.',
-    bg: 'var(--play-blue)',
+    bg: 'var(--play-sky)',
   },
   {
     n: '03',
     title: 'And it names what broke.',
     body:
       'Not "good try". The exact step that went wrong, why it went wrong, and the same question again until it holds.',
-    bg: 'var(--play-teal)',
+    bg: 'var(--play-mint)',
   },
 ]
 
@@ -86,7 +86,7 @@ export default function Home() {
       <SiteHeader />
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="on-play relative overflow-hidden" style={{ background: 'var(--play-amber)' }}>
+      <section className="on-play relative overflow-hidden" style={{ background: 'var(--play-sky)' }}>
         <div className="relative mx-auto max-w-6xl px-5 pb-14 pt-12 lg:px-8 lg:pb-20 lg:pt-16">
           <div className="grid items-center gap-10 lg:grid-cols-[1.08fr_1fr] lg:gap-14">
             <div>
@@ -110,7 +110,7 @@ export default function Home() {
                   <span
                     aria-hidden
                     className="absolute inset-x-0 -bottom-1 h-2.5 rounded-full"
-                    style={{ background: 'var(--play-coral-deep)' }}
+                    style={{ background: 'var(--play-marigold)' }}
                   />
                 </span>
               </h1>
@@ -154,14 +154,14 @@ export default function Home() {
                 className="twinkle absolute right-2 top-0 hidden sm:block"
                 />
               <HeroLesson />
-              {/* Behind the card, peeking out of a corner — in front of it, Ayo
-                  covered the very exchange the card exists to show. Present on
-                  phones too: this is a phone-first audience, and hiding the
-                  character on the device most of them use defeats the point.
+              {/* Standing clear of the card, not tucked behind it. Sitting it
+                  behind meant most of the character was hidden, and putting it
+                  in front covered the exchange the card exists to show — so it
+                  gets its own ground below the card instead.
                   CSS sizing overrides the SVG's own width/height attributes. */}
               <Ayo
-                size={126}
-                className="bob pointer-events-none absolute -bottom-7 -right-3 z-0 h-[86px] w-[86px] lg:-bottom-9 lg:-left-24 lg:right-auto lg:h-[126px] lg:w-[126px]"
+                size={132}
+                className="bob pointer-events-none absolute -bottom-14 right-2 z-20 h-[92px] w-[92px] lg:-bottom-16 lg:-left-16 lg:right-auto lg:h-[132px] lg:w-[132px]"
               />
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function Home() {
       </section>
 
       {/* ── Subjects ─────────────────────────────────────────────────── */}
-      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-lilac)' }}>
+      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-marigold)' }}>
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
           <div data-reveal>
             <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink opacity-70">
@@ -280,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────────────── */}
-      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-lime)' }}>
+      <section className="on-play border-y-[3px] border-ink" style={{ background: 'var(--play-mint)' }}>
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
           <div data-reveal>
             <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink opacity-70">
@@ -320,7 +320,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="on-play ink-card p-6" style={{ background: 'var(--play-amber)' }}>
+            <div className="on-play ink-card p-6" style={{ background: 'var(--play-marigold)' }}>
               <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink">
                 {pro.name}
               </p>
@@ -375,7 +375,7 @@ export default function Home() {
       </section>
 
       {/* ── Close ────────────────────────────────────────────────────── */}
-      <section className="on-play border-t-[3px] border-ink" style={{ background: 'var(--play-teal)' }}>
+      <section className="on-play border-t-[3px] border-ink" style={{ background: 'var(--play-marigold)' }}>
         <div className="mx-auto max-w-3xl px-5 py-16 text-center lg:py-24">
           <div data-reveal className="flex items-end justify-center gap-3">
             <Ayo size={92} className="bob" />

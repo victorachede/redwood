@@ -55,28 +55,16 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fbf8f2' },
-    { media: '(prefers-color-scheme: dark)', color: '#14120f' },
-  ],
+  themeColor: '#fbf8f2',
 }
 
-/**
- * Applies the saved theme before first paint. Without this the page renders
- * light and then snaps to dark, which is worse than having no toggle at all.
- */
-const THEME_BOOTSTRAP = `(function(){try{var t=localStorage.getItem('ewin-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})()`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable}`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      </head>
       <body>
         {children}
         <ServiceWorker />
