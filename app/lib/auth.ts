@@ -212,6 +212,37 @@ export async function signIn(input: {
   return { ok: true, user: toPublic(u) }
 }
 
+/**
+ * Google sign-in, via Supabase OAuth.
+ *
+ * Returns only on failure — on success the browser is already navigating to
+ * Google, so there is nothing to return to.
+ *
+ * Requires the Google provider to be enabled in the Supabase dashboard and
+ * this origin to be in the allowed redirect list. Without that the call comes
+ * back with a provider error rather than failing silently, which is why the
+ * message is surfaced rather than swallowed.
+ */
+export async function signInWithGoogle(): Promise<{ ok: false; error: string } | void> {
+  if (!isSupabaseConfigured) {
+    return { ok: false, error: 'Google sign-in is not set up yet.' }
+  }
+  const sb = createBrowserClient()
+  if (!sb) return { ok: false, error: 'Google sign-in is not set up yet.' }
+
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/dashboard`,
+      // Always show the chooser: students share devices, and silently
+      // reusing whoever signed in last is how work lands in a sibling's
+      // account.
+      queryParams: { prompt: 'select_account' },
+    },
+  })
+  if (error) return { ok: false, error: error.message }
+}
+
 export async function signOut(): Promise<void> {
   if (isSupabaseConfigured) {
     const sb = createBrowserClient()

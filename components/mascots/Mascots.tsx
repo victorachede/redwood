@@ -20,6 +20,16 @@ type MascotProps = {
   title?: string
 }
 
+/**
+ * What Ayo is doing.
+ *
+ * `peek` covers the eyes completely — used while a password is being typed,
+ * so the character is visibly not looking. `peek-through` drops the hands
+ * just far enough for the eyes to show over them, which is what happens when
+ * the student reveals the password themselves.
+ */
+export type AyoPose = 'wave' | 'peek' | 'peek-through'
+
 const INK = '#1a1714'
 
 function Frame({ size, className, title, children }: MascotProps & { children: React.ReactNode }) {
@@ -41,7 +51,16 @@ function Frame({ size, className, title, children }: MascotProps & { children: R
 }
 
 /** Ayo — the tutor. Waves, and does most of the talking. */
-export function Ayo({ size = 160, className, title }: MascotProps) {
+export function Ayo({
+  size = 160,
+  className,
+  title,
+  pose = 'wave',
+}: MascotProps & { pose?: AyoPose }) {
+  const covering = pose !== 'wave'
+  // Hands sit right on the eyes to cover them, and drop 13 units to let the
+  // eyes show over the top when the student reveals the password.
+  const handY = pose === 'peek-through' ? 126 : 104
   return (
     <Frame size={size} className={className} title={title}>
       <ellipse cx="100" cy="184" rx="44" ry="7.5" fill={INK} opacity=".12" data-part="shadow" />
@@ -57,14 +76,21 @@ export function Ayo({ size = 160, className, title }: MascotProps) {
           strokeWidth="5.5"
         />
         <ellipse cx="100" cy="132" rx="33" ry="26" fill="#F6CE8B" opacity=".8" />
-        <g data-part="arm-wave" style={{ transformOrigin: '158px 106px' }}>
-          <path d="M158 106 C176 92 186 70 180 56" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-          <path d="M158 106 C176 92 186 70 180 56" stroke="#E8A33D" strokeWidth="6" strokeLinecap="round" />
-          <circle cx="180" cy="52" r="11" fill="#E8A33D" stroke={INK} strokeWidth="5" />
-        </g>
-        <path d="M42 118 C28 122 22 136 30 144" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-        <path d="M42 118 C28 122 22 136 30 144" stroke="#E8A33D" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="31" cy="146" r="10" fill="#E8A33D" stroke={INK} strokeWidth="5" />
+        {/* Arms first when they are down, so the body reads in front of them;
+            when they come up to the face they are drawn after the eyes. */}
+        {!covering && (
+          <>
+            <g data-part="arm-wave" style={{ transformOrigin: '158px 106px' }}>
+              <path d="M158 106 C176 92 186 70 180 56" stroke={INK} strokeWidth="12" strokeLinecap="round" />
+              <path d="M158 106 C176 92 186 70 180 56" stroke="#E8A33D" strokeWidth="6" strokeLinecap="round" />
+              <circle cx="180" cy="52" r="11" fill="#E8A33D" stroke={INK} strokeWidth="5" />
+            </g>
+            <path d="M42 118 C28 122 22 136 30 144" stroke={INK} strokeWidth="12" strokeLinecap="round" />
+            <path d="M42 118 C28 122 22 136 30 144" stroke="#E8A33D" strokeWidth="6" strokeLinecap="round" />
+            <circle cx="31" cy="146" r="10" fill="#E8A33D" stroke={INK} strokeWidth="5" />
+          </>
+        )}
+
         <g data-part="eyes">
           <circle cx="79" cy="104" r="14.5" fill="#fff" stroke={INK} strokeWidth="4" />
           <circle cx="126" cy="104" r="14.5" fill="#fff" stroke={INK} strokeWidth="4" />
@@ -73,8 +99,46 @@ export function Ayo({ size = 160, className, title }: MascotProps) {
           <circle cx="78" cy="101" r="3.4" fill="#fff" />
           <circle cx="125" cy="101" r="3.4" fill="#fff" />
         </g>
+
         <path d="M87 130 C94 148 113 148 119 130 Z" fill={INK} />
         <path d="M97 142 C100 147 107 147 110 141" fill="#E36A5C" />
+
+        {/* Hands over the eyes. Drawn last so they cover, and animated by
+            their y position alone so the two covered poses are one drawing. */}
+        {covering && (
+          <g data-part="hands" style={{ transition: 'transform 180ms cubic-bezier(0.2,0,0,1)' }}>
+            <path
+              d={`M44 132 C40 112 56 ${handY - 2} 72 ${handY}`}
+              stroke={INK}
+              strokeWidth="12"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M44 132 C40 112 56 ${handY - 2} 72 ${handY}`}
+              stroke="#E8A33D"
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M156 132 C160 112 144 ${handY - 2} 128 ${handY}`}
+              stroke={INK}
+              strokeWidth="12"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M156 132 C160 112 144 ${handY - 2} 128 ${handY}`}
+              stroke="#E8A33D"
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <circle cx="76" cy={handY} r="18" fill="#E8A33D" stroke={INK} strokeWidth="5" />
+            <circle cx="128" cy={handY} r="18" fill="#E8A33D" stroke={INK} strokeWidth="5" />
+          </g>
+        )}
         <circle cx="59" cy="126" r="6" fill="#E36A5C" opacity=".35" />
         <circle cx="144" cy="126" r="6" fill="#E36A5C" opacity=".35" />
       </g>

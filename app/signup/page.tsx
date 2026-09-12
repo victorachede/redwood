@@ -4,8 +4,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
 import { getSession, refreshSession, signUp, subscribeToAuth } from '@/app/lib/auth'
-import { PasswordField } from '@/components/PasswordField'
-import { AuthShell, AuthField, AuthSubmit, AuthError } from '@/components/AuthShell'
+import {
+  AuthShell,
+  AuthField,
+  AuthPassword,
+  AuthSubmit,
+  AuthError,
+  GoogleButton,
+  AuthDivider,
+} from '@/components/AuthShell'
+import type { AyoPose } from '@/components/mascots/Mascots'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -14,6 +22,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [pose, setPose] = useState<AyoPose>('wave')
 
   useEffect(() => {
     void refreshSession().then((u) => {
@@ -39,8 +48,9 @@ export default function SignupPage() {
 
   return (
     <AuthShell
-      title="Create your account"
-      subtitle="Free forever for core study. Upgrade later if you need mocks."
+      title="Start for free."
+      subtitle="No card. Six subjects, the tutor and practice, all free."
+      pose={pose}
       footer={
         <>
           Already have an account?{' '}
@@ -50,7 +60,12 @@ export default function SignupPage() {
         </>
       }
     >
-      <form onSubmit={onSubmit} className="mt-8 space-y-4">
+      <div className="mt-8 space-y-4">
+        <GoogleButton label="Sign up with Google" />
+        <AuthDivider />
+      </div>
+
+      <form onSubmit={onSubmit} className="mt-4 space-y-4">
         <AuthField
           label="Name"
           autoComplete="name"
@@ -66,18 +81,18 @@ export default function SignupPage() {
           onChange={setEmail}
           required
         />
-        <PasswordField
+        <AuthPassword
           value={password}
           onChange={setPassword}
           autoComplete="new-password"
-          minLength={6}
-          label="Password"
+          onPoseChange={setPose}
+          placeholder="At least 6 characters"
         />
 
         {error && <AuthError>{error}</AuthError>}
 
         <AuthSubmit loading={loading} loadingLabel="Creating…">
-          Sign up
+          Create account
         </AuthSubmit>
       </form>
     </AuthShell>
