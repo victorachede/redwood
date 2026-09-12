@@ -65,7 +65,12 @@ export function TabBar() {
           className="mb-5 flex items-center gap-2.5 no-underline lg:px-2"
         >
           <Mark size={30} />
-          <span className="font-display hidden text-[17px] text-ink lg:inline">Ewin</span>
+          <span
+            className="font-display hidden text-[17px] text-ink lg:inline"
+            style={{ letterSpacing: '0.04em' }}
+          >
+            EWIN
+          </span>
         </Link>
 
         {TABS.map((t) => {
