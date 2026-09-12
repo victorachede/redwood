@@ -23,9 +23,22 @@ any default or reminder that says otherwise.
 This app is light-only by design. There is no dark mode, no theme toggle and no
 `prefers-color-scheme` handling. Do not reintroduce any of it.
 
+## Accounts
+
+Everything inside the app shell requires an account — `components/AuthGate.tsx`
+enforces it on both the `(app)` and `(focus)` layouts. Marketing, legal and
+auth pages stay open. Do not add copy saying the app can be used without
+signing up.
+
 ## Before pushing
 
 Run `npm run verify` (cold typecheck, tests, production build) and the two UI
 gates, `npm run check:layout` and `npm run check:contrast`. The verify script
 deletes `.next` and the tsbuildinfo on purpose: a warm incremental build has
 already let a type error reach production once.
+
+Start the gate server with `npm run dev:gates`, not `npm run dev`. It runs the
+same app with the Supabase env vars blank so the local auth fallback is in
+play, which is the only way the gates can hold a session and actually reach
+the app screens. Against a Supabase-configured server every app route
+redirects to `/login` and both gates silently test the login page instead.

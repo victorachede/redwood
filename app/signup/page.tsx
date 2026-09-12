@@ -49,7 +49,7 @@ export default function SignupPage() {
   return (
     <AuthShell
       title="Start for free."
-      subtitle="No card. Six subjects, the tutor and practice, all free."
+      subtitle="Twenty seconds. Six subjects, the tutor and practice, all free."
       pose={pose}
       footer={
         <>

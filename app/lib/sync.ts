@@ -4,8 +4,8 @@
  * Supabase is the source of truth whenever a student is signed in. Local
  * storage stays for exactly two jobs, both of which are load-bearing:
  *
- *   1. Signed-out students. The product promises "no account needed to
- *      start", so a guest's work has to live somewhere until they sign up.
+ *   1. The gap before a session resolves. Auth is checked client-side, so
+ *      there is a moment on every load where work has nowhere else to go.
  *   2. An offline cache. These users are on mobile data in Nigeria; reads
  *      serve instantly from cache and a failed write must not lose work.
  *

@@ -12,7 +12,8 @@
     "check:ui": "npm run check:layout && npm run check:contrast",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "verify": "rm -rf .next tsconfig.tsbuildinfo && npm run typecheck && npm test && npm run build"
+    "verify": "rm -rf .next tsconfig.tsbuildinfo && npm run typecheck && npm test && npm run build",
+    "dev:gates": "NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= next dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",

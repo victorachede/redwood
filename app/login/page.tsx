@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
 import { getSession, refreshSession, signIn, subscribeToAuth } from '@/app/lib/auth'
 import {
@@ -15,8 +15,17 @@ import {
 } from '@/components/AuthShell'
 import type { AyoPose } from '@/components/mascots/Mascots'
 
+function safeNext(raw: string | null): string {
+  // Only same-origin paths: a `next` that accepts anything is an open
+  // redirect, and this one comes straight off the query string.
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/dashboard'
+  return raw
+}
+
 export default function LoginPage() {
   const router = useRouter()
+  const params = useSearchParams()
+  const next = safeNext(params.get('next'))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -26,12 +35,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     void refreshSession().then((u) => {
-      if (u || getSession()) router.replace('/dashboard')
+      if (u || getSession()) router.replace(next)
     })
     return subscribeToAuth(() => {
-      if (getSession()) router.replace('/dashboard')
+      if (getSession()) router.replace(next)
     })
-  }, [router])
+  }, [router, next])
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -43,7 +52,7 @@ export default function LoginPage() {
       setError(res.error)
       return
     }
-    router.push('/dashboard')
+    router.push(next)
   }
 
   return (

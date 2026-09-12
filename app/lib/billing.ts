@@ -18,7 +18,7 @@ export const PLANS: Record<PlanId, Plan> = {
     name: 'Free',
     priceMonthlyNgn: 0,
     priceYearlyNgn: 0,
-    blurb: 'Start learning today. No card needed.',
+    blurb: 'Everything you need to study. No card, ever.',
     features: [
       'All 6 core subjects',
       'Tutor sessions (fair use)',

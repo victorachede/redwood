@@ -430,7 +430,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={clearHistory}
-                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-on-primary transition-opacity hover:opacity-90"
+                    className="press rounded-xl bg-wrong px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   >
                     Confirm
                   </button>
@@ -470,7 +470,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={removeAccount}
-                    className="rounded-xl bg-danger px-4 py-2 text-[13px] font-medium text-on-primary transition-opacity hover:opacity-90"
+                    className="press rounded-xl bg-wrong px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   >
                     {delStep === 0 ? 'Delete' : delStep === 1 ? 'Continue' : 'Delete forever'}
                   </button>

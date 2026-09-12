@@ -15,12 +15,20 @@ const SIZE = 256
 const QUALITY = 0.85
 
 /** Preset colours, so a student without a photo still gets an identity. */
+/**
+ * Avatar grounds, deliberately darker than the matching subject accents.
+ *
+ * An avatar carries a white initial, so it has a job the accents do not: the
+ * teal, green and orange from subjects.ts sit at about 3.2:1 against white,
+ * which fails AA for text. These are the same hues taken down until they
+ * clear it.
+ */
 export const AVATAR_COLORS = [
   '#3b6fd4',
   '#7c4dd4',
-  '#16a394',
-  '#2f9e5f',
-  '#d4763b',
+  '#128276',
+  '#278550',
+  '#ae6130',
   '#c4485f',
 ] as const
 
