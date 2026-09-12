@@ -21,6 +21,12 @@ const PRODUCT = [
   { href: '/pricing', label: 'Pricing' },
 ]
 
+const ACCOUNT = [
+  { href: '/login', label: 'Log in' },
+  { href: '/signup', label: 'Sign up' },
+  { href: '/forgot-password', label: 'Reset password' },
+]
+
 const COMPANY = [
   { href: '/support', label: 'Help centre' },
   { href: '/terms', label: 'Terms' },
@@ -86,7 +92,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t-[3px] border-ink bg-paper">
       <div className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div>
             <Wordmark size={30} />
             <p className="mt-4 max-w-xs text-[14.5px] leading-relaxed text-ink-muted">
@@ -114,6 +120,7 @@ export function SiteFooter() {
 
           <Column title="Study" links={STUDY} />
           <Column title="Product" links={PRODUCT} />
+          <Column title="Account" links={ACCOUNT} />
           <Column title="Company" links={COMPANY} />
         </div>
 

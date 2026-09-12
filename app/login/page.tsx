@@ -4,8 +4,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
 import { getSession, refreshSession, signIn, subscribeToAuth } from '@/app/lib/auth'
-import { PasswordField } from '@/components/PasswordField'
-import { AuthShell, AuthField, AuthSubmit, AuthError } from '@/components/AuthShell'
+import {
+  AuthShell,
+  AuthField,
+  AuthPassword,
+  AuthSubmit,
+  AuthError,
+  GoogleButton,
+  AuthDivider,
+} from '@/components/AuthShell'
+import type { AyoPose } from '@/components/mascots/Mascots'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -13,6 +21,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  /** What Ayo is doing — driven by the password field. */
+  const [pose, setPose] = useState<AyoPose>('wave')
 
   useEffect(() => {
     void refreshSession().then((u) => {
@@ -38,8 +48,9 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to continue learning."
+      title="Welcome back."
+      subtitle="Pick up where you left off."
+      pose={pose}
       footer={
         <>
           No account?{' '}
@@ -49,7 +60,12 @@ export default function LoginPage() {
         </>
       }
     >
-      <form onSubmit={onSubmit} className="mt-8 space-y-4">
+      <div className="mt-8 space-y-4">
+        <GoogleButton label="Sign in with Google" />
+        <AuthDivider />
+      </div>
+
+      <form onSubmit={onSubmit} className="mt-4 space-y-4">
         <AuthField
           label="Email"
           type="email"
@@ -60,11 +76,16 @@ export default function LoginPage() {
         />
 
         <div>
-          <PasswordField value={password} onChange={setPassword} autoComplete="current-password" />
+          <AuthPassword
+            value={password}
+            onChange={setPassword}
+            autoComplete="current-password"
+            onPoseChange={setPose}
+          />
           <div className="mt-2 flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-[12.5px] font-medium text-ink-muted no-underline hover:text-ink hover:underline"
+              className="text-[13px] font-semibold text-ink-muted no-underline hover:text-ink hover:underline"
             >
               Forgot password?
             </Link>
