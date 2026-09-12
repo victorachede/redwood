@@ -4,30 +4,20 @@ import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Wordmark } from '@/components/Mark'
-import { Ayo, Sparkle, type AyoPose } from '@/components/mascots/Mascots'
+import { Ayo, Zuri, Sparkle, type AyoPose } from '@/components/mascots/Mascots'
 import { signInWithGoogle } from '@/app/lib/auth'
 
-/**
- * Shared frame for login / signup / forgot-password / reset-password.
- *
- * Ayo watches the form and covers its eyes while a password is being typed —
- * and peeks through its fingers when the student reveals it themselves. It is
- * a joke, but it is also the only honest way to say "nobody is looking at
- * this" to an audience that has been told that by every app they have ever
- * used.
- */
+/** Shared frame for login / signup / forgot-password / reset-password. */
 export function AuthShell({
   title,
   subtitle,
   children,
   footer,
-  pose = 'wave',
 }: {
   title: string
   subtitle: string
   children: ReactNode
   footer?: ReactNode
-  pose?: AyoPose
 }) {
   return (
     <main className="min-h-dvh bg-paper text-ink lg:grid lg:grid-cols-[1fr_0.85fr]">
@@ -37,12 +27,6 @@ export function AuthShell({
           <Link href="/" className="mb-8 inline-block no-underline">
             <Wordmark size={30} />
           </Link>
-
-          {/* On phones the character sits above the form, because the brand
-              panel it normally lives in is gone at this width. */}
-          <div className="mb-5 lg:hidden">
-            <Ayo size={104} pose={pose} className="bob" />
-          </div>
 
           <h1 className="font-display text-[clamp(2rem,8vw,2.75rem)] leading-[1.02]">{title}</h1>
           <p className="mt-2.5 text-[15.5px] font-medium text-ink-muted">{subtitle}</p>
@@ -63,7 +47,11 @@ export function AuthShell({
           <Sparkle size={18} color="var(--play-coral-deep)" className="twinkle absolute right-16 top-40" />
           <Sparkle size={20} color="var(--play-mint-deep)" className="twinkle absolute bottom-28 left-20" />
 
-          <Ayo size={230} pose={pose} className="bob" />
+          {/* Zuri, not Ayo. The panel is decoration a screen away from the
+              cursor; the character that reacts is perched on the password
+              field. Two different characters means nobody waits for this one
+              to do something. */}
+          <Zuri size={210} className="bob" />
 
           <p className="mt-8 max-w-sm font-display text-[2rem] leading-[1.06] text-ink">
             Learn one idea.
@@ -117,40 +105,50 @@ export function AuthField({
 }
 
 /**
- * Password field that tells the shell what the character should be doing.
+ * Password field, with the character perched on it.
  *
- * The pose is driven by focus rather than by content: a student who has
- * clicked into the box but not typed yet should already see it look away,
- * otherwise the gag lands a beat late.
+ * Ayo sits on the field rather than in the brand panel. In the panel it was
+ * most of a screen away from the cursor, so the one moment it exists for —
+ * eyes covered while you type — happened outside where anyone was looking.
+ * Perched here it is a few dozen pixels from the caret, on every screen size.
+ *
+ * It also owns its own pose now: the state never has to travel up to the
+ * shell and back down, so there is no prop to forget to wire.
+ *
+ * Pose follows focus rather than content — someone who has clicked in but not
+ * typed yet should already see it look away, or the gag lands a beat late.
  */
 export function AuthPassword({
   label = 'Password',
   value,
   onChange,
   autoComplete,
-  onPoseChange,
   placeholder,
 }: {
   label?: string
   value: string
   onChange: (v: string) => void
   autoComplete?: string
-  onPoseChange?: (pose: AyoPose) => void
   placeholder?: string
 }) {
   const [shown, setShown] = useState(false)
   const [focused, setFocused] = useState(false)
-
-  function report(nextShown: boolean, nextFocused: boolean) {
-    if (!onPoseChange) return
-    onPoseChange(!nextFocused ? 'wave' : nextShown ? 'peek-through' : 'peek')
-  }
+  const pose: AyoPose = !focused ? 'wave' : shown ? 'peek-through' : 'peek'
 
   return (
     <label className="block">
-      <span className="text-[12.5px] font-bold uppercase tracking-[0.1em] text-ink-muted">
-        {label}
-      </span>
+      <div className="flex items-end justify-between gap-3">
+        <span className="text-[12.5px] font-bold uppercase tracking-[0.1em] text-ink-muted">
+          {label}
+        </span>
+        {/* Sits on the field's top edge, so covering its eyes happens right
+            where the caret is. */}
+        <Ayo
+          size={78}
+          pose={pose}
+          className={`-mb-5 shrink-0 ${focused ? '' : 'bob'}`}
+        />
+      </div>
       <div className="relative mt-2">
         <input
           type={shown ? 'text' : 'password'}
@@ -159,23 +157,13 @@ export function AuthPassword({
           required
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          onFocus={() => {
-            setFocused(true)
-            report(shown, true)
-          }}
-          onBlur={() => {
-            setFocused(false)
-            report(shown, false)
-          }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           className="w-full rounded-xl border-2 border-line-strong bg-surface px-4 py-3.5 pr-12 text-[15.5px] font-medium outline-none transition-colors placeholder:text-ink-faint focus:border-primary"
         />
         <button
           type="button"
-          onClick={() => {
-            const next = !shown
-            setShown(next)
-            report(next, focused)
-          }}
+          onClick={() => setShown(!shown)}
           aria-label={shown ? 'Hide password' : 'Show password'}
           className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted hover:text-ink"
         >
