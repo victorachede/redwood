@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Check, X } from 'lucide-react'
+import { ArrowRight, Check, ImageIcon, X } from 'lucide-react'
 import { SUBJECTS } from '@/app/lib/subjects'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { ExamBadgeRow } from '@/components/ExamBadges'
@@ -87,114 +87,84 @@ export default function Home() {
       <SiteHeader />
 
       {/* ── Hero ─────────────────────────────────────────────────────────
-          Rogue take: not a SaaS hero at all. Ewin's actual promise is "you
-          write the answer, it gets marked, you find out what broke" — so
-          the hero doesn't describe that, it shows the artifact that promise
-          produces: a script marked in red biro, the way every one of these
-          students has gotten work back their whole school life. No stock
-          photo, no chat-demo card, no mascot. Dark ink ground so the paper
-          card reads as an object sitting on a desk, not a UI panel. */}
+          Full-bleed photo hero, the pattern real photography-led ed
+          platforms use: one photograph doing the emotional work, a dark
+          gradient for legibility, the headline and CTA sitting directly on
+          it. The photo itself is a labelled placeholder, not a fake — this
+          environment cannot fetch or generate one (no reachable stock-photo
+          host, no image model in this session). Send a real photograph
+          into the chat and it drops straight into this div, nothing else
+          about the section needs to change. */}
       <section className="relative overflow-hidden bg-ink">
-        <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-16 lg:px-8 lg:pb-28 lg:pt-24">
-          <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-            <div>
-              <p data-hero-item className="text-[13px] font-bold uppercase tracking-[0.16em] text-on-hero-dim">
-                Free &nbsp;·&nbsp; WAEC &nbsp;·&nbsp; NECO &nbsp;·&nbsp; JAMB
-              </p>
-
-              <h1
-                data-hero-item
-                className="mt-5 font-display text-[clamp(2.5rem,6vw,4rem)] leading-[1.02] text-on-primary"
-              >
-                Answer it like the
-                <br />
-                exam hall.
-                <br />
-                Get marked like one.
-              </h1>
-
-              <p data-hero-item className="mt-6 max-w-md text-[16.5px] font-medium leading-relaxed text-on-hero-dim">
-                Ewin doesn&rsquo;t just explain a topic. It makes you write the answer, marks it
-                like a real script, and shows you exactly where the marks were lost.
-              </p>
-
-              <div data-hero-item className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
-                <Link
-                  href="/signup"
-                  className="press inline-flex items-center justify-center gap-2 rounded-full bg-on-primary px-7 py-4 text-[16px] font-bold text-primary no-underline transition-opacity hover:opacity-90"
-                >
-                  Start learning — free
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="text-[15px] font-bold text-on-primary no-underline hover:underline"
-                >
-                  See pricing
-                </Link>
-              </div>
-            </div>
-
-            {/* The marked script. */}
-            <div data-hero-cast className="relative mx-auto w-full max-w-[360px]">
-              <div className="rotate-[-2.5deg] rounded-[3px] bg-[#fffdf8] p-6 shadow-2xl">
-                <div className="flex items-start justify-between gap-4 border-b border-dashed border-ink/15 pb-3.5">
-                  <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-ink-faint">
-                      WAEC · Mathematics
-                    </p>
-                    <p className="mt-0.5 text-[14px] font-semibold text-ink">Paper 2 — Question 4</p>
-                  </div>
-                  <div className="flex gap-[3px]" aria-hidden>
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <span key={i} className="h-4 w-3 border border-ink/20" />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2.5 text-[14px] leading-relaxed text-ink">
-                  <p className="flex items-start gap-2.5">
-                    <Check className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
-                    3x &minus; 5 = 10
-                  </p>
-                  <p className="flex items-start gap-2.5">
-                    <Check className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
-                    3x = 15
-                  </p>
-                  <p className="flex items-start gap-2.5">
-                    <X className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
-                    <span>
-                      x = 3{' '}
-                      <span className="ml-1 -rotate-3 font-semibold text-wrong">↗ x = 5</span>
-                    </span>
-                  </p>
-                </div>
-
-                <p className="mt-4 -rotate-1 text-[12px] font-semibold italic leading-snug text-wrong">
-                  Arithmetic slip — divide both sides by 3 again.
-                </p>
-
-                <div className="mt-5 border-t border-dashed border-ink/15 pt-3 text-[11px] font-medium text-ink-faint">
-                  Marked and returned the same session.
-                </div>
-              </div>
-
-              {/* Score, circled — overlapping the card corner. */}
-              <div
-                className="absolute -right-4 -top-6 flex h-[72px] w-[72px] rotate-[10deg] items-center justify-center rounded-full border-[3px] border-wrong bg-ink"
-                aria-hidden
-              >
-                <span className="font-display text-[1.65rem] leading-none text-wrong">7/10</span>
-              </div>
-            </div>
+        {/* Placeholder for the hero photograph. Swap for a real <img> or
+            next/image the moment one exists — replace this div's contents,
+            keep the wrapping absolute inset-0. */}
+        <div
+          data-photo-placeholder
+          className="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.05)_0px,rgba(255,255,255,0.05)_2px,transparent_2px,transparent_14px)] bg-ink"
+        >
+          {/* Label lives in a corner, well clear of the headline — a
+              placeholder that fights the copy for attention is worse than
+              no label at all. */}
+          <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1.5 pl-2.5 pr-3.5">
+            <ImageIcon className="h-3.5 w-3.5 text-white/40" strokeWidth={1.5} />
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-white/40">
+              Photo placeholder
+            </p>
           </div>
         </div>
-      </section>
+        {/* The overlay a real photo would carry too, for text legibility.
+            Diagonal, not vertical: the text block anchors top-left, so
+            darkness needs to sit there and clear toward the bottom-right,
+            not fade bottom-to-top where nothing is reading against it. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(115deg, var(--ink) 0%, rgba(26,23,20,0.82) 32%, rgba(26,23,20,0.4) 62%, rgba(26,23,20,0.12) 100%)',
+          }}
+        />
 
-      {/* ── Boards ───────────────────────────────────────────────────── */}
-      <section className="border-b border-line bg-paper">
-        <div className="mx-auto max-w-6xl px-5 py-6 lg:px-8">
-          <ExamBadgeRow />
+        <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-28 lg:px-8 lg:pb-24 lg:pt-40">
+          <div className="max-w-xl">
+            <p data-hero-item className="text-[13px] font-bold uppercase tracking-[0.16em] text-on-hero-dim">
+              Free &nbsp;·&nbsp; WAEC &nbsp;·&nbsp; NECO &nbsp;·&nbsp; JAMB
+            </p>
+
+            <h1
+              data-hero-item
+              className="mt-5 font-display text-[clamp(2.4rem,5.6vw,3.75rem)] leading-[1.05] text-on-primary"
+            >
+              You don&rsquo;t need more hours.
+              <br />
+              You need it to stick.
+            </h1>
+
+            <p data-hero-item className="mt-6 max-w-lg text-[17px] font-medium leading-relaxed text-on-hero-dim">
+              Ewin teaches one thing, makes you prove you got it, then tells you exactly which
+              step you fumbled — for WAEC, NECO and JAMB.
+            </p>
+
+            <div data-hero-item className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
+              <Link
+                href="/signup"
+                className="press inline-flex items-center justify-center gap-2 rounded-full bg-on-primary px-7 py-4 text-[16px] font-bold text-primary no-underline transition-opacity hover:opacity-90"
+              >
+                Start learning — free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/pricing"
+                className="text-[15px] font-bold text-on-primary no-underline hover:underline"
+              >
+                See pricing
+              </Link>
+            </div>
+
+            <div data-hero-item className="mt-10">
+              <ExamBadgeRow variant="dark" />
+            </div>
+          </div>
         </div>
       </section>
 
