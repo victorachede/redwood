@@ -147,6 +147,9 @@
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-instrument);
   --font-mono: var(--font-geist-mono);
+  /* Marketing page only — see app/layout.tsx for why this sits alongside
+     the serif pairing rather than replacing it. */
+  --font-marketing: var(--font-sora);
 
   --text-xs: var(--t-xs);
   --text-sm: var(--t-sm);
@@ -585,3 +588,183 @@ button.press:focus-visible {
    has confirmed it will run — otherwise a failed chunk leaves a blank page. */
 .js-reveal-ready [data-reveal],
 .js-reveal-ready [data-reveal-group] > * { opacity: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Landing page — hero, features, subjects, trust, closing CTA.
+
+   Every class below is prefixed `lp-` and lives only on the marketing
+   homepage. That is deliberate, not laziness: the floating hero cards, the
+   wavy blob stage and the photo-slot cards use `position:absolute` and
+   fixed proportions tuned by hand against real screenshots, and giving them
+   generic names like `.card` would silently redefine those classes
+   everywhere else they are already used (auth screens, the footer, the
+   subjects list). Scoping them here means this page can be this specific
+   without touching anything outside it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 7px 16px;
+  border-radius: var(--r-full);
+}
+
+.lp-eyebrow-dark {
+  color: #cfe0ff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* The two CTA pills on this page are ink-black, not biro-blue — that is
+   the one place this page deliberately breaks from --primary as the action
+   colour, because the blob already carries blue and a blue button on a
+   blue blob went flat in review. Blue stays reserved for the blob, the
+   icon badges and small accents. */
+.lp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--ink);
+  color: var(--on-dark);
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  padding: 14px 24px;
+  border-radius: var(--r-full);
+  border: none;
+}
+
+.lp-stage {
+  position: relative;
+  height: 580px;
+}
+
+.lp-blob {
+  position: absolute;
+  width: 760px;
+  height: 620px;
+  right: -160px;
+  top: -10px;
+}
+
+.lp-photo-slot {
+  position: absolute;
+  left: 96px;
+  bottom: 0;
+  width: 290px;
+  height: 450px;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+
+.lp-float-card {
+  position: absolute;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px 18px;
+  z-index: 4;
+  font-family: var(--font-marketing), sans-serif;
+}
+.lp-card-subject { top: 36px; left: 0; width: 186px; }
+.lp-card-board { top: 8px; right: 8px; width: 158px; }
+.lp-card-mark { bottom: 64px; right: -10px; width: 168px; }
+
+.lp-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Section rhythm ─────────────────────────────────────────────────── */
+.lp-section { max-width: 1240px; margin: 0 auto; padding: 90px 32px; }
+.lp-head { text-align: center; max-width: 620px; margin: 0 auto; }
+
+.lp-how-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 28px; align-items: center; margin-top: 52px; }
+.lp-how-photo { width: 100%; height: 360px; border-radius: var(--r-xl); }
+/* Plain neutral grey, not --sunken — --sunken is warm on purpose
+   everywhere else in the app, but the reference's feature cards are a flat
+   neutral grey and --sunken's warmth read as beige next to them. A
+   deliberate one-off exception, same reasoning as the ink-black CTAs
+   above. */
+.lp-feature { display: flex; gap: 16px; background: #f5f5f5; border-radius: var(--r-lg); padding: 20px 22px; }
+.lp-f-icon { width: 38px; height: 38px; border-radius: 11px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.lp-subj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+.lp-subj-photo { width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; }
+.lp-subj-dot { width: 30px; height: 30px; border-radius: 9px; }
+
+.lp-trust-row { display: grid; grid-template-columns: 0.85fr 1.3fr 0.85fr; gap: 16px; align-items: stretch; margin-top: 52px; }
+.lp-trust-photo { border-radius: var(--r-xl); min-height: 240px; }
+.lp-quote-card { background: var(--primary-soft); border-radius: var(--r-xl); padding: 32px; display: flex; flex-direction: column; justify-content: space-between; }
+
+.lp-board-row { display: flex; align-items: center; justify-content: center; gap: 44px; flex-wrap: wrap; }
+
+.lp-close-stage { position: relative; height: 480px; margin-top: 50px; }
+.lp-close-blob { position: absolute; width: 820px; height: 560px; left: 50%; transform: translateX(-50%); bottom: -40px; }
+.lp-shape { position: absolute; background: var(--ink); z-index: 2; }
+.lp-shape-a { width: 70px; height: 70px; left: calc(50% - 220px); top: 120px; }
+.lp-shape-b { width: 50px; height: 50px; right: calc(50% - 250px); top: 60px; }
+.lp-shape-c {
+  left: calc(50% + 210px);
+  top: 180px;
+  width: 0;
+  height: 0;
+  background: none;
+  border-left: 34px solid transparent;
+  border-right: 34px solid transparent;
+  border-bottom: 58px solid var(--ink);
+}
+
+@media (max-width: 900px) {
+  .lp-section { padding: 60px 20px; }
+  .lp-head h2 { font-size: 26px; }
+
+  .lp-stage { height: 600px; margin-top: 34px; }
+  /* The blob is a raw SVG width/height attribute, not a CSS size — those
+     do not respond to a media query on their own. This class is what
+     actually shrinks it; without it the blob stays full desktop size and
+     floats up into whatever copy sits above the stage on a narrow screen,
+     which is exactly the bug this page shipped once already in mockup. */
+  .lp-blob { width: 280px; height: 340px; right: -10px; top: 0; }
+  .lp-photo-slot { left: 50%; transform: translateX(-50%); width: 190px; height: 300px; }
+  .lp-card-subject { left: 6px; top: 60px; width: 150px; padding: 13px 14px; }
+  .lp-card-board { right: 6px; top: 10px; width: 130px; padding: 13px 14px; }
+  .lp-card-mark { right: 6px; bottom: 30px; width: 150px; padding: 13px 14px; }
+
+  .lp-how-grid { grid-template-columns: 1fr; gap: 16px; }
+  .lp-how-photo { height: 260px; }
+  .lp-subj-grid { grid-template-columns: 1fr 1fr; }
+  .lp-trust-row { grid-template-columns: 1fr; }
+  .lp-trust-photo { min-height: 160px; }
+  .lp-board-row { gap: 24px; }
+
+  .lp-close-stage { height: 340px; margin-top: 36px; }
+  .lp-close-blob { width: 320px; height: 340px; bottom: -20px; }
+
+  /* Scaled down, not just re-centred: at desktop these offsets (±210–250px
+     from centre) sit inside an 1180px stage with room to spare; at a
+     360–414px viewport the same fixed pixel offsets push two of the three
+     clean off the edge, which is exactly what the layout gate below
+     caught. */
+  .lp-shape-a { left: calc(50% - 80px); top: 40px; width: 44px; height: 44px; }
+  .lp-shape-b { right: calc(50% - 90px); top: 20px; width: 34px; height: 34px; }
+  .lp-shape-c {
+    left: calc(50% + 75px);
+    top: 60px;
+    border-left-width: 22px;
+    border-right-width: 22px;
+    border-bottom-width: 38px;
+  }
+}
