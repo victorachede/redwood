@@ -6,7 +6,7 @@ import { Wordmark } from '@/components/Mark'
 /** Header for the marketing and legal pages. */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
+    <header className="sticky top-0 z-40 border-b border-line bg-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5 lg:px-8">
         <Link href="/" className="no-underline">
           <Wordmark size={28} />
@@ -25,7 +25,7 @@ export function SiteHeader() {
         </Link>
         <Link
           href="/signup"
-          className="ink-btn bg-primary px-5 py-2.5 text-[14px] font-bold text-on-primary no-underline"
+          className="btn btn-primary press px-5 py-2.5 text-[14px] no-underline"
         >
           Sign up free
         </Link>

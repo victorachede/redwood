@@ -3,12 +3,19 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Ewin — design system
 
-   Built for a 16-year-old on a mid-range Android at 10pm, revising for WAEC.
-   That single sentence decides everything below:
+   Built for someone sitting WAEC, NECO or JAMB — the exams that decide
+   whether they get into university. That is not a kid's errand, and a study
+   tool for it should not read like one. So the read this system is aiming
+   for is closer to a well-made notebook than a nursery poster:
 
-   · Warm paper, never stark white — easier on the eyes at night
+   · Warm paper, never stark white — easier on the eyes at night, and it is
+     what the object this app replaces actually looks like.
    · Biro blue for actions, teacher's green/red for right and wrong.
-     Colour carries meaning here; it is not decoration.
+     Colour carries meaning here; it is not decoration, and it is not spread
+     across whole sections just to keep the page lively.
+   · Elevation is a hairline and a soft shadow, not a black outline and a
+     hard offset block — that is a comic-panel device, and it is the single
+     biggest thing that was making this read young.
    · Dark mode is not an extra. Half the sessions happen after dark.
    · Motion is capped and functional. Nothing decorative, nothing that
      costs a frame on a cheap phone.
@@ -96,26 +103,7 @@
   --t-lg: 1.5rem;       /* 24px  — card headings */
   --t-xl: 2rem;         /* 32px  — sub-section */
   --t-2xl: clamp(2rem, 5vw, 3rem);         /* section heads */
-  --t-3xl: clamp(2.5rem, 6.5vw, 4.25rem);  /* the hero, and only the hero */
-
-  /* ── The play palette ────────────────────────────────────────────────
-     Four hues, not six. The previous set had a lilac and a lime in it; a
-     yellow-green is very hard to make look anything but cheap, and the candy
-     purple pulled the whole page toward primary-school. Four confident
-     colours used with discipline read more designed than six pastels.
-
-     Each is a flat block that carries dark ink at well past AA, which is what
-     lets the whole page be colour without a single low-contrast run. */
-  --play-marigold: #F8C049;
-  --play-marigold-deep: #E5A31F;
-  --play-sky: #7CB8F7;
-  --play-sky-deep: #2F7FD9;
-  --play-mint: #6FD3B4;
-  --play-mint-deep: #17A67F;
-  --play-coral: #FF9478;
-  --play-coral-deep: #F2603A;
-  /* A card sitting on a play block. */
-  --play-card: #FFFCF4;
+  --t-3xl: clamp(2.35rem, 5.6vw, 3.75rem); /* the hero, and only the hero */
 
   /* Layout */
   --tabbar-h: 60px;
@@ -148,16 +136,6 @@
 
   --color-streak: var(--streak);
   --color-streak-soft: var(--streak-soft);
-
-  --color-play-marigold: var(--play-marigold);
-  --color-play-marigold-deep: var(--play-marigold-deep);
-  --color-play-sky: var(--play-sky);
-  --color-play-sky-deep: var(--play-sky-deep);
-  --color-play-mint: var(--play-mint);
-  --color-play-mint-deep: var(--play-mint-deep);
-  --color-play-coral: var(--play-coral);
-  --color-play-coral-deep: var(--play-coral-deep);
-  --color-play-card: var(--play-card);
 
   --color-rule: var(--rule);
   --color-rule-soft: var(--rule-soft);
@@ -336,7 +314,6 @@
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
-.ink-btn:focus-visible,
 button.press:focus-visible {
   outline: none;
 }
@@ -519,70 +496,90 @@ button.press:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Play surfaces
+   Surfaces
 
-   Flat colour, thick ink border, hard offset shadow — no gradients and no
-   blur, both because they read as cheap at speed and because they cost
-   frames on the mid-range Android this is built for.
+   A hairline border and a soft, warm-tinted shadow carry elevation — not a
+   black outline with a hard offset block. That comic-panel device is what
+   was making a serious exam-prep tool read like a toy for a nine-year-old.
+   No gradients, no blur: both read as cheap at speed and both cost frames on
+   the mid-range Android this is built for. Restraint is the whole move.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Play blocks are fixed-colour surfaces: the amber stays amber in dark mode,
-   because the characters drawn on it do not invert either. So the ink on them
-   must be fixed too — using --ink there put near-white text on a light amber
-   block at 1.45:1, the same mistake as the pricing band using --primary as a
-   surface.
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
 
-   Rather than hand-correcting every child, this rebinds the tokens locally.
-   text-ink, border-ink, ink-card's shadow and everything else downstream then
-   resolve to the fixed values with no further thought. */
-.on-play {
-  --ink: #1a1714;
-  --ink-muted: #4a4239;
-  --ink-faint: #5f5649;
-  --line: rgba(26, 23, 20, 0.22);
-  --line-strong: rgba(26, 23, 20, 0.4);
+.card-lg {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* Only for a card that sits on its own, away from the run of the page —
+   the demo lesson in the hero, a pricing card called out as the default
+   pick. Everything else uses --shadow-sm; reaching for this by default is
+   how a page ends up looking like it is shouting at every scale at once. */
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-interactive {
+  transition: border-color var(--base) var(--ease), box-shadow var(--base) var(--ease);
+}
+.card-interactive:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r-full);
+  font-weight: 700;
+  transition: background-color var(--base) var(--ease), border-color var(--base) var(--ease),
+    color var(--base) var(--ease), box-shadow var(--base) var(--ease);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--surface);
   color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+.btn-secondary:hover {
+  background: var(--sunken);
+  border-color: var(--ink-faint);
 }
 
-.ink-card {
-  border: 3px solid var(--ink);
-  border-radius: 22px;
-  box-shadow: 5px 5px 0 var(--ink);
+.btn-ghost-on-dark {
+  background: var(--surface);
+  color: var(--primary);
+}
+.btn-ghost-on-dark:hover {
+  background: var(--paper);
 }
 
-.ink-card-sm {
-  border: 2.5px solid var(--ink);
-  border-radius: 16px;
-  box-shadow: 3px 3px 0 var(--ink);
-}
-
-/* Buttons press into their own shadow rather than scaling — it reads as a
-   physical key on a touchscreen. */
-.ink-btn {
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  box-shadow: 4px 4px 0 var(--ink);
-  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
-}
-.ink-btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
-}
-
-/* Idle bob for the cast. Paused under reduced motion by the global rule
-   below, which zeroes every animation duration. */
+/* Idle bob for the cast — kept for the one place a character still earns an
+   animation: perched on the password field, a few pixels from the caret.
+   Paused under reduced motion by the global rule below. */
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
 }
 .bob { animation: bob 3.2s ease-in-out infinite; }
-.bob-slow { animation: bob 4.6s ease-in-out infinite; }
-
-@keyframes twinkle {
-  0%, 100% { opacity: .25; transform: scale(.8) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.1) rotate(35deg); }
-}
-.twinkle { animation: twinkle 2.6s ease-in-out infinite; }
 
 /* Anything GSAP is going to reveal starts hidden, but only once the script
    has confirmed it will run — otherwise a failed chunk leaves a blank page. */

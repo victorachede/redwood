@@ -90,7 +90,7 @@ function Column({
 
 export function SiteFooter() {
   return (
-    <footer className="border-t-[3px] border-ink bg-paper">
+    <footer className="border-t border-line bg-paper">
       <div className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div>
@@ -108,7 +108,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="press flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-surface text-ink transition-colors hover:bg-ink hover:text-paper"
+                  className="press flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-surface text-ink-muted transition-colors hover:border-ink hover:text-ink"
                 >
                   <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="currentColor" aria-hidden>
                     <path d={s.path} />

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 import { getSession, refreshSession, subscribeToAuth } from '@/app/lib/auth'
-import { Ayo } from '@/components/mascots/Mascots'
+import { Wordmark } from '@/components/Mark'
 
 /**
  * Requires an account for everything inside the app shell.
@@ -63,8 +64,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   // in" during a check that is about to succeed is its own small lie.
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-paper px-6 text-center">
-      <Ayo size={96} className="bob" />
-      <p className="text-[15px] font-semibold text-ink-muted">
+      <Wordmark size={30} />
+      <p className="flex items-center gap-2 text-[15px] font-semibold text-ink-muted">
+        <Loader2 className="h-4 w-4 animate-spin" />
         {state === 'checking' ? 'One moment…' : 'Taking you to sign in…'}
       </p>
     </div>
