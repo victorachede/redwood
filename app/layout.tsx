@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
+import { Geist, Geist_Mono, Instrument_Serif, Sora } from 'next/font/google'
 import './globals.css'
 import { ServiceWorker } from '@/components/ServiceWorker'
 
@@ -19,6 +19,21 @@ const instrument = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
   style: ['normal', 'italic'],
+  display: 'swap',
+})
+
+/**
+ * Marketing face.
+ *
+ * The landing page rebuild moved away from the serif/grotesque pairing on
+ * purpose — sharper and more confident than Geist alone, without the
+ * editorial weight Instrument Serif carries. Scoped to the marketing page;
+ * the app shell keeps the serif pairing above.
+ */
+const sora = Sora({
+  variable: '--font-sora',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 })
 
@@ -63,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable} ${sora.variable}`}
     >
       <body>
         {children}

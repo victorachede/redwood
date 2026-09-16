@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { SUBJECTS } from '@/app/lib/subjects'
-import { Wordmark } from '@/components/Mark'
+import { Mark } from '@/components/Mark'
 
 /**
  * Site footer.
@@ -71,13 +71,15 @@ function Column({
 }) {
   return (
     <div>
-      <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-faint">{title}</p>
+      <p className="font-marketing text-[12px] font-bold uppercase tracking-[0.14em] text-ink-faint">
+        {title}
+      </p>
       <ul className="mt-3.5 space-y-2.5">
         {links.map((l) => (
           <li key={l.href}>
             <Link
               href={l.href}
-              className="text-[14.5px] font-medium text-ink-muted no-underline hover:text-ink"
+              className="font-marketing text-[14.5px] font-medium text-ink-muted no-underline hover:text-ink"
             >
               {l.label}
             </Link>
@@ -90,11 +92,16 @@ function Column({
 
 export function SiteFooter() {
   return (
-    <footer className="border-t-[3px] border-ink bg-paper">
+    <footer className="border-t border-line bg-paper">
       <div className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div>
-            <Wordmark size={30} />
+            <span className="flex items-center gap-2.5">
+              <Mark size={26} />
+              <span className="font-marketing text-[18px] font-bold leading-none tracking-tight text-ink">
+                Ewin
+              </span>
+            </span>
             <p className="mt-4 max-w-xs text-[14.5px] leading-relaxed text-ink-muted">
               An AI tutor that teaches one idea, then makes you prove you got it. Built for
               Nigerian students sitting WAEC, NECO and JAMB.
@@ -108,7 +115,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="press flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-surface text-ink transition-colors hover:bg-ink hover:text-paper"
+                  className="press flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-surface text-ink-muted transition-colors hover:border-ink hover:text-ink"
                 >
                   <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="currentColor" aria-hidden>
                     <path d={s.path} />
@@ -124,7 +131,7 @@ export function SiteFooter() {
           <Column title="Company" links={COMPANY} />
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 font-marketing sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[13px] text-ink-muted">
             © {new Date().getFullYear()} EWIN Academy. Made in Nigeria.
           </p>

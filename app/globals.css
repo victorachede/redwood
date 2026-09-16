@@ -3,12 +3,19 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Ewin — design system
 
-   Built for a 16-year-old on a mid-range Android at 10pm, revising for WAEC.
-   That single sentence decides everything below:
+   Built for someone sitting WAEC, NECO or JAMB — the exams that decide
+   whether they get into university. That is not a kid's errand, and a study
+   tool for it should not read like one. So the read this system is aiming
+   for is closer to a well-made notebook than a nursery poster:
 
-   · Warm paper, never stark white — easier on the eyes at night
+   · Warm paper, never stark white — easier on the eyes at night, and it is
+     what the object this app replaces actually looks like.
    · Biro blue for actions, teacher's green/red for right and wrong.
-     Colour carries meaning here; it is not decoration.
+     Colour carries meaning here; it is not decoration, and it is not spread
+     across whole sections just to keep the page lively.
+   · Elevation is a hairline and a soft shadow, not a black outline and a
+     hard offset block — that is a comic-panel device, and it is the single
+     biggest thing that was making this read young.
    · Dark mode is not an extra. Half the sessions happen after dark.
    · Motion is capped and functional. Nothing decorative, nothing that
      costs a frame on a cheap phone.
@@ -96,26 +103,7 @@
   --t-lg: 1.5rem;       /* 24px  — card headings */
   --t-xl: 2rem;         /* 32px  — sub-section */
   --t-2xl: clamp(2rem, 5vw, 3rem);         /* section heads */
-  --t-3xl: clamp(2.5rem, 6.5vw, 4.25rem);  /* the hero, and only the hero */
-
-  /* ── The play palette ────────────────────────────────────────────────
-     Four hues, not six. The previous set had a lilac and a lime in it; a
-     yellow-green is very hard to make look anything but cheap, and the candy
-     purple pulled the whole page toward primary-school. Four confident
-     colours used with discipline read more designed than six pastels.
-
-     Each is a flat block that carries dark ink at well past AA, which is what
-     lets the whole page be colour without a single low-contrast run. */
-  --play-marigold: #F8C049;
-  --play-marigold-deep: #E5A31F;
-  --play-sky: #7CB8F7;
-  --play-sky-deep: #2F7FD9;
-  --play-mint: #6FD3B4;
-  --play-mint-deep: #17A67F;
-  --play-coral: #FF9478;
-  --play-coral-deep: #F2603A;
-  /* A card sitting on a play block. */
-  --play-card: #FFFCF4;
+  --t-3xl: clamp(2.35rem, 5.6vw, 3.75rem); /* the hero, and only the hero */
 
   /* Layout */
   --tabbar-h: 60px;
@@ -149,16 +137,6 @@
   --color-streak: var(--streak);
   --color-streak-soft: var(--streak-soft);
 
-  --color-play-marigold: var(--play-marigold);
-  --color-play-marigold-deep: var(--play-marigold-deep);
-  --color-play-sky: var(--play-sky);
-  --color-play-sky-deep: var(--play-sky-deep);
-  --color-play-mint: var(--play-mint);
-  --color-play-mint-deep: var(--play-mint-deep);
-  --color-play-coral: var(--play-coral);
-  --color-play-coral-deep: var(--play-coral-deep);
-  --color-play-card: var(--play-card);
-
   --color-rule: var(--rule);
   --color-rule-soft: var(--rule-soft);
 
@@ -169,6 +147,9 @@
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-instrument);
   --font-mono: var(--font-geist-mono);
+  /* Marketing page only — see app/layout.tsx for why this sits alongside
+     the serif pairing rather than replacing it. */
+  --font-marketing: var(--font-sora);
 
   --text-xs: var(--t-xs);
   --text-sm: var(--t-sm);
@@ -336,7 +317,6 @@
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
-.ink-btn:focus-visible,
 button.press:focus-visible {
   outline: none;
 }
@@ -519,72 +499,272 @@ button.press:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Play surfaces
+   Surfaces
 
-   Flat colour, thick ink border, hard offset shadow — no gradients and no
-   blur, both because they read as cheap at speed and because they cost
-   frames on the mid-range Android this is built for.
+   A hairline border and a soft, warm-tinted shadow carry elevation — not a
+   black outline with a hard offset block. That comic-panel device is what
+   was making a serious exam-prep tool read like a toy for a nine-year-old.
+   No gradients, no blur: both read as cheap at speed and both cost frames on
+   the mid-range Android this is built for. Restraint is the whole move.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Play blocks are fixed-colour surfaces: the amber stays amber in dark mode,
-   because the characters drawn on it do not invert either. So the ink on them
-   must be fixed too — using --ink there put near-white text on a light amber
-   block at 1.45:1, the same mistake as the pricing band using --primary as a
-   surface.
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
 
-   Rather than hand-correcting every child, this rebinds the tokens locally.
-   text-ink, border-ink, ink-card's shadow and everything else downstream then
-   resolve to the fixed values with no further thought. */
-.on-play {
-  --ink: #1a1714;
-  --ink-muted: #4a4239;
-  --ink-faint: #5f5649;
-  --line: rgba(26, 23, 20, 0.22);
-  --line-strong: rgba(26, 23, 20, 0.4);
+.card-lg {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* Only for a card that sits on its own, away from the run of the page —
+   the demo lesson in the hero, a pricing card called out as the default
+   pick. Everything else uses --shadow-sm; reaching for this by default is
+   how a page ends up looking like it is shouting at every scale at once. */
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-interactive {
+  transition: border-color var(--base) var(--ease), box-shadow var(--base) var(--ease);
+}
+.card-interactive:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r-full);
+  font-weight: 700;
+  transition: background-color var(--base) var(--ease), border-color var(--base) var(--ease),
+    color var(--base) var(--ease), box-shadow var(--base) var(--ease);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--surface);
   color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+.btn-secondary:hover {
+  background: var(--sunken);
+  border-color: var(--ink-faint);
 }
 
-.ink-card {
-  border: 3px solid var(--ink);
-  border-radius: 22px;
-  box-shadow: 5px 5px 0 var(--ink);
+.btn-ghost-on-dark {
+  background: var(--surface);
+  color: var(--primary);
+}
+.btn-ghost-on-dark:hover {
+  background: var(--paper);
 }
 
-.ink-card-sm {
-  border: 2.5px solid var(--ink);
-  border-radius: 16px;
-  box-shadow: 3px 3px 0 var(--ink);
-}
-
-/* Buttons press into their own shadow rather than scaling — it reads as a
-   physical key on a touchscreen. */
-.ink-btn {
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  box-shadow: 4px 4px 0 var(--ink);
-  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
-}
-.ink-btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
-}
-
-/* Idle bob for the cast. Paused under reduced motion by the global rule
-   below, which zeroes every animation duration. */
+/* Idle bob for the cast — kept for the one place a character still earns an
+   animation: perched on the password field, a few pixels from the caret.
+   Paused under reduced motion by the global rule below. */
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
 }
 .bob { animation: bob 3.2s ease-in-out infinite; }
-.bob-slow { animation: bob 4.6s ease-in-out infinite; }
-
-@keyframes twinkle {
-  0%, 100% { opacity: .25; transform: scale(.8) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.1) rotate(35deg); }
-}
-.twinkle { animation: twinkle 2.6s ease-in-out infinite; }
 
 /* Anything GSAP is going to reveal starts hidden, but only once the script
    has confirmed it will run — otherwise a failed chunk leaves a blank page. */
 .js-reveal-ready [data-reveal],
 .js-reveal-ready [data-reveal-group] > * { opacity: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Landing page — hero, features, subjects, trust, closing CTA.
+
+   Every class below is prefixed `lp-` and lives only on the marketing
+   homepage. That is deliberate, not laziness: the floating hero cards, the
+   wavy blob stage and the photo-slot cards use `position:absolute` and
+   fixed proportions tuned by hand against real screenshots, and giving them
+   generic names like `.card` would silently redefine those classes
+   everywhere else they are already used (auth screens, the footer, the
+   subjects list). Scoping them here means this page can be this specific
+   without touching anything outside it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 7px 16px;
+  border-radius: var(--r-full);
+}
+
+.lp-eyebrow-dark {
+  color: #cfe0ff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* The two CTA pills on this page are ink-black, not biro-blue — that is
+   the one place this page deliberately breaks from --primary as the action
+   colour, because the blob already carries blue and a blue button on a
+   blue blob went flat in review. Blue stays reserved for the blob, the
+   icon badges and small accents. */
+.lp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--ink);
+  color: var(--on-dark);
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  padding: 14px 24px;
+  border-radius: var(--r-full);
+  border: none;
+}
+
+.lp-stage {
+  position: relative;
+  height: 580px;
+}
+
+.lp-blob {
+  position: absolute;
+  width: 760px;
+  height: 620px;
+  right: -160px;
+  top: -10px;
+}
+
+.lp-photo-slot {
+  position: absolute;
+  left: 96px;
+  bottom: 0;
+  width: 290px;
+  height: 450px;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+
+.lp-float-card {
+  position: absolute;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px 18px;
+  z-index: 4;
+  font-family: var(--font-marketing), sans-serif;
+}
+.lp-card-subject { top: 36px; left: 0; width: 186px; }
+.lp-card-board { top: 8px; right: 8px; width: 158px; }
+.lp-card-mark { bottom: 64px; right: -10px; width: 168px; }
+
+.lp-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Section rhythm ─────────────────────────────────────────────────── */
+.lp-section { max-width: 1240px; margin: 0 auto; padding: 90px 32px; }
+.lp-head { text-align: center; max-width: 620px; margin: 0 auto; }
+
+.lp-how-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 28px; align-items: center; margin-top: 52px; }
+.lp-how-photo { width: 100%; height: 360px; border-radius: var(--r-xl); }
+/* Plain neutral grey, not --sunken — --sunken is warm on purpose
+   everywhere else in the app, but the reference's feature cards are a flat
+   neutral grey and --sunken's warmth read as beige next to them. A
+   deliberate one-off exception, same reasoning as the ink-black CTAs
+   above. */
+.lp-feature { display: flex; gap: 16px; background: #f5f5f5; border-radius: var(--r-lg); padding: 20px 22px; }
+.lp-f-icon { width: 38px; height: 38px; border-radius: 11px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.lp-subj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+.lp-subj-photo { width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; }
+.lp-subj-dot { width: 30px; height: 30px; border-radius: 9px; }
+
+.lp-trust-row { display: grid; grid-template-columns: 0.85fr 1.3fr 0.85fr; gap: 16px; align-items: stretch; margin-top: 52px; }
+.lp-trust-photo { border-radius: var(--r-xl); min-height: 240px; }
+.lp-quote-card { background: var(--primary-soft); border-radius: var(--r-xl); padding: 32px; display: flex; flex-direction: column; justify-content: space-between; }
+
+.lp-board-row { display: flex; align-items: center; justify-content: center; gap: 44px; flex-wrap: wrap; }
+
+.lp-close-stage { position: relative; height: 480px; margin-top: 50px; }
+.lp-close-blob { position: absolute; width: 820px; height: 560px; left: 50%; transform: translateX(-50%); bottom: -40px; }
+.lp-shape { position: absolute; background: var(--ink); z-index: 2; }
+.lp-shape-a { width: 70px; height: 70px; left: calc(50% - 220px); top: 120px; }
+.lp-shape-b { width: 50px; height: 50px; right: calc(50% - 250px); top: 60px; }
+.lp-shape-c {
+  left: calc(50% + 210px);
+  top: 180px;
+  width: 0;
+  height: 0;
+  background: none;
+  border-left: 34px solid transparent;
+  border-right: 34px solid transparent;
+  border-bottom: 58px solid var(--ink);
+}
+
+@media (max-width: 900px) {
+  .lp-section { padding: 60px 20px; }
+  .lp-head h2 { font-size: 26px; }
+
+  .lp-stage { height: 600px; margin-top: 34px; }
+  /* The blob is a raw SVG width/height attribute, not a CSS size — those
+     do not respond to a media query on their own. This class is what
+     actually shrinks it; without it the blob stays full desktop size and
+     floats up into whatever copy sits above the stage on a narrow screen,
+     which is exactly the bug this page shipped once already in mockup. */
+  .lp-blob { width: 280px; height: 340px; right: -10px; top: 0; }
+  .lp-photo-slot { left: 50%; transform: translateX(-50%); width: 190px; height: 300px; }
+  .lp-card-subject { left: 6px; top: 60px; width: 150px; padding: 13px 14px; }
+  .lp-card-board { right: 6px; top: 10px; width: 130px; padding: 13px 14px; }
+  .lp-card-mark { right: 6px; bottom: 30px; width: 150px; padding: 13px 14px; }
+
+  .lp-how-grid { grid-template-columns: 1fr; gap: 16px; }
+  .lp-how-photo { height: 260px; }
+  .lp-subj-grid { grid-template-columns: 1fr 1fr; }
+  .lp-trust-row { grid-template-columns: 1fr; }
+  .lp-trust-photo { min-height: 160px; }
+  .lp-board-row { gap: 24px; }
+
+  .lp-close-stage { height: 340px; margin-top: 36px; }
+  .lp-close-blob { width: 320px; height: 340px; bottom: -20px; }
+
+  /* Scaled down, not just re-centred: at desktop these offsets (±210–250px
+     from centre) sit inside an 1180px stage with room to spare; at a
+     360–414px viewport the same fixed pixel offsets push two of the three
+     clean off the edge, which is exactly what the layout gate below
+     caught. */
+  .lp-shape-a { left: calc(50% - 80px); top: 40px; width: 44px; height: 44px; }
+  .lp-shape-b { right: calc(50% - 90px); top: 20px; width: 34px; height: 34px; }
+  .lp-shape-c {
+    left: calc(50% + 75px);
+    top: 60px;
+    border-left-width: 22px;
+    border-right-width: 22px;
+    border-bottom-width: 38px;
+  }
+}

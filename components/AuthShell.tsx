@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Wordmark } from '@/components/Mark'
-import { Ayo, Zuri, Sparkle, type AyoPose } from '@/components/mascots/Mascots'
+import { Ayo, type AyoPose } from '@/components/mascots/Mascots'
 import { signInWithGoogle } from '@/app/lib/auth'
 
 /** Shared frame for login / signup / forgot-password / reset-password. */
@@ -37,28 +37,20 @@ export function AuthShell({
         </div>
       </div>
 
-      {/* Brand side */}
-      <div
-        className="on-play relative hidden overflow-hidden border-l-[3px] border-ink lg:block"
-        style={{ background: 'var(--play-sky)' }}
-      >
-        <div className="relative flex min-h-dvh flex-col items-center justify-center px-10 py-14 text-center">
-          <Sparkle size={24} color="var(--play-marigold)" className="twinkle absolute left-14 top-24" />
-          <Sparkle size={18} color="var(--play-coral-deep)" className="twinkle absolute right-16 top-40" />
-          <Sparkle size={20} color="var(--play-mint-deep)" className="twinkle absolute bottom-28 left-20" />
-
-          {/* Zuri, not Ayo. The panel is decoration a screen away from the
-              cursor; the character that reacts is perched on the password
-              field. Two different characters means nobody waits for this one
-              to do something. */}
-          <Zuri size={210} className="bob" />
-
-          <p className="mt-8 max-w-sm font-display text-[2rem] leading-[1.06] text-ink">
+      {/* Brand side — the same confident dark panel the landing page closes
+          on, so the two feel like one product. No mascot here: the one
+          mascot moment on this screen is Ayo on the password field, a few
+          pixels from where the student is actually looking. A second
+          character in the panel was decoration competing with that. */}
+      <div className="relative hidden overflow-hidden bg-primary lg:block">
+        <div className="relative flex min-h-dvh flex-col justify-center px-12 py-14">
+          <span className="h-[3px] w-12 rounded-full bg-on-hero-dim" aria-hidden />
+          <p className="mt-8 max-w-sm font-display text-[2.25rem] leading-[1.1] text-on-primary">
             Learn one idea.
             <br />
             Then prove you got it.
           </p>
-          <p className="mt-4 max-w-xs text-[15px] font-medium leading-relaxed text-ink opacity-80">
+          <p className="mt-4 max-w-xs text-[15px] font-medium leading-relaxed text-on-hero-dim">
             Short lessons, a real check after each one, and feedback that names exactly what held
             up and what did not.
           </p>
@@ -188,7 +180,7 @@ export function AuthSubmit({
     <button
       type="submit"
       disabled={loading}
-      className="ink-btn flex w-full items-center justify-center gap-2 bg-primary py-4 text-[16px] font-bold text-on-primary disabled:opacity-60"
+      className="btn btn-primary press w-full py-4 text-[16px] disabled:opacity-60"
     >
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
       {loading ? (loadingLabel ?? 'Working…') : children}
@@ -216,7 +208,7 @@ export function GoogleButton({ label = 'Continue with Google' }: { label?: strin
             setBusy(false)
           }
         }}
-        className="ink-btn flex w-full items-center justify-center gap-2.5 bg-surface py-4 text-[15.5px] font-bold text-ink disabled:opacity-60"
+        className="btn btn-secondary press w-full gap-2.5 py-4 text-[15.5px] disabled:opacity-60"
       >
         {busy ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -249,10 +241,7 @@ export function AuthDivider() {
 /** Error banner. */
 export function AuthError({ children }: { children: ReactNode }) {
   return (
-    <p
-      className="ink-card-sm px-4 py-3 text-[14px] font-semibold text-ink"
-      style={{ background: 'var(--play-coral)' }}
-    >
+    <p className="rounded-xl border border-wrong/30 bg-wrong-soft px-4 py-3 text-[14px] font-semibold text-ink">
       {children}
     </p>
   )
