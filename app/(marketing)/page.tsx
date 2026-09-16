@@ -7,7 +7,6 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { formatNgn, PLANS } from '@/app/lib/billing'
 import { Motion } from '@/components/marketing/Motion'
-import { HeroLesson } from '@/components/marketing/HeroLesson'
 
 /**
  * The landing page.
@@ -88,80 +87,114 @@ export default function Home() {
       <SiteHeader />
 
       {/* ── Hero ─────────────────────────────────────────────────────────
-          Taking a cue from Coursera's hero, not copying it: modest,
-          confident type rather than a dramatic display size; a functional
-          device under the headline instead of a second decorative button;
-          trust logos folded into the hero itself rather than asserted in
-          a headline. Coursera's own device is a search bar, because their
-          problem is finding 1 course out of thousands — Ewin has six
-          subjects, so the honest equivalent is letting you jump straight
-          to one, not a search box with nothing behind it. */}
-      <section className="relative overflow-hidden bg-paper">
-        <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-14 lg:px-8 lg:pb-20 lg:pt-16">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          Rogue take: not a SaaS hero at all. Ewin's actual promise is "you
+          write the answer, it gets marked, you find out what broke" — so
+          the hero doesn't describe that, it shows the artifact that promise
+          produces: a script marked in red biro, the way every one of these
+          students has gotten work back their whole school life. No stock
+          photo, no chat-demo card, no mascot. Dark ink ground so the paper
+          card reads as an object sitting on a desk, not a UI panel. */}
+      <section className="relative overflow-hidden bg-ink">
+        <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-16 lg:px-8 lg:pb-28 lg:pt-24">
+          <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
             <div>
-              <p data-hero-item className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
-                Free, always
+              <p data-hero-item className="text-[13px] font-bold uppercase tracking-[0.16em] text-on-hero-dim">
+                Free &nbsp;·&nbsp; WAEC &nbsp;·&nbsp; NECO &nbsp;·&nbsp; JAMB
               </p>
 
               <h1
                 data-hero-item
-                className="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.25rem)] leading-[1.08] text-ink"
+                className="mt-5 font-display text-[clamp(2.5rem,6vw,4rem)] leading-[1.02] text-on-primary"
               >
-                Learn one idea.
+                Answer it like the
                 <br />
-                Prove you actually know it.
+                exam hall.
+                <br />
+                Get marked like one.
               </h1>
 
-              <p data-hero-item className="mt-5 max-w-lg text-[16.5px] font-medium leading-relaxed text-ink-muted">
-                Ewin teaches one topic, makes you answer in your own words, then tells you exactly
-                which step you fumbled — for WAEC, NECO and JAMB.
+              <p data-hero-item className="mt-6 max-w-md text-[16.5px] font-medium leading-relaxed text-on-hero-dim">
+                Ewin doesn&rsquo;t just explain a topic. It makes you write the answer, marks it
+                like a real script, and shows you exactly where the marks were lost.
               </p>
 
-              <div data-hero-item className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div data-hero-item className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
                 <Link
                   href="/signup"
-                  className="press inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[15px] font-bold text-on-primary shadow-sm transition-colors hover:bg-primary-hover no-underline"
+                  className="press inline-flex items-center justify-center gap-2 rounded-full bg-on-primary px-7 py-4 text-[16px] font-bold text-primary no-underline transition-opacity hover:opacity-90"
                 >
                   Start learning — free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/pricing"
-                  className="press inline-flex items-center justify-center rounded-lg border border-line-strong bg-surface px-6 py-3.5 text-[15px] font-bold text-ink transition-colors hover:bg-sunken no-underline"
+                  className="text-[15px] font-bold text-on-primary no-underline hover:underline"
                 >
                   See pricing
                 </Link>
               </div>
+            </div>
 
-              {/* Jump straight to a subject — the six-subject equivalent of
-                  a search bar, and honest about what it actually does. */}
-              <div data-hero-item className="mt-6">
-                <p className="text-[12.5px] font-bold uppercase tracking-[0.1em] text-ink-faint">
-                  Or jump straight to a subject
+            {/* The marked script. */}
+            <div data-hero-cast className="relative mx-auto w-full max-w-[360px]">
+              <div className="rotate-[-2.5deg] rounded-[3px] bg-[#fffdf8] p-6 shadow-2xl">
+                <div className="flex items-start justify-between gap-4 border-b border-dashed border-ink/15 pb-3.5">
+                  <div>
+                    <p className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-ink-faint">
+                      WAEC · Mathematics
+                    </p>
+                    <p className="mt-0.5 text-[14px] font-semibold text-ink">Paper 2 — Question 4</p>
+                  </div>
+                  <div className="flex gap-[3px]" aria-hidden>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <span key={i} className="h-4 w-3 border border-ink/20" />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-2.5 text-[14px] leading-relaxed text-ink">
+                  <p className="flex items-start gap-2.5">
+                    <Check className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
+                    3x &minus; 5 = 10
+                  </p>
+                  <p className="flex items-start gap-2.5">
+                    <Check className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
+                    3x = 15
+                  </p>
+                  <p className="flex items-start gap-2.5">
+                    <X className="mt-[3px] h-3.5 w-3.5 shrink-0 text-wrong" strokeWidth={3} />
+                    <span>
+                      x = 3{' '}
+                      <span className="ml-1 -rotate-3 font-semibold text-wrong">↗ x = 5</span>
+                    </span>
+                  </p>
+                </div>
+
+                <p className="mt-4 -rotate-1 text-[12px] font-semibold italic leading-snug text-wrong">
+                  Arithmetic slip — divide both sides by 3 again.
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-2">
-                  {SUBJECTS.map((s) => (
-                    <Link
-                      key={s.id}
-                      href="/signup"
-                      className="rounded-full border border-line-strong bg-surface px-3.5 py-1.5 text-[13.5px] font-semibold text-ink no-underline transition-colors hover:border-ink-faint hover:bg-sunken"
-                    >
-                      {s.name}
-                    </Link>
-                  ))}
+
+                <div className="mt-5 border-t border-dashed border-ink/15 pt-3 text-[11px] font-medium text-ink-faint">
+                  Marked and returned the same session.
                 </div>
               </div>
 
-              <div data-hero-item className="mt-7">
-                <ExamBadgeRow />
+              {/* Score, circled — overlapping the card corner. */}
+              <div
+                className="absolute -right-4 -top-6 flex h-[72px] w-[72px] rotate-[10deg] items-center justify-center rounded-full border-[3px] border-wrong bg-ink"
+                aria-hidden
+              >
+                <span className="font-display text-[1.65rem] leading-none text-wrong">7/10</span>
               </div>
             </div>
-
-            <div data-hero-cast className="relative">
-              <HeroLesson />
-            </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Boards ───────────────────────────────────────────────────── */}
+      <section className="border-b border-line bg-paper">
+        <div className="mx-auto max-w-6xl px-5 py-6 lg:px-8">
+          <ExamBadgeRow />
         </div>
       </section>
 
