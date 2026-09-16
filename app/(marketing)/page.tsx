@@ -87,70 +87,81 @@ export default function Home() {
       <Motion />
       <SiteHeader />
 
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────────────────
+          Taking a cue from Coursera's hero, not copying it: modest,
+          confident type rather than a dramatic display size; a functional
+          device under the headline instead of a second decorative button;
+          trust logos folded into the hero itself rather than asserted in
+          a headline. Coursera's own device is a search bar, because their
+          problem is finding 1 course out of thousands — Ewin has six
+          subjects, so the honest equivalent is letting you jump straight
+          to one, not a search box with nothing behind it. */}
       <section className="relative overflow-hidden bg-paper">
-        <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_1fr] lg:gap-16">
+        <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-14 lg:px-8 lg:pb-20 lg:pt-16">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
             <div>
               <p data-hero-item className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
-                Free &nbsp;·&nbsp; WAEC &nbsp;·&nbsp; NECO &nbsp;·&nbsp; JAMB
+                Free, always
               </p>
 
               <h1
                 data-hero-item
-                className="mt-5 font-display text-[clamp(2.35rem,5.6vw,3.75rem)] leading-[1.03] text-ink"
+                className="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.25rem)] leading-[1.08] text-ink"
               >
-                You don&rsquo;t need
+                Learn one idea.
                 <br />
-                more hours.
-                <br />
-                <span className="relative inline-block">
-                  You need it to stick.
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-primary"
-                  />
-                </span>
+                Prove you actually know it.
               </h1>
 
-              <p data-hero-item className="mt-7 max-w-lg text-[17px] font-medium leading-relaxed text-ink-muted">
-                Ewin teaches one thing, makes you prove you got it, then tells you exactly which
-                step you fumbled. Reading a topic and knowing it are different — and only one of
-                them shows up in your result.
+              <p data-hero-item className="mt-5 max-w-lg text-[16.5px] font-medium leading-relaxed text-ink-muted">
+                Ewin teaches one topic, makes you answer in your own words, then tells you exactly
+                which step you fumbled — for WAEC, NECO and JAMB.
               </p>
 
-              <div data-hero-item className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div data-hero-item className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/signup"
-                  className="btn btn-primary press px-7 py-4 text-[16px] no-underline"
+                  className="press inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[15px] font-bold text-on-primary shadow-sm transition-colors hover:bg-primary-hover no-underline"
                 >
                   Start learning — free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/pricing"
-                  className="btn btn-secondary press px-7 py-4 text-[16px] no-underline"
+                  className="press inline-flex items-center justify-center rounded-lg border border-line-strong bg-surface px-6 py-3.5 text-[15px] font-bold text-ink transition-colors hover:bg-sunken no-underline"
                 >
                   See pricing
                 </Link>
               </div>
 
-              <p data-hero-item className="mt-4 text-[14px] font-semibold text-ink-faint">
-                Free forever. No card, ever.
-              </p>
+              {/* Jump straight to a subject — the six-subject equivalent of
+                  a search bar, and honest about what it actually does. */}
+              <div data-hero-item className="mt-6">
+                <p className="text-[12.5px] font-bold uppercase tracking-[0.1em] text-ink-faint">
+                  Or jump straight to a subject
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  {SUBJECTS.map((s) => (
+                    <Link
+                      key={s.id}
+                      href="/signup"
+                      className="rounded-full border border-line-strong bg-surface px-3.5 py-1.5 text-[13.5px] font-semibold text-ink no-underline transition-colors hover:border-ink-faint hover:bg-sunken"
+                    >
+                      {s.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div data-hero-item className="mt-7">
+                <ExamBadgeRow />
+              </div>
             </div>
 
             <div data-hero-cast className="relative">
               <HeroLesson />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Boards ───────────────────────────────────────────────────── */}
-      <section className="border-y border-line bg-paper">
-        <div className="mx-auto max-w-6xl px-5 py-6 lg:px-8">
-          <ExamBadgeRow />
         </div>
       </section>
 
