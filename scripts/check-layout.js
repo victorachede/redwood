@@ -62,7 +62,7 @@ const SEED_SESSION = () => {
   } catch {}
 }
 
-const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/signup', '/support']
+const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/signup', '/support', '/rooms', '/rooms/mathematics']
 
 async function main() {
   const browser = await chromium.launch({ executablePath: EXEC, args: ['--no-sandbox'] })

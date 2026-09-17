@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Flame, Lock, Trophy } from 'lucide-react'
+import { Flame, Lock } from 'lucide-react'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { Avatar } from '@/components/ui/Avatar'
+import { BarsIcon } from '@/components/icons'
+import { colorForName } from '@/app/lib/avatar'
 import {
   cachedBoard,
   fetchBoard,
@@ -15,6 +17,14 @@ import {
   type LeaderboardRow,
 } from '@/app/lib/leaderboard'
 import { onSync } from '@/app/lib/sync'
+
+/** Gold / silver / bronze, restrained rather than literal medal colours —
+ *  matched to the app's existing tint system instead of inventing new hues. */
+const TIERS: Record<number, { bg: string; fg: string }> = {
+  1: { bg: 'var(--streak-soft)', fg: 'var(--streak)' },
+  2: { bg: 'var(--sunken)', fg: 'var(--ink-muted)' },
+  3: { bg: 'color-mix(in srgb, var(--streak) 16%, var(--streak-soft))', fg: '#a5641b' },
+}
 
 /**
  * The weekly board.
@@ -36,9 +46,11 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true)
   const [unreachable, setUnreachable] = useState(false)
   const [days, setDays] = useState(7)
+  const [rankDelta, setRankDelta] = useState<number | null>(null)
 
   useEffect(() => {
     const load = () => {
+      const prevMe = cachedBoard().find((r) => r.isMe)
       setRows(cachedBoard())
       setOpted(isOptedIn())
       setJoinable(canJoin())
@@ -48,6 +60,10 @@ export default function LeaderboardPage() {
         else {
           setUnreachable(false)
           setRows(r)
+          const nowMe = r.find((x) => x.isMe)
+          // Honest delta since this device last cached a board, not a formal
+          // "since last week" claim — there's no other snapshot to compare to.
+          setRankDelta(prevMe && nowMe ? prevMe.rank - nowMe.rank : null)
         }
         setLoading(false)
       })
@@ -82,7 +98,9 @@ export default function LeaderboardPage() {
         {!optedIn && (
           <section className="rounded-2xl border border-line bg-surface p-5">
             <div className="flex items-start gap-3">
-              <Trophy className="mt-0.5 h-[18px] w-[18px] shrink-0" style={{ color: 'var(--streak)' }} />
+              <span className="mt-0.5 shrink-0" style={{ color: 'var(--streak)' }}>
+                <BarsIcon size={18} />
+              </span>
               <div className="min-w-0 flex-1">
                 <p className="text-[14.5px] font-medium text-ink">
                   {joinable ? 'You are not on the board' : 'Sign in to join the board'}
@@ -128,6 +146,14 @@ export default function LeaderboardPage() {
               <span className="text-[14.5px]" style={{ color: 'var(--on-hero-dim)' }}>
                 {me.correct} right of {me.total} · {me.accuracy}%
               </span>
+              {rankDelta !== null && rankDelta !== 0 && (
+                <span
+                  className="tnum ml-auto shrink-0 rounded-full bg-white/[0.12] px-2.5 py-1 text-[12px] font-bold"
+                  style={{ color: rankDelta > 0 ? '#bfe0c9' : 'var(--on-hero-dim)' }}
+                >
+                  {rankDelta > 0 ? '▲' : '▼'} {Math.abs(rankDelta)}
+                </span>
+              )}
             </div>
           </section>
         )}
@@ -171,13 +197,19 @@ export default function LeaderboardPage() {
                 className="flex items-center gap-3.5 border-b border-line py-3.5"
                 style={r.isMe ? { background: 'var(--primary-soft)' } : undefined}
               >
-                <span
-                  className="tnum w-9 shrink-0 text-right font-display text-[20px] leading-none"
-                  style={{ color: r.rank <= 3 ? 'var(--streak)' : 'var(--ink-faint)' }}
-                >
-                  {r.rank}
-                </span>
-                <Avatar name={r.name} size={34} />
+                {TIERS[r.rank] ? (
+                  <span
+                    className="tnum flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-[16px] leading-none"
+                    style={{ background: TIERS[r.rank].bg, color: TIERS[r.rank].fg }}
+                  >
+                    {r.rank}
+                  </span>
+                ) : (
+                  <span className="tnum w-9 shrink-0 text-right font-display text-[20px] leading-none text-ink-faint">
+                    {r.rank}
+                  </span>
+                )}
+                <Avatar name={r.name} size={34} color={r.isMe ? undefined : colorForName(r.name)} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[14.5px] font-medium text-ink">
                     {r.name}

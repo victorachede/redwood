@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, ClipboardList, Flame } from 'lucide-react'
+import { ArrowRight, ClipboardList, Flame, Users } from 'lucide-react'
 import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { SubjectIcon } from '@/components/SubjectIcon'
@@ -426,6 +426,16 @@ export default function TodayPage() {
               <span className="text-[13.5px] font-medium text-ink">Study cards</span>
             </Link>
           </div>
+          <Link
+            href="/rooms"
+            className="press flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3 no-underline"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-primary-soft">
+              <Users className="h-4 w-4 text-primary" />
+            </span>
+            <span className="flex-1 text-[13.5px] font-medium text-ink">Study rooms</span>
+            <ArrowRight className="h-4 w-4 text-ink-faint" />
+          </Link>
         </section>
 
         {/* ── Accuracy, broken down by subject — the one breakdown real
