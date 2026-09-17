@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Camera, FileText, Plus, X, BookOpen } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, FileText, Plus, Reply, X, BookOpen } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
 import {
   saveSession,
@@ -24,7 +24,7 @@ import { buildLearnerProfile } from '@/app/lib/learnerProfile'
 import { prepareImage, type PreparedImage } from '@/app/lib/image'
 import { Diagram } from '@/components/Diagram'
 import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
-import { ChatMessage } from '@/components/ChatMessage'
+import { ChatMessage, DateDivider, type ReplySnapshot } from '@/components/ChatMessage'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
 
@@ -32,6 +32,10 @@ import { Avatar } from '@/components/ui/Avatar'
 type Message = TutorMessage
 
 type DocAttach = { name: string; text: string }
+
+function sameDay(a: number, b: number) {
+  return new Date(a).toDateString() === new Date(b).toDateString()
+}
 
 function storageKey(subjectId: string, topic: string) {
   return `ewin-msgs-${subjectId}-${topic}`
@@ -162,6 +166,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const [docs, setDocs] = useState<DocAttach[]>([])
   const [photos, setPhotos] = useState<PreparedImage[]>([])
+  const [replyingTo, setReplyingTo] = useState<ReplySnapshot | null>(null)
   const photoRef = useRef<HTMLInputElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -366,6 +371,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       attachments: docs.map((d) => ({ name: d.name })),
       photos: photos.map((ph) => ph.preview),
       at: Date.now(),
+      replyTo: replyingTo ?? undefined,
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
@@ -374,6 +380,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     setInput('')
     setDocs([])
     setPhotos([])
+    setReplyingTo(null)
     if (inputRef.current) inputRef.current.style.height = 'auto'
     setLoading(true)
     setError(null)
@@ -584,14 +591,29 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 px-3 py-4">
+        <div className="mx-auto flex max-w-2xl flex-col px-3 py-4">
           {messages.map((m, i) => {
             const isStudent = m.role === 'student'
-            const grouped = i > 0 && messages[i - 1].role === m.role
+            const prev = messages[i - 1]
+            const showDivider = Boolean(m.at && (!prev?.at || !sameDay(m.at, prev.at)))
+            const grouped = !showDivider && i > 0 && prev.role === m.role
             const streaming = loading && i === messages.length - 1 && !isStudent
 
             return (
-              <ChatMessage key={i} isStudent={isStudent} grouped={grouped} at={m.at}>
+              <div key={i}>
+                {showDivider && m.at && <DateDivider at={m.at} />}
+                <ChatMessage
+                  isStudent={isStudent}
+                  grouped={grouped}
+                  at={m.at}
+                  replyTo={m.replyTo}
+                  onReply={() =>
+                    setReplyingTo({
+                      label: isStudent ? 'You' : 'Ewin',
+                      snippet: m.content.slice(0, 120),
+                    })
+                  }
+                >
                 {isStudent ? (
                   <>
                     {m.attachments && m.attachments.length > 0 && (
@@ -632,7 +654,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                     ))}
                   </div>
                 )}
-              </ChatMessage>
+                </ChatMessage>
+              </div>
             )
           })}
 
@@ -729,6 +752,24 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       {/* Composer */}
       <div className="shrink-0 border-t border-line bg-paper px-3 pb-safe pt-2.5">
         <div className="mx-auto max-w-2xl">
+          {replyingTo && (
+            <div className="mb-2 flex items-center gap-2 rounded-lg bg-sunken px-3 py-1.5">
+              <Reply className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+              <p className="min-w-0 flex-1 truncate text-[12.5px] text-ink-muted">
+                Replying to <span className="font-semibold">{replyingTo.label}</span> —{' '}
+                {replyingTo.snippet}
+              </p>
+              <button
+                type="button"
+                aria-label="Cancel reply"
+                onClick={() => setReplyingTo(null)}
+                className="press flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-ink-faint hover:text-ink"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
           {docs.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-1.5">
               {docs.map((d) => (

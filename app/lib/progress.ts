@@ -26,6 +26,10 @@ export type TutorMessage = {
    *  field existed have none, and the transcript just omits the time
    *  rather than showing a fabricated one. */
   at?: number
+  /** A snapshot of the message this one replied to, if any — the label and
+   *  a short snippet, not a live pointer, so it still renders correctly
+   *  even after the referenced message scrolls out of the loaded window. */
+  replyTo?: { label: string; snippet: string }
 }
 
 export type SessionRecord = {
