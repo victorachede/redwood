@@ -68,7 +68,7 @@ export default function SignupPage() {
           autoComplete="name"
           value={displayName}
           onChange={setDisplayName}
-          placeholder="What should Ewin call you?"
+          placeholder="What should EWIN call you?"
         />
         <AuthField
           label="Email"

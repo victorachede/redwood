@@ -28,7 +28,7 @@ function sameDay(a: number, b: number) {
 const LABELS: Record<string, { title: string; blurb: string }> = {
   homework: {
     title: 'Homework',
-    blurb: 'Paste the questions or photo text. Ewin checks your work and explains mistakes in chat.',
+    blurb: 'Paste the questions or photo text. EWIN checks your work and explains mistakes in chat.',
   },
   classwork: {
     title: 'Classwork',
@@ -40,7 +40,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
   const { slug } = use(params)
   const meta = LABELS[slug] || {
     title: slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-    blurb: 'Paste the assignment. Ewin reviews it with you in chat — grades, fixes, and next steps.',
+    blurb: 'Paste the assignment. EWIN reviews it with you in chat — grades, fixes, and next steps.',
   }
 
   const kind = (slug === 'classwork' || slug === 'homework' ? slug : null) as WorkKind | null
@@ -126,7 +126,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
         }),
       })
       if (!res.ok) {
-        let msg = 'Ewin could not mark this right now. Try again.'
+        let msg = 'EWIN could not mark this right now. Try again.'
         try {
           const data = (await res.json()) as { error?: string }
           if (data?.error) msg = data.error
@@ -196,9 +196,9 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
           <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft">
             <Lock className="h-6 w-6 text-primary" />
           </span>
-          <h1 className="font-display text-[20px] text-ink">Ewin opens this for you</h1>
+          <h1 className="font-display text-[20px] text-ink">EWIN opens this for you</h1>
           <p className="mx-auto mt-2.5 max-w-xs text-[14px] leading-relaxed text-ink-muted">
-            Classwork and homework are not a menu. When Ewin decides during a lesson that you are
+            Classwork and homework are not a menu. When EWIN decides during a lesson that you are
             ready to practise, it will open this screen.
           </p>
           <Link
@@ -247,7 +247,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             <p className="truncate text-[14.5px] font-semibold leading-tight text-ink">
               {meta.title}
             </p>
-            <p className="truncate text-[12px] leading-tight text-ink-muted">Ewin marks your work</p>
+            <p className="truncate text-[12px] leading-tight text-ink-muted">EWIN marks your work</p>
           </div>
           {marked && (
             <button
@@ -271,7 +271,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
               {ticketBrief && (
                 <div className="mt-3.5 rounded-xl border-l-[3px] border-primary bg-primary-soft px-3.5 py-3">
                   <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary">
-                    What Ewin set
+                    What EWIN set
                   </p>
                   <p className="text-[14px] leading-relaxed text-ink">{ticketBrief}</p>
                 </div>
@@ -298,7 +298,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
                   replyTo={m.replyTo}
                   onReply={() =>
                     setReplyingTo({
-                      label: isStudent ? 'You' : 'Ewin',
+                      label: isStudent ? 'You' : 'EWIN',
                       snippet: m.content.slice(0, 120),
                     })
                   }

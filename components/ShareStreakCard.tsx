@@ -18,13 +18,13 @@ export function ShareStreakCard() {
 
   const text =
     streak > 0
-      ? `I'm on a ${streak}-day study streak with Ewin 🔥 WAEC/JAMB prep, one idea at a time.`
-      : `I'm studying with Ewin for WAEC & JAMB — short lessons, real checks.`
+      ? `I'm on a ${streak}-day study streak with EWIN 🔥 WAEC/JAMB prep, one idea at a time.`
+      : `I'm studying with EWIN for WAEC & JAMB — short lessons, real checks.`
 
   async function share() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Ewin streak', text, url: window.location.origin })
+        await navigator.share({ title: 'EWIN streak', text, url: window.location.origin })
         return
       } catch {
         /* fall through */
@@ -48,7 +48,7 @@ export function ShareStreakCard() {
         <div className="relative flex items-start justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-on-primary opacity-70">
-              Ewin · Study streak
+              EWIN · Study streak
             </p>
             <p className="mt-3 flex items-baseline gap-2">
               <span className="font-serif text-5xl font-semibold tracking-tight">

@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         <div className="prose-ewin">
         <div className="mt-8 space-y-5 text-[14px] leading-relaxed text-ink-muted">
           <p>
-            We collect the minimum needed to run Ewin: account email and display name if you sign
+            We collect the minimum needed to run EWIN: account email and display name if you sign
             up, lesson progress on your device, and payment references if you upgrade via Paystack.
           </p>
           <p>

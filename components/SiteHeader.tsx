@@ -21,7 +21,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-2.5 no-underline">
           <Mark size={28} />
           <span className="font-marketing text-[19px] font-bold leading-none tracking-tight text-ink">
-            Ewin
+            EWIN
           </span>
         </Link>
 

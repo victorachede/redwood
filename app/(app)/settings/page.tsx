@@ -143,7 +143,7 @@ const NOTIF_ROWS: {
   {
     key: 'work',
     title: 'New work assigned',
-    sub: 'When Ewin sets classwork or homework',
+    sub: 'When EWIN sets classwork or homework',
     icon: (p) => <PencilIcon {...p} />,
     bg: 'var(--primary-soft)',
     fg: 'var(--primary)',
@@ -615,7 +615,7 @@ export default function SettingsPage() {
         </Group>
 
         <p className="px-1 pb-10 text-center text-[11px] text-ink-muted">
-          Ewin · data stays on this device until cloud accounts are on
+          EWIN · data stays on this device until cloud accounts are on
         </p>
       </div>
     </main>

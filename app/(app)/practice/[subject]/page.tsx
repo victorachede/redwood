@@ -319,7 +319,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               <div className="min-w-0 flex-1">
                 <p className="text-[14.5px] font-medium text-ink">Run out of questions?</p>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-                  Ewin writes fresh ones in {exam === 'ALL' ? 'exam' : exam} style and checks
+                  EWIN writes fresh ones in {exam === 'ALL' ? 'exam' : exam} style and checks
                   each answer before you see it.
                 </p>
 
@@ -451,7 +451,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               className="press rounded-full py-3.5 text-center text-[15px] font-semibold text-white no-underline"
               style={{ background: accent }}
             >
-              {misses.length ? 'Go over what I missed' : 'Learn with Ewin'}
+              {misses.length ? 'Go over what I missed' : 'Learn with EWIN'}
             </Link>
             <button
               type="button"

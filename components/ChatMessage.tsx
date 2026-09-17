@@ -75,7 +75,7 @@ export function ChatMessage({
         )}
         {!grouped && (
           <p className="flex items-baseline gap-2">
-            <span className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : 'Ewin'}</span>
+            <span className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : 'EWIN'}</span>
             {at && <span className="text-[11px] text-ink-faint">{formatTime(at)}</span>}
           </p>
         )}

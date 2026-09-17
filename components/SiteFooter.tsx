@@ -99,7 +99,7 @@ export function SiteFooter() {
             <span className="flex items-center gap-2.5">
               <Mark size={26} />
               <span className="font-marketing text-[18px] font-bold leading-none tracking-tight text-ink">
-                Ewin
+                EWIN
               </span>
             </span>
             <p className="mt-4 max-w-xs text-[14.5px] leading-relaxed text-ink-muted">

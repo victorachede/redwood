@@ -398,7 +398,7 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
           >
             <p className="font-display text-[19px] text-ink">Report {reportTarget.from.split(' ')[0]}?</p>
             <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">
-              This goes to Ewin, not back to them. Pick what happened.
+              This goes to EWIN, not back to them. Pick what happened.
             </p>
             <div className="mt-4 flex flex-col gap-2">
               {REPORT_REASONS.map((reason) => (
