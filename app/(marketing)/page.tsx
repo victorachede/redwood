@@ -245,7 +245,7 @@ export default function Home() {
                       stays a pure swap target for a real photo, with
                       nothing else depending on its internals. */}
                   <span
-                    className="absolute left-1/2 top-1/2 flex h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[10px]"
+                    className="absolute left-1/2 top-1/2 flex h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[10px] text-on-dark"
                     style={{ background: s.accent }}
                     aria-hidden
                   >
