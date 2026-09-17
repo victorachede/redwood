@@ -1,6 +1,6 @@
 /** Billing + plans. Paystack-ready; works offline with local plan until keys are set. */
 
-export type PlanId = 'free' | 'pro'
+export type PlanId = 'free' | 'pro' | 'voice'
 
 export type Plan = {
   id: PlanId
@@ -42,6 +42,20 @@ export const PLANS: Record<PlanId, Plan> = {
       'Priority tutor responses',
     ],
     cta: 'Upgrade with Paystack',
+  },
+  voice: {
+    id: 'voice',
+    name: 'Voice',
+    priceMonthlyNgn: 10000,
+    priceYearlyNgn: 0,
+    blurb: 'A real teacher on a call — explains out loud, draws it on a whiteboard as it talks.',
+    features: [
+      'Everything in Pro',
+      '30 min/month of live voice tutoring',
+      'Interruptible — jump in and ask, like a real class',
+      'Whiteboard narration synced to the call',
+    ],
+    cta: 'Coming soon',
   },
 }
 
