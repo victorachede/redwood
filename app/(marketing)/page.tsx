@@ -149,7 +149,11 @@ export default function Home() {
                 <p className="mt-0.5 text-[10px] text-ink-faint">Written for all three</p>
               </div>
 
-              <PhotoSlot className="lp-photo-slot" />
+              <PhotoSlot
+                className="lp-photo-slot"
+                src="/marketing/hero.jpg"
+                alt="A student studying at home, notebook in hand, laptop open beside them"
+              />
 
               <div className="lp-float-card lp-card-mark">
                 <p className="text-[26px] font-bold leading-none text-ink">7/10</p>
@@ -176,7 +180,11 @@ export default function Home() {
         </div>
 
         <div className="lp-how-grid">
-          <PhotoSlot className="lp-how-photo" />
+          <PhotoSlot
+            className="lp-how-photo"
+            src="/marketing/how-it-works.jpg"
+            alt="A student working through a problem at a laptop"
+          />
           <div data-reveal-group className="flex flex-col gap-3.5">
             {FEATURES.map((f) => (
               <div key={f.title} className="lp-feature">
@@ -251,7 +259,11 @@ export default function Home() {
         </div>
 
         <div data-reveal-group className="lp-trust-row">
-          <PhotoSlot className="lp-trust-photo" />
+          <PhotoSlot
+            className="lp-trust-photo"
+            src="/marketing/trust-left.jpg"
+            alt="A student studying in the evening, focused on their notebook"
+          />
           <div className="lp-quote-card">
             <p className="text-[16.5px] font-medium leading-snug text-[#16305c]">
               &ldquo;Reading a topic and knowing it are different things. Ewin only counts the
@@ -269,7 +281,11 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <PhotoSlot className="lp-trust-photo" />
+          <PhotoSlot
+            className="lp-trust-photo"
+            src="/marketing/trust-right.jpg"
+            alt="A student writing in a notebook, laptop open beside them"
+          />
         </div>
 
         <div data-reveal className="mt-14 text-center">
@@ -328,6 +344,8 @@ export default function Home() {
 
           <PhotoSlot
             className="absolute bottom-[50px] left-1/2 z-[3] h-[290px] w-[230px] -translate-x-1/2 rounded-t-[20px]"
+            src="/marketing/closing.jpg"
+            alt="A student reading over their notes"
           />
         </div>
       </section>
