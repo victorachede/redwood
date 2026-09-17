@@ -232,12 +232,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     let text = ''
     let failed: string | null = null
     const figures: ShowDiagramInput[] = []
+    const at = Date.now()
 
     await readTutorStream(res, (e: TutorEvent) => {
       switch (e.t) {
         case 'text': {
           text += e.v
-          setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
+          setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures], at }])
           break
         }
         case 'tool': {
@@ -258,7 +259,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             const d = e.input as ShowDiagramInput
             if (d?.spec?.kind) {
               figures.push(d)
-              setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
+              setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures], at }])
             }
           }
           break
@@ -273,7 +274,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     })
 
     if (failed && !text) throw new Error(failed)
-    return { text, failed, figures }
+    return { text, failed, figures, at }
   }
 
   async function onPickPhotos(files: FileList | null) {
@@ -334,10 +335,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
       setSuggestedCards([])
       setPendingWork(null)
-      const { text, failed } = await runTurn(res, [], 'lesson')
+      const { text, failed, at } = await runTurn(res, [], 'lesson')
       if (failed) setError(failed)
 
-      const initial: Message[] = [{ role: 'tutor', content: text, type: 'lesson' }]
+      const initial: Message[] = [{ role: 'tutor', content: text, type: 'lesson', at }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
       saveSession({ subjectId: subject, subjectName: subjectLabel, topic: chosenTopic, at: Date.now() })
@@ -364,6 +365,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       content: label,
       attachments: docs.map((d) => ({ name: d.name })),
       photos: photos.map((ph) => ph.preview),
+      at: Date.now(),
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
@@ -402,10 +404,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
 
       setSuggestedCards([])
-      const { text, failed } = await runTurn(res, updated)
+      const { text, failed, at } = await runTurn(res, updated)
       if (failed) setError(failed)
 
-      const next: Message[] = [...updated, { role: 'tutor', content: text }]
+      const next: Message[] = [...updated, { role: 'tutor', content: text, at }]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
       inputRef.current?.blur()
@@ -589,7 +591,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             const streaming = loading && i === messages.length - 1 && !isStudent
 
             return (
-              <ChatMessage key={i} isStudent={isStudent} grouped={grouped}>
+              <ChatMessage key={i} isStudent={isStudent} grouped={grouped} at={m.at}>
                 {isStudent ? (
                   <>
                     {m.attachments && m.attachments.length > 0 && (

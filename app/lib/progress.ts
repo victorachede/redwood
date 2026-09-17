@@ -22,6 +22,10 @@ export type TutorMessage = {
   photos?: string[]
   /** Figures the tutor drew during this reply */
   diagrams?: ShowDiagramInput[]
+  /** When this message was sent. Optional — messages saved before this
+   *  field existed have none, and the transcript just omits the time
+   *  rather than showing a fabricated one. */
+  at?: number
 }
 
 export type SessionRecord = {

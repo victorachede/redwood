@@ -13,7 +13,7 @@ import { prepareImage, type PreparedImage } from '@/app/lib/image'
 import { consumeWorkTicket, clearWorkTicket, type WorkKind } from '@/app/lib/workGate'
 import { completeLatestOpen } from '@/app/lib/assignments'
 
-type Msg = { role: 'tutor' | 'student'; content: string; photos?: string[] }
+type Msg = { role: 'tutor' | 'student'; content: string; photos?: string[]; at?: number }
 
 const LABELS: Record<string, { title: string; blurb: string }> = {
   homework: {
@@ -87,6 +87,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       role: 'student',
       content: input.trim() || 'Here is my work — please mark it.',
       photos: snapshot.map((p) => p.preview),
+      at: Date.now(),
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
@@ -128,11 +129,12 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       let text = ''
       let failed: string | null = null
       const cards: { front: string; back: string }[] = []
+      const at = Date.now()
 
       await readTutorStream(res, (e: TutorEvent) => {
         if (e.t === 'text') {
           text += e.v
-          setMessages([...updated, { role: 'tutor', content: text }])
+          setMessages([...updated, { role: 'tutor', content: text, at }])
         } else if (e.t === 'tool') {
           if (e.name === 'save_study_card') {
             const c = e.input as SaveStudyCardInput
@@ -149,7 +151,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       if (failed && !text) throw new Error(failed)
       if (failed) setError(failed)
 
-      setMessages([...updated, { role: 'tutor', content: text }])
+      setMessages([...updated, { role: 'tutor', content: text, at }])
       if (cards.length) setSuggested(cards)
       inputRef.current?.blur()
     } catch (e) {
@@ -272,7 +274,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             const isStudent = m.role === 'student'
             const grouped = i > 0 && messages[i - 1].role === m.role
             return (
-              <ChatMessage key={i} isStudent={isStudent} grouped={grouped}>
+              <ChatMessage key={i} isStudent={isStudent} grouped={grouped} at={m.at}>
                 {isStudent ? (
                   <>
                     {m.photos && m.photos.length > 0 && (

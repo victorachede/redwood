@@ -12,15 +12,23 @@ import { EwinAvatar } from '@/components/EwinAvatar'
  * messages from the same speaker collapse into one run (avatar/name shown
  * once), the way a real chat thread reads.
  */
+function formatTime(at: number) {
+  return new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' }).format(at)
+}
+
 export function ChatMessage({
   isStudent,
   grouped,
+  at,
   children,
 }: {
   isStudent: boolean
   /** True when the previous row was the same speaker — hides the
    *  avatar/name so a run of messages reads as one turn. */
   grouped: boolean
+  /** When this message was sent. Messages saved before this field existed
+   *  have none — the row just omits the time rather than fake one. */
+  at?: number
   children: ReactNode
 }) {
   return (
@@ -34,7 +42,10 @@ export function ChatMessage({
       </div>
       <div className="min-w-0 flex-1">
         {!grouped && (
-          <p className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : 'Ewin'}</p>
+          <p className="flex items-baseline gap-2">
+            <span className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : 'Ewin'}</span>
+            {at && <span className="text-[11px] text-ink-faint">{formatTime(at)}</span>}
+          </p>
         )}
         {children}
       </div>
