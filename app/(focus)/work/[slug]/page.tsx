@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Camera, Lock, Send, X } from 'lucide-react'
+import { ArrowLeft, Camera, Lock, Reply, Send, X } from 'lucide-react'
 import { EwinAvatar } from '@/components/EwinAvatar'
+import { ChatMessage, DateDivider, type ReplySnapshot } from '@/components/ChatMessage'
 import { addCard } from '@/app/lib/cards'
 import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
 import type { SaveStudyCardInput, RecordMasteryInput } from '@/app/lib/tutorProtocol'
@@ -12,7 +13,17 @@ import { prepareImage, type PreparedImage } from '@/app/lib/image'
 import { consumeWorkTicket, clearWorkTicket, type WorkKind } from '@/app/lib/workGate'
 import { completeLatestOpen } from '@/app/lib/assignments'
 
-type Msg = { role: 'tutor' | 'student'; content: string; photos?: string[] }
+type Msg = {
+  role: 'tutor' | 'student'
+  content: string
+  photos?: string[]
+  at?: number
+  replyTo?: ReplySnapshot
+}
+
+function sameDay(a: number, b: number) {
+  return new Date(a).toDateString() === new Date(b).toDateString()
+}
 
 const LABELS: Record<string, { title: string; blurb: string }> = {
   homework: {
@@ -60,6 +71,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const photoRef = useRef<HTMLInputElement>(null)
   const [photos, setPhotos] = useState<PreparedImage[]>([])
+  const [replyingTo, setReplyingTo] = useState<ReplySnapshot | null>(null)
 
   async function onPickPhotos(files: FileList | null) {
     if (!files?.length) return
@@ -86,11 +98,14 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       role: 'student',
       content: input.trim() || 'Here is my work — please mark it.',
       photos: snapshot.map((p) => p.preview),
+      at: Date.now(),
+      replyTo: replyingTo ?? undefined,
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
     setInput('')
     setPhotos([])
+    setReplyingTo(null)
     setLoading(true)
     setError(null)
     setSuggested([])
@@ -127,11 +142,12 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       let text = ''
       let failed: string | null = null
       const cards: { front: string; back: string }[] = []
+      const at = Date.now()
 
       await readTutorStream(res, (e: TutorEvent) => {
         if (e.t === 'text') {
           text += e.v
-          setMessages([...updated, { role: 'tutor', content: text }])
+          setMessages([...updated, { role: 'tutor', content: text, at }])
         } else if (e.t === 'tool') {
           if (e.name === 'save_study_card') {
             const c = e.input as SaveStudyCardInput
@@ -148,7 +164,7 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
       if (failed && !text) throw new Error(failed)
       if (failed) setError(failed)
 
-      setMessages([...updated, { role: 'tutor', content: text }])
+      setMessages([...updated, { role: 'tutor', content: text, at }])
       if (cards.length) setSuggested(cards)
       inputRef.current?.blur()
     } catch (e) {
@@ -267,42 +283,63 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             </div>
           )}
 
-          {messages.map((m, i) =>
-            m.role === 'student' ? (
-              <div key={i} className="rise flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5">
-                  {m.photos && m.photos.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {m.photos.map((src) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img key={src} src={src} alt="Your work" className="h-24 w-24 rounded-lg object-cover" />
-                      ))}
-                    </div>
+          {messages.map((m, i) => {
+            const isStudent = m.role === 'student'
+            const prev = messages[i - 1]
+            const showDivider = Boolean(m.at && (!prev?.at || !sameDay(m.at, prev.at)))
+            const grouped = !showDivider && i > 0 && prev.role === m.role
+            return (
+              <div key={i}>
+                {showDivider && m.at && <DateDivider at={m.at} />}
+                <ChatMessage
+                  isStudent={isStudent}
+                  grouped={grouped}
+                  at={m.at}
+                  replyTo={m.replyTo}
+                  onReply={() =>
+                    setReplyingTo({
+                      label: isStudent ? 'You' : 'Ewin',
+                      snippet: m.content.slice(0, 120),
+                    })
+                  }
+                >
+                  {isStudent ? (
+                    <>
+                      {m.photos && m.photos.length > 0 && (
+                        <div className="mb-2 flex flex-wrap gap-1.5">
+                          {m.photos.map((src) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              key={src}
+                              src={src}
+                              alt="Your work"
+                              className="h-24 w-24 rounded-lg object-cover"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-ink">
+                        {m.content}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="whitespace-pre-wrap text-[15px] leading-[1.6] text-ink">
+                      {m.content}
+                    </p>
                   )}
-                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-on-primary">
-                    {m.content}
-                  </p>
-                </div>
+                </ChatMessage>
               </div>
-            ) : (
-              <div key={i} className="rise flex gap-2.5">
-                <EwinAvatar size={28} className="mt-0.5 shrink-0" />
-                <p className="min-w-0 flex-1 whitespace-pre-wrap pt-0.5 text-[15px] leading-[1.6] text-ink">
-                  {m.content}
-                </p>
-              </div>
-            ),
-          )}
+            )
+          })}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && (
-            <div className="flex items-center gap-2.5">
-              <EwinAvatar size={28} className="shrink-0" />
-              <span className="flex items-center gap-1.5">
+            <ChatMessage isStudent={false} grouped={false}>
+              <span className="flex items-center gap-1.5 py-1">
                 <span className="dot" />
                 <span className="dot" />
                 <span className="dot" />
               </span>
-            </div>
+            </ChatMessage>
           )}
 
           {suggested.length > 0 && (
@@ -347,6 +384,24 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
 
       <div className="shrink-0 border-t border-line bg-paper px-3 pb-safe pt-2.5">
         <div className="mx-auto max-w-2xl">
+          {replyingTo && (
+            <div className="mb-2 flex items-center gap-2 rounded-lg bg-sunken px-3 py-1.5">
+              <Reply className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+              <p className="min-w-0 flex-1 truncate text-[12.5px] text-ink-muted">
+                Replying to <span className="font-semibold">{replyingTo.label}</span> —{' '}
+                {replyingTo.snippet}
+              </p>
+              <button
+                type="button"
+                aria-label="Cancel reply"
+                onClick={() => setReplyingTo(null)}
+                className="press flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-ink-faint hover:text-ink"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
           {photos.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-2">
               {photos.map((ph, i) => (

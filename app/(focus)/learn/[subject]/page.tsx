@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Camera, FileText, Plus, X, BookOpen } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, FileText, Plus, Reply, X, BookOpen } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
 import {
   saveSession,
@@ -24,7 +24,7 @@ import { buildLearnerProfile } from '@/app/lib/learnerProfile'
 import { prepareImage, type PreparedImage } from '@/app/lib/image'
 import { Diagram } from '@/components/Diagram'
 import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
-import { EwinAvatar } from '@/components/EwinAvatar'
+import { ChatMessage, DateDivider, type ReplySnapshot } from '@/components/ChatMessage'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
 
@@ -32,6 +32,10 @@ import { Avatar } from '@/components/ui/Avatar'
 type Message = TutorMessage
 
 type DocAttach = { name: string; text: string }
+
+function sameDay(a: number, b: number) {
+  return new Date(a).toDateString() === new Date(b).toDateString()
+}
 
 function storageKey(subjectId: string, topic: string) {
   return `ewin-msgs-${subjectId}-${topic}`
@@ -162,6 +166,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const [savedTopics, setSavedTopics] = useState<Record<string, boolean>>({})
   const [docs, setDocs] = useState<DocAttach[]>([])
   const [photos, setPhotos] = useState<PreparedImage[]>([])
+  const [replyingTo, setReplyingTo] = useState<ReplySnapshot | null>(null)
   const photoRef = useRef<HTMLInputElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -232,12 +237,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     let text = ''
     let failed: string | null = null
     const figures: ShowDiagramInput[] = []
+    const at = Date.now()
 
     await readTutorStream(res, (e: TutorEvent) => {
       switch (e.t) {
         case 'text': {
           text += e.v
-          setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
+          setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures], at }])
           break
         }
         case 'tool': {
@@ -258,7 +264,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             const d = e.input as ShowDiagramInput
             if (d?.spec?.kind) {
               figures.push(d)
-              setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures] }])
+              setMessages([...base, { role: 'tutor', content: text, type, diagrams: [...figures], at }])
             }
           }
           break
@@ -273,7 +279,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     })
 
     if (failed && !text) throw new Error(failed)
-    return { text, failed, figures }
+    return { text, failed, figures, at }
   }
 
   async function onPickPhotos(files: FileList | null) {
@@ -334,10 +340,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
       setSuggestedCards([])
       setPendingWork(null)
-      const { text, failed } = await runTurn(res, [], 'lesson')
+      const { text, failed, at } = await runTurn(res, [], 'lesson')
       if (failed) setError(failed)
 
-      const initial: Message[] = [{ role: 'tutor', content: text, type: 'lesson' }]
+      const initial: Message[] = [{ role: 'tutor', content: text, type: 'lesson', at }]
       setMessages(initial)
       persistMessages(subject, chosenTopic, initial)
       saveSession({ subjectId: subject, subjectName: subjectLabel, topic: chosenTopic, at: Date.now() })
@@ -364,6 +370,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       content: label,
       attachments: docs.map((d) => ({ name: d.name })),
       photos: photos.map((ph) => ph.preview),
+      at: Date.now(),
+      replyTo: replyingTo ?? undefined,
     }
     const updated = [...messages, userMsg]
     setMessages(updated)
@@ -372,6 +380,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
     setInput('')
     setDocs([])
     setPhotos([])
+    setReplyingTo(null)
     if (inputRef.current) inputRef.current.style.height = 'auto'
     setLoading(true)
     setError(null)
@@ -402,10 +411,10 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       if (!res.ok) throw new Error(await readTutorError(res))
 
       setSuggestedCards([])
-      const { text, failed } = await runTurn(res, updated)
+      const { text, failed, at } = await runTurn(res, updated)
       if (failed) setError(failed)
 
-      const next: Message[] = [...updated, { role: 'tutor', content: text }]
+      const next: Message[] = [...updated, { role: 'tutor', content: text, at }]
       setMessages(next)
       if (topic) persistMessages(subject, topic, next)
       inputRef.current?.blur()
@@ -582,63 +591,78 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 px-3 py-4">
+        <div className="mx-auto flex max-w-2xl flex-col px-3 py-4">
           {messages.map((m, i) => {
             const isStudent = m.role === 'student'
+            const prev = messages[i - 1]
+            const showDivider = Boolean(m.at && (!prev?.at || !sameDay(m.at, prev.at)))
+            const grouped = !showDivider && i > 0 && prev.role === m.role
             const streaming = loading && i === messages.length - 1 && !isStudent
 
-            return isStudent ? (
-              <div key={i} className="rise flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5">
-                  {m.attachments && m.attachments.length > 0 && (
-                    <div className="mb-1.5 flex flex-wrap gap-1.5">
-                      {m.attachments.map((a) => (
-                        <span
-                          key={a.name}
-                          className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[11px] text-on-primary"
-                        >
-                          <FileText className="h-3 w-3" />
-                          {a.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {m.photos && m.photos.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {m.photos.map((src) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={src}
-                          src={src}
-                          alt="Your work"
-                          className="h-24 w-24 rounded-lg object-cover"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-on-primary">
-                    {m.content}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className="rise flex gap-2.5">
-                <EwinAvatar size={28} className="mt-0.5 shrink-0" />
-                <div className="min-w-0 flex-1 space-y-3 pt-0.5">
-                  <TutorBody text={m.content} accent={accent} streaming={streaming} />
-                  {m.diagrams?.map((d, k) => (
-                    <Diagram key={k} spec={d.spec} caption={d.caption} />
-                  ))}
-                </div>
+            return (
+              <div key={i}>
+                {showDivider && m.at && <DateDivider at={m.at} />}
+                <ChatMessage
+                  isStudent={isStudent}
+                  grouped={grouped}
+                  at={m.at}
+                  replyTo={m.replyTo}
+                  onReply={() =>
+                    setReplyingTo({
+                      label: isStudent ? 'You' : 'Ewin',
+                      snippet: m.content.slice(0, 120),
+                    })
+                  }
+                >
+                {isStudent ? (
+                  <>
+                    {m.attachments && m.attachments.length > 0 && (
+                      <div className="mb-1.5 flex flex-wrap gap-1.5">
+                        {m.attachments.map((a) => (
+                          <span
+                            key={a.name}
+                            className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-ink-muted"
+                          >
+                            <FileText className="h-3 w-3" />
+                            {a.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {m.photos && m.photos.length > 0 && (
+                      <div className="mb-2 flex flex-wrap gap-1.5">
+                        {m.photos.map((src) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            key={src}
+                            src={src}
+                            alt="Your work"
+                            className="h-24 w-24 rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-ink">
+                      {m.content}
+                    </p>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <TutorBody text={m.content} accent={accent} streaming={streaming} />
+                    {m.diagrams?.map((d, k) => (
+                      <Diagram key={k} spec={d.spec} caption={d.caption} />
+                    ))}
+                  </div>
+                )}
+                </ChatMessage>
               </div>
             )
           })}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && (
-            <div className="flex gap-2.5">
-              <EwinAvatar size={28} className="mt-0.5 shrink-0" />
+            <ChatMessage isStudent={false} grouped={false}>
               <Thinking />
-            </div>
+            </ChatMessage>
           )}
 
           {/* Work the tutor assigned — a card you tap, not a redirect */}
@@ -728,6 +752,24 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
       {/* Composer */}
       <div className="shrink-0 border-t border-line bg-paper px-3 pb-safe pt-2.5">
         <div className="mx-auto max-w-2xl">
+          {replyingTo && (
+            <div className="mb-2 flex items-center gap-2 rounded-lg bg-sunken px-3 py-1.5">
+              <Reply className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+              <p className="min-w-0 flex-1 truncate text-[12.5px] text-ink-muted">
+                Replying to <span className="font-semibold">{replyingTo.label}</span> —{' '}
+                {replyingTo.snippet}
+              </p>
+              <button
+                type="button"
+                aria-label="Cancel reply"
+                onClick={() => setReplyingTo(null)}
+                className="press flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-ink-faint hover:text-ink"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
           {docs.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-1.5">
               {docs.map((d) => (

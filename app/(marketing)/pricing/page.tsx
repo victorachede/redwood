@@ -280,7 +280,7 @@ export default function PricingPage() {
               </button>
 
               <p className="mt-3.5 text-center text-[11.5px] text-ink-muted">
-                Secured by Paystack · NGN · Cancel anytime when live billing is on
+                Secured by Paystack · NGN
               </p>
             </div>
           
