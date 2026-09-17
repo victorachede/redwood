@@ -145,10 +145,10 @@
   --color-on-hero-dim: var(--on-hero-dim);
 
   --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-instrument);
+  --font-display: var(--font-sora);
   --font-mono: var(--font-geist-mono);
-  /* Marketing page only — see app/layout.tsx for why this sits alongside
-     the serif pairing rather than replacing it. */
+  /* Same face as --font-display — kept as a separate name because the
+     landing page's CSS already reaches for `font-marketing` throughout. */
   --font-marketing: var(--font-sora);
 
   --text-xs: var(--t-xs);
@@ -211,8 +211,8 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-instrument), Georgia, "Times New Roman", serif;
-    font-weight: 400;
+    font-family: var(--font-sora), system-ui, sans-serif;
+    font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.02;
     margin: 0;
@@ -228,14 +228,14 @@
   }
 }
 
-/* A high-contrast serif against a neutral grotesque.
-   The contrast between the two IS the design — a page set in one grotesque at
-   three sizes, which is what shipped before, cannot read as anything but a
-   component library. The serif is where the voice lives; Geist stays out of
-   the way and does the work. */
+/* One voice across the whole site. Sora carries every headline and display
+   moment — marketing, dashboard, settings, cards, auth — instead of the
+   marketing page reaching for Sora while the rest of the app spoke in a
+   serif; Geist stays for body copy and UI text, where a display-leaning
+   grotesque would read too heavy at length. */
 .font-display {
-  font-family: var(--font-instrument), Georgia, "Times New Roman", serif;
-  font-weight: 400;
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.02;
 }
@@ -298,7 +298,8 @@
 
 /* Numerals in the margin — the "01 02 03" of a worked question. */
 .margin-num {
-  font-family: var(--font-instrument), Georgia, serif;
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-weight: 700;
   font-size: 2.5rem;
   line-height: 1;
   color: var(--rule);
