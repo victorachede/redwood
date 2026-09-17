@@ -1,6 +1,6 @@
 {
-  "name": "Ewin — AI tutor for WAEC, NECO & JAMB",
-  "short_name": "Ewin",
+  "name": "EWIN — AI tutor for WAEC, NECO & JAMB",
+  "short_name": "EWIN",
   "description": "Learn one idea, then prove you got it.",
   "start_url": "/dashboard",
   "display": "standalone",

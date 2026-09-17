@@ -1,6 +1,6 @@
 import { renderOgImage, OG_SIZE } from '@/app/lib/ogImage'
 
-export const alt = 'Ewin — learn one idea, then prove it'
+export const alt = 'EWIN — learn one idea, then prove it'
 export const size = OG_SIZE
 export const contentType = 'image/png'
 

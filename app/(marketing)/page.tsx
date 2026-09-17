@@ -108,7 +108,7 @@ const courseListSchema = {
       '@type': 'Course',
       name: `${s.name} — ${s.exam}`,
       description: s.blurb,
-      provider: { '@type': 'EducationalOrganization', name: 'Ewin', url: 'https://redwood-sand.vercel.app' },
+      provider: { '@type': 'EducationalOrganization', name: 'EWIN', url: 'https://redwood-sand.vercel.app' },
     },
   })),
 }
@@ -117,7 +117,7 @@ export default function Home() {
   const heroCta = useAuthCta('/signup')
 
   return (
-    <main className="bg-white font-marketing text-ink">
+    <main className="bg-paper font-marketing text-ink">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseListSchema) }}
@@ -126,7 +126,7 @@ export default function Home() {
       <SiteHeader />
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-paper">
         <div className="relative mx-auto max-w-[1240px] px-5 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
           <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-6">
             <div className="max-w-[460px]">
@@ -142,7 +142,7 @@ export default function Home() {
               </h1>
 
               <p data-hero-item className="mt-5 text-[16px] leading-relaxed text-ink-muted">
-                Ewin teaches one thing, makes you prove you got it, then tells you exactly which
+                EWIN teaches one thing, makes you prove you got it, then tells you exactly which
                 step you fumbled.
               </p>
 
@@ -205,14 +205,14 @@ export default function Home() {
       </section>
 
       {/* ── How a session goes ───────────────────────────────────────── */}
-      <section id="how-it-works" className="lp-section">
+      <section id="how-it-works" className="lp-section bg-sunken">
         <div data-reveal className="lp-head">
           <span className="lp-eyebrow">How a session goes</span>
           <h2 className="mt-4 font-marketing text-[28px] font-bold leading-[1.18] tracking-tight lg:text-[34px]">
             Ten minutes. One idea. Proof.
           </h2>
           <p className="mt-3.5 text-[15.5px] leading-relaxed text-ink-muted">
-            Ewin teaches one topic, checks you actually understood it, then names exactly what
+            EWIN teaches one topic, checks you actually understood it, then names exactly what
             broke.
           </p>
         </div>
@@ -240,7 +240,7 @@ export default function Home() {
       </section>
 
       {/* ── Subjects ──────────────────────────────────────────────────── */}
-      <section id="subjects" className="lp-section">
+      <section id="subjects" className="lp-section bg-paper">
         <div data-reveal className="lp-head">
           <span className="lp-eyebrow">What you can study</span>
           <h2 className="mt-4 font-marketing text-[28px] font-bold leading-[1.18] tracking-tight lg:text-[34px]">
@@ -288,7 +288,7 @@ export default function Home() {
       </section>
 
       {/* ── Why it's different (trust row + board credential) ───────── */}
-      <section className="lp-section">
+      <section className="lp-section bg-sunken">
         <div data-reveal className="lp-head">
           <span className="lp-eyebrow">Why it&rsquo;s different</span>
           <h2 className="mt-4 font-marketing text-[28px] font-bold leading-[1.18] tracking-tight lg:text-[34px]">
@@ -304,7 +304,7 @@ export default function Home() {
           />
           <div className="lp-quote-card">
             <p className="text-[16.5px] font-medium leading-snug text-[#16305c]">
-              &ldquo;Reading a topic and knowing it are different things. Ewin only counts the
+              &ldquo;Reading a topic and knowing it are different things. EWIN only counts the
               second one.&rdquo;
             </p>
             <div className="mt-6 flex items-center gap-2.5">
@@ -312,7 +312,7 @@ export default function Home() {
                 <TickIcon size={14} />
               </div>
               <div>
-                <p className="text-[13px] font-bold text-ink">Ewin</p>
+                <p className="text-[13px] font-bold text-ink">EWIN</p>
                 <p className="text-[11.5px] text-[#5c6b8a]">
                   On what makes it different from a search engine
                 </p>
@@ -347,7 +347,7 @@ export default function Home() {
       </section>
 
       {/* ── Where it stops ───────────────────────────────────────────── */}
-      <section className="lp-section pt-0">
+      <section className="lp-section pt-0 bg-paper">
         <div data-reveal-group className="mx-auto grid max-w-xl gap-2.5">
           {NOTS.map((n) => (
             <div key={n} className="flex items-center gap-3 rounded-2xl bg-wrong-soft px-5 py-4">

@@ -84,7 +84,7 @@ export function HeroLesson() {
       className="card card-elevated relative z-10 overflow-hidden bg-surface"
       /* Reserved so the page never reflows as lines land. */
       style={{ minHeight: 396 }}
-      aria-label="A short example of an Ewin lesson"
+      aria-label="A short example of an EWIN lesson"
     >
       <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
         <Mark size={22} />

@@ -24,13 +24,13 @@ export default function TermsPage() {
       <article className="mx-auto max-w-2xl px-5 py-14 sm:px-6">
         <div className="prose-ewin space-y-5">
           <p>
-            Ewin is an AI study tool for secondary-school exam preparation (WAEC, NECO, JAMB). By
+            EWIN is an AI study tool for secondary-school exam preparation (WAEC, NECO, JAMB). By
             using the service you agree to these terms.
           </p>
           <h2 className="font-display text-[1.15rem] text-ink">Not the exam boards</h2>
           <p>
-            Ewin is not affiliated with, endorsed by, or connected to WAEC, NECO, or JAMB. Practice
-            questions are for learning only. Do not use Ewin inside an exam hall.
+            EWIN is not affiliated with, endorsed by, or connected to WAEC, NECO, or JAMB. Practice
+            questions are for learning only. Do not use EWIN inside an exam hall.
           </p>
           <h2 className="font-display text-[1.15rem] text-ink">Accounts &amp; billing</h2>
           <p>

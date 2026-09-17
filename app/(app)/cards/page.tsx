@@ -111,7 +111,7 @@ export default function CardsPage() {
             </span>
             <p className="font-display text-[20px] text-ink">No cards yet</p>
             <p className="mx-auto mt-2 max-w-xs text-[14px] leading-relaxed text-ink-muted">
-              When Ewin spots a fact worth remembering during a lesson, it will offer to save
+              When EWIN spots a fact worth remembering during a lesson, it will offer to save
               it here.
             </p>
             <Link

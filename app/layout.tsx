@@ -24,20 +24,20 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
-  title: { default: 'Ewin — learn one idea, then prove it', template: '%s · Ewin' },
+  title: { default: 'EWIN — learn one idea, then prove it', template: '%s · EWIN' },
   description:
     'An AI tutor that teaches one idea, then checks you got it. Built for Nigerian secondary students preparing for WAEC, NECO and JAMB.',
-  applicationName: 'Ewin',
+  applicationName: 'EWIN',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'Ewin', statusBarStyle: 'default' },
-  keywords: ['WAEC', 'JAMB', 'NECO', 'AI tutor', 'Nigeria', 'exam prep', 'Ewin'],
-  authors: [{ name: 'Ewin Academy' }],
+  appleWebApp: { capable: true, title: 'EWIN', statusBarStyle: 'default' },
+  keywords: ['WAEC', 'JAMB', 'NECO', 'AI tutor', 'Nigeria', 'exam prep', 'EWIN'],
+  authors: [{ name: 'EWIN Academy' }],
   metadataBase: new URL('https://redwood-sand.vercel.app'),
   openGraph: {
     type: 'website',
     locale: 'en_NG',
-    siteName: 'Ewin',
-    title: 'Ewin — learn one idea, then prove it',
+    siteName: 'EWIN',
+    title: 'EWIN — learn one idea, then prove it',
     description: 'Free AI tutor for WAEC, NECO and JAMB.',
   },
   twitter: { card: 'summary_large_image' },
@@ -64,7 +64,7 @@ export const viewport: Viewport = {
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'EducationalOrganization',
-  name: 'Ewin',
+  name: 'EWIN',
   url: 'https://redwood-sand.vercel.app',
   logo: 'https://redwood-sand.vercel.app/icon-512.png',
   description:

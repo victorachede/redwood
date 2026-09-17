@@ -25,7 +25,7 @@ const CONFETTI = [
 const SHARE_URL = 'https://redwood-sand.vercel.app'
 
 function shareText(m: Milestone) {
-  return `${m.emoji} ${m.title} on Ewin — learning one idea at a time for WAEC, NECO and JAMB.`
+  return `${m.emoji} ${m.title} on EWIN — learning one idea at a time for WAEC, NECO and JAMB.`
 }
 
 /**
@@ -55,7 +55,7 @@ export function MilestonePopup({ milestone, onDismiss }: { milestone: Milestone;
     const text = shareText(milestone)
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ title: 'Ewin', text, url: SHARE_URL })
+        await navigator.share({ title: 'EWIN', text, url: SHARE_URL })
       } catch {
         /* cancelled — not an error */
       }

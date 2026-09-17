@@ -76,7 +76,7 @@ function Thinking() {
       <span className="dot" />
       <span className="dot" />
       <span className="dot" />
-      <span className="ml-1 text-[12.5px] text-ink-faint">Ewin is thinking</span>
+      <span className="ml-1 text-[12.5px] text-ink-faint">EWIN is thinking</span>
     </div>
   )
 }
@@ -609,7 +609,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                   replyTo={m.replyTo}
                   onReply={() =>
                     setReplyingTo({
-                      label: isStudent ? 'You' : 'Ewin',
+                      label: isStudent ? 'You' : 'EWIN',
                       snippet: m.content.slice(0, 120),
                     })
                   }
