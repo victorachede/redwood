@@ -12,11 +12,18 @@ export function Avatar({
   size = 40,
   className = '',
   ring = false,
+  color,
 }: {
   name?: string
   size?: number
   className?: string
   ring?: boolean
+  /**
+   * Overrides the colour, for someone else's avatar (a room, a leaderboard
+   * row) where `loadAvatar()` — this device's own stored photo/colour —
+   * would otherwise leak onto every name shown, not just the viewer's own.
+   */
+  color?: string
 }) {
   const [avatar, setAvatar] = useState<AvatarData>({})
 
@@ -28,19 +35,20 @@ export function Avatar({
 
   const label = (name || 'You').trim()
   const initial = label.slice(0, 1).toUpperCase()
-  const bg = avatar.color || colorForName(label)
+  const photo = color ? undefined : avatar.photo
+  const bg = color || avatar.color || colorForName(label)
 
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full ${
         ring ? 'ring-2 ring-line' : ''
       } ${className}`}
-      style={{ width: size, height: size, background: avatar.photo ? undefined : bg }}
+      style={{ width: size, height: size, background: photo ? undefined : bg }}
       aria-hidden
     >
-      {avatar.photo ? (
+      {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatar.photo} alt="" className="h-full w-full object-cover" />
+        <img src={photo} alt="" className="h-full w-full object-cover" />
       ) : (
         <span
           className="font-semibold text-white"
