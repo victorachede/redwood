@@ -1,15 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Blob } from '@/components/Blob'
 import type { Milestone, MilestoneKind } from '@/app/lib/milestones'
 import { checkMilestones } from '@/app/lib/milestones'
 
-const KIND_ACCENT: Record<MilestoneKind, { from: string; to: string; glow: string }> = {
-  streak: { from: '#f2b25c', to: 'var(--streak)', glow: 'var(--streak)' },
-  questions: { from: '#3a67a8', to: 'var(--primary)', glow: 'var(--primary)' },
-  cards: { from: '#4fbd85', to: 'var(--correct)', glow: 'var(--correct)' },
+const KIND: Record<MilestoneKind, { from: string; to: string; glow: string; label: string }> = {
+  streak: { from: '#ffd27a', to: '#e08a2b', glow: 'var(--streak)', label: 'day streak' },
+  questions: { from: '#7fb0ff', to: '#2b57a3', glow: 'var(--primary)', label: 'questions answered' },
+  cards: { from: '#7fe6b8', to: '#1e9a63', glow: 'var(--correct)', label: 'cards saved' },
 }
+
+/** Fixed, tasteful positions — a scatter, not randomness re-rolled every render. */
+const CONFETTI = [
+  { x: '12%', y: '18%', size: 7, delay: 0, shape: 'circle' },
+  { x: '85%', y: '14%', size: 5, delay: 80, shape: 'square' },
+  { x: '20%', y: '78%', size: 6, delay: 160, shape: 'square' },
+  { x: '90%', y: '70%', size: 8, delay: 40, shape: 'circle' },
+  { x: '6%', y: '48%', size: 5, delay: 220, shape: 'circle' },
+  { x: '94%', y: '44%', size: 6, delay: 120, shape: 'square' },
+  { x: '30%', y: '8%', size: 5, delay: 260, shape: 'circle' },
+  { x: '72%', y: '86%', size: 6, delay: 60, shape: 'square' },
+] as const
 
 const SHARE_URL = 'https://redwood-sand.vercel.app'
 
@@ -38,7 +49,7 @@ export function useMilestoneCheck(trigger: unknown) {
 
 export function MilestonePopup({ milestone, onDismiss }: { milestone: Milestone; onDismiss: () => void }) {
   const [shared, setShared] = useState(false)
-  const accent = KIND_ACCENT[milestone.kind]
+  const accent = KIND[milestone.kind]
 
   async function share() {
     const text = shareText(milestone)
@@ -64,46 +75,79 @@ export function MilestonePopup({ milestone, onDismiss }: { milestone: Milestone;
       role="dialog"
       aria-modal="true"
       aria-label={milestone.title}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 p-5"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-5"
       onClick={onDismiss}
     >
       <div
-        className="pop relative w-full max-w-sm overflow-hidden rounded-3xl p-7 text-center text-on-dark shadow-[var(--shadow-lg)]"
-        style={{ background: 'var(--ink)' }}
+        className="pop relative w-full max-w-sm overflow-hidden rounded-[28px] px-7 pb-7 pt-9 text-center shadow-[var(--shadow-lg)]"
+        style={{ background: 'linear-gradient(180deg, #201d18 0%, #14120f 100%)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Blob
-          id={`milestone-blob-${milestone.id}`}
-          from={accent.from}
-          to={accent.to}
-          className="pointer-events-none absolute -top-20 left-1/2 h-[260px] w-[260px] -translate-x-1/2 opacity-70"
-        />
+        {CONFETTI.map((c, i) => (
+          <span
+            key={i}
+            aria-hidden
+            className="rise pointer-events-none absolute"
+            style={{
+              left: c.x,
+              top: c.y,
+              width: c.size,
+              height: c.size,
+              background: i % 2 === 0 ? accent.glow : '#fff',
+              opacity: i % 2 === 0 ? 0.9 : 0.5,
+              borderRadius: c.shape === 'circle' ? '50%' : '2px',
+              animationDelay: `${c.delay}ms`,
+              animationDuration: '700ms',
+            }}
+          />
+        ))}
 
-        <div className="relative">
-          <span className="text-[56px] leading-none">{milestone.emoji}</span>
-          <p className="mt-4 font-display text-[26px] leading-tight">{milestone.title}</p>
-          <p className="mx-auto mt-2.5 max-w-[260px] text-[14px] leading-relaxed text-on-dark/70">
-            {milestone.subtitle}
-          </p>
-
-          <div className="mt-7 flex flex-col gap-2.5">
-            <button
-              type="button"
-              onClick={share}
-              className="press rounded-full px-5 py-3 text-[14.5px] font-semibold"
-              style={{ background: 'rgba(255,255,255,0.12)', color: 'var(--on-dark)' }}
-            >
-              {shared ? 'Copied!' : 'Share'}
-            </button>
-            <button
-              type="button"
-              onClick={onDismiss}
-              className="press rounded-full bg-paper px-5 py-3 text-[14.5px] font-semibold text-ink"
-            >
-              Nice!
-            </button>
-          </div>
+        {/* Badge: layered glow rings behind the emoji, not a flat blob. */}
+        <div className="pop relative mx-auto flex h-[104px] w-[104px] items-center justify-center" style={{ animationDelay: '60ms' }}>
+          <span
+            aria-hidden
+            className="absolute inset-[-22px] rounded-full blur-2xl"
+            style={{ background: accent.glow, opacity: 0.45 }}
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `radial-gradient(circle at 32% 28%, ${accent.from}, ${accent.to})`,
+              boxShadow: `0 0 0 5px rgba(255,255,255,0.07), 0 18px 32px -10px ${accent.glow}`,
+            }}
+          />
+          <span className="relative text-[46px] leading-none">{milestone.emoji}</span>
         </div>
+
+        <p className="tnum relative mt-6 font-display text-[46px] leading-none text-on-dark">
+          {milestone.value}
+        </p>
+        <p
+          className="relative mt-1.5 text-[12px] font-bold uppercase tracking-[0.16em]"
+          style={{ color: accent.glow }}
+        >
+          {accent.label}
+        </p>
+
+        <p className="relative mx-auto mt-4 max-w-[250px] text-[14px] leading-relaxed text-on-dark/70">
+          {milestone.subtitle}
+        </p>
+
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="press relative mt-7 w-full rounded-full bg-paper py-3.5 text-[15px] font-bold text-ink"
+        >
+          Nice!
+        </button>
+        <button
+          type="button"
+          onClick={share}
+          className="press relative mt-3 text-[13px] font-semibold text-on-dark/65"
+        >
+          {shared ? 'Copied to clipboard' : 'Share the win'}
+        </button>
       </div>
     </div>
   )
