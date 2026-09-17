@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Camera, Lock, Send, X } from 'lucide-react'
 import { EwinAvatar } from '@/components/EwinAvatar'
+import { ChatMessage } from '@/components/ChatMessage'
 import { addCard } from '@/app/lib/cards'
 import { readTutorStream, type TutorEvent } from '@/app/lib/tutorProtocol'
 import type { SaveStudyCardInput, RecordMasteryInput } from '@/app/lib/tutorProtocol'
@@ -267,42 +268,47 @@ export default function WorkPage({ params }: { params: Promise<{ slug: string }>
             </div>
           )}
 
-          {messages.map((m, i) =>
-            m.role === 'student' ? (
-              <div key={i} className="rise flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5">
-                  {m.photos && m.photos.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {m.photos.map((src) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img key={src} src={src} alt="Your work" className="h-24 w-24 rounded-lg object-cover" />
-                      ))}
-                    </div>
-                  )}
-                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-on-primary">
+          {messages.map((m, i) => {
+            const isStudent = m.role === 'student'
+            const grouped = i > 0 && messages[i - 1].role === m.role
+            return (
+              <ChatMessage key={i} isStudent={isStudent} grouped={grouped}>
+                {isStudent ? (
+                  <>
+                    {m.photos && m.photos.length > 0 && (
+                      <div className="mb-2 flex flex-wrap gap-1.5">
+                        {m.photos.map((src) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            key={src}
+                            src={src}
+                            alt="Your work"
+                            className="h-24 w-24 rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-ink">
+                      {m.content}
+                    </p>
+                  </>
+                ) : (
+                  <p className="whitespace-pre-wrap text-[15px] leading-[1.6] text-ink">
                     {m.content}
                   </p>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className="rise flex gap-2.5">
-                <EwinAvatar size={28} className="mt-0.5 shrink-0" />
-                <p className="min-w-0 flex-1 whitespace-pre-wrap pt-0.5 text-[15px] leading-[1.6] text-ink">
-                  {m.content}
-                </p>
-              </div>
-            ),
-          )}
+                )}
+              </ChatMessage>
+            )
+          })}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && (
-            <div className="flex items-center gap-2.5">
-              <EwinAvatar size={28} className="shrink-0" />
-              <span className="flex items-center gap-1.5">
+            <ChatMessage isStudent={false} grouped={false}>
+              <span className="flex items-center gap-1.5 py-1">
                 <span className="dot" />
                 <span className="dot" />
                 <span className="dot" />
               </span>
-            </div>
+            </ChatMessage>
           )}
 
           {suggested.length > 0 && (

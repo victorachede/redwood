@@ -24,7 +24,7 @@ import { buildLearnerProfile } from '@/app/lib/learnerProfile'
 import { prepareImage, type PreparedImage } from '@/app/lib/image'
 import { Diagram } from '@/components/Diagram'
 import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
-import { EwinAvatar } from '@/components/EwinAvatar'
+import { ChatMessage } from '@/components/ChatMessage'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
 
@@ -585,60 +585,59 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
         <div className="mx-auto flex max-w-2xl flex-col gap-4 px-3 py-4">
           {messages.map((m, i) => {
             const isStudent = m.role === 'student'
+            const grouped = i > 0 && messages[i - 1].role === m.role
             const streaming = loading && i === messages.length - 1 && !isStudent
 
-            return isStudent ? (
-              <div key={i} className="rise flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2.5">
-                  {m.attachments && m.attachments.length > 0 && (
-                    <div className="mb-1.5 flex flex-wrap gap-1.5">
-                      {m.attachments.map((a) => (
-                        <span
-                          key={a.name}
-                          className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[11px] text-on-primary"
-                        >
-                          <FileText className="h-3 w-3" />
-                          {a.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {m.photos && m.photos.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {m.photos.map((src) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={src}
-                          src={src}
-                          alt="Your work"
-                          className="h-24 w-24 rounded-lg object-cover"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-on-primary">
-                    {m.content}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className="rise flex gap-2.5">
-                <EwinAvatar size={28} className="mt-0.5 shrink-0" />
-                <div className="min-w-0 flex-1 space-y-3 pt-0.5">
-                  <TutorBody text={m.content} accent={accent} streaming={streaming} />
-                  {m.diagrams?.map((d, k) => (
-                    <Diagram key={k} spec={d.spec} caption={d.caption} />
-                  ))}
-                </div>
-              </div>
+            return (
+              <ChatMessage key={i} isStudent={isStudent} grouped={grouped}>
+                {isStudent ? (
+                  <>
+                    {m.attachments && m.attachments.length > 0 && (
+                      <div className="mb-1.5 flex flex-wrap gap-1.5">
+                        {m.attachments.map((a) => (
+                          <span
+                            key={a.name}
+                            className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-ink-muted"
+                          >
+                            <FileText className="h-3 w-3" />
+                            {a.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {m.photos && m.photos.length > 0 && (
+                      <div className="mb-2 flex flex-wrap gap-1.5">
+                        {m.photos.map((src) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            key={src}
+                            src={src}
+                            alt="Your work"
+                            className="h-24 w-24 rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-wrap text-[15px] leading-[1.5] text-ink">
+                      {m.content}
+                    </p>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <TutorBody text={m.content} accent={accent} streaming={streaming} />
+                    {m.diagrams?.map((d, k) => (
+                      <Diagram key={k} spec={d.spec} caption={d.caption} />
+                    ))}
+                  </div>
+                )}
+              </ChatMessage>
             )
           })}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && (
-            <div className="flex gap-2.5">
-              <EwinAvatar size={28} className="mt-0.5 shrink-0" />
+            <ChatMessage isStudent={false} grouped={false}>
               <Thinking />
-            </div>
+            </ChatMessage>
           )}
 
           {/* Work the tutor assigned — a card you tap, not a redirect */}
