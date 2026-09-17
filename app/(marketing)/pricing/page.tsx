@@ -188,7 +188,7 @@ export default function PricingPage() {
           </p>
         )}
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* ── Free ─────────────────────────────────────────────────── */}
           
             <div
@@ -283,7 +283,43 @@ export default function PricingPage() {
                 Secured by Paystack · NGN
               </p>
             </div>
-          
+
+
+          {/* ── Voice ────────────────────────────────────────────────── */}
+
+            <div className="relative h-full rounded-2xl border border-line bg-surface p-7 shadow-[var(--shadow-sm)] sm:p-8">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                Voice
+              </p>
+              <p className="mt-3 font-display text-4xl">
+                {formatNgn(PLANS.voice.priceMonthlyNgn)}
+                <span className="ml-1 text-base font-normal text-ink-muted">/month</span>
+              </p>
+              <p className="mt-2 text-[14px] text-ink-muted">{PLANS.voice.blurb}</p>
+
+              <ul className="mt-7 space-y-3">
+                {PLANS.voice.features.map((f) => (
+                  <li key={f} className="flex gap-3 text-[13.5px] text-ink">
+                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-sunken">
+                      <Check className="h-3 w-3 text-ink-muted" />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                type="button"
+                disabled
+                className="mt-8 w-full cursor-not-allowed rounded-xl border border-line py-3 text-[14px] font-medium text-ink-faint"
+              >
+                {PLANS.voice.cta}
+              </button>
+              <p className="mt-3.5 text-center text-[11.5px] text-ink-muted">
+                In development — we&rsquo;ll let you know when it&rsquo;s ready.
+              </p>
+            </div>
+
         </div>
 
         
