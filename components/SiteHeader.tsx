@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Mark } from '@/components/Mark'
+import { useAuthCta } from '@/components/useAuthCta'
 
 /**
  * Header for the marketing and legal pages.
@@ -12,6 +13,8 @@ import { Mark } from '@/components/Mark'
  * what moved to Sora, not the whole product.
  */
 export function SiteHeader() {
+  const cta = useAuthCta('/signup')
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5 lg:px-8">
@@ -39,18 +42,22 @@ export function SiteHeader() {
         {/* There was no way in from the marketing pages at all — only "Start
             free", which reads as a signup and left returning students with
             nowhere to click. Log in is a link rather than a second button so
-            it does not compete with the primary action. */}
+            it does not compete with the primary action. Hidden entirely once
+            useAuthCta knows there's already a session — "Log in" to someone
+            already logged in is just wrong, not merely redundant. */}
+        {!cta.signedIn && (
+          <Link
+            href="/login"
+            className="hidden px-3 py-2 font-marketing text-[14.5px] font-bold text-ink no-underline hover:underline sm:inline-block"
+          >
+            Log in
+          </Link>
+        )}
         <Link
-          href="/login"
-          className="hidden px-3 py-2 font-marketing text-[14.5px] font-bold text-ink no-underline hover:underline sm:inline-block"
-        >
-          Log in
-        </Link>
-        <Link
-          href="/signup"
+          href={cta.href}
           className="press inline-flex items-center rounded-full bg-ink px-5 py-2.5 font-marketing text-[14px] font-bold text-on-dark no-underline"
         >
-          Sign up free
+          {cta.signedIn ? 'Go to dashboard' : 'Sign up free'}
         </Link>
       </div>
     </header>

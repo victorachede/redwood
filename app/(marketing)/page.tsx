@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { SUBJECTS, type SubjectId } from '@/app/lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -5,6 +7,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { Motion } from '@/components/marketing/Motion'
 import { Blob } from '@/components/Blob'
 import { PhotoSlot } from '@/components/marketing/PhotoSlot'
+import { useAuthCta } from '@/components/useAuthCta'
 import {
   ArrowIcon,
   AtomIcon,
@@ -87,6 +90,8 @@ const NOTS = [
 const BOARDS = ['WAEC', 'NECO', 'JAMB']
 
 export default function Home() {
+  const heroCta = useAuthCta('/signup')
+
   return (
     <main className="bg-white font-marketing text-ink">
       <Motion />
@@ -114,8 +119,8 @@ export default function Home() {
               </p>
 
               <div data-hero-item className="mt-8">
-                <Link href="/signup" className="lp-cta press no-underline">
-                  Start learning — free
+                <Link href={heroCta.href} className="lp-cta press no-underline">
+                  {heroCta.signedIn ? 'Continue learning' : 'Start learning — free'}
                   <ArrowIcon className="text-on-dark" />
                 </Link>
               </div>
@@ -220,7 +225,7 @@ export default function Home() {
             return (
               <Link
                 key={s.id}
-                href="/signup"
+                href={heroCta.signedIn ? `/learn/${s.id}` : '/signup'}
                 className="card card-interactive block overflow-hidden no-underline"
               >
                 <div className="relative">
@@ -328,8 +333,8 @@ export default function Home() {
             Ten honest minutes tonight beat three hours of cramming the week before.
           </p>
           <div className="mt-7 flex justify-center">
-            <Link href="/signup" className="lp-cta press no-underline">
-              Start with one topic
+            <Link href={heroCta.href} className="lp-cta press no-underline">
+              {heroCta.signedIn ? 'Back to Today' : 'Start with one topic'}
               <ArrowIcon className="text-on-dark" />
             </Link>
           </div>
