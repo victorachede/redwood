@@ -5,6 +5,8 @@ import { useState, type ReactNode } from 'react'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Wordmark } from '@/components/Mark'
 import { Ayo, type AyoPose } from '@/components/mascots/Mascots'
+import { Blob } from '@/components/Blob'
+import { SUBJECTS } from '@/app/lib/subjects'
 import { signInWithGoogle } from '@/app/lib/auth'
 
 /** Shared frame for login / signup / forgot-password / reset-password. */
@@ -43,6 +45,12 @@ export function AuthShell({
           pixels from where the student is actually looking. A second
           character in the panel was decoration competing with that. */}
       <div className="relative hidden overflow-hidden bg-primary lg:block">
+        <Blob
+          id="auth-panel-blob"
+          from="#3a67a8"
+          to="var(--primary)"
+          className="pointer-events-none absolute -right-24 -top-20 h-[420px] w-[480px] opacity-50"
+        />
         <div className="relative flex min-h-dvh flex-col justify-center px-12 py-14">
           <span className="h-[3px] w-12 rounded-full bg-on-hero-dim" aria-hidden />
           <p className="mt-8 max-w-sm font-display text-[2.25rem] leading-[1.1] text-on-primary">
@@ -54,6 +62,19 @@ export function AuthShell({
             Short lessons, a real check after each one, and feedback that names exactly what held
             up and what did not.
           </p>
+          <div className="mt-8 flex items-center gap-2">
+            {SUBJECTS.map((s) => (
+              <span
+                key={s.id}
+                aria-hidden
+                className="h-2 w-2 rounded-full"
+                style={{ background: s.accent }}
+              />
+            ))}
+            <span className="ml-1 text-[12.5px] font-semibold text-on-hero-dim">
+              All {SUBJECTS.length} subjects, free
+            </span>
+          </div>
         </div>
       </div>
     </main>

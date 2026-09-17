@@ -163,7 +163,22 @@ export function touchStreak(): number {
 }
 
 export function getStreak(): number {
-  if (typeof window === 'undefined') return 0
+  return getStreakInfo().count
+}
+
+/**
+ * The count plus the day it last ran, for anything that needs to draw the
+ * streak rather than just state it — a week strip, say.
+ *
+ * There is no per-day log to read back (touchStreak only ever keeps the
+ * current run), so a week view built from this can only be honest about
+ * one thing: the most recent `count` calendar days, ending at `last`, were
+ * studied — because that is the literal definition of an unbroken streak.
+ * Anything further back is genuinely unknown, not "not studied", and
+ * should render as such rather than guessed at.
+ */
+export function getStreakInfo(): { count: number; last: string | null } {
+  if (typeof window === 'undefined') return { count: 0, last: null }
   try {
     const raw = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}') as {
       last?: string
@@ -171,10 +186,12 @@ export function getStreak(): number {
     }
     const today = dayKey()
     const yesterday = dayKey(new Date(Date.now() - 86400000))
-    if (raw.last === today || raw.last === yesterday) return raw.count || 0
-    return 0
+    if (raw.last === today || raw.last === yesterday) {
+      return { count: raw.count || 0, last: raw.last ?? null }
+    }
+    return { count: 0, last: null }
   } catch {
-    return 0
+    return { count: 0, last: null }
   }
 }
 

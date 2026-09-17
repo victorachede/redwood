@@ -1,13 +1,13 @@
-import { Atom, FlaskConical, Leaf, PenLine, Sigma, TrendingUp } from 'lucide-react'
+import { AtomIcon, BookIcon, FlaskIcon, LeafIcon, SigmaIcon, TrendIcon } from '@/components/icons'
 import type { SubjectIconName } from '@/app/lib/subjects'
 
 const ICONS = {
-  Sigma,
-  Atom,
-  FlaskConical,
-  Leaf,
-  PenLine,
-  TrendingUp,
+  Sigma: SigmaIcon,
+  Atom: AtomIcon,
+  FlaskConical: FlaskIcon,
+  Leaf: LeafIcon,
+  PenLine: BookIcon,
+  TrendingUp: TrendIcon,
 } as const
 
 /**
@@ -28,7 +28,7 @@ export function SubjectIcon({
   tone?: 'soft' | 'solid'
   className?: string
 }) {
-  const Icon = ICONS[icon] ?? Sigma
+  const Icon = ICONS[icon] ?? SigmaIcon
   const solid = tone === 'solid'
 
   return (
@@ -39,15 +39,11 @@ export function SubjectIcon({
         height: size,
         background: solid ? accent : `color-mix(in srgb, ${accent} 12%, transparent)`,
         boxShadow: solid ? `0 6px 18px -6px ${accent}` : undefined,
+        color: solid ? '#fff' : accent,
       }}
       aria-hidden
     >
-      <Icon
-        style={{ color: solid ? '#fff' : accent }}
-        strokeWidth={2}
-        width={size * 0.48}
-        height={size * 0.48}
-      />
+      <Icon size={size * 0.48} />
     </span>
   )
 }
