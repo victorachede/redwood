@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif, Sora } from 'next/font/google'
+import { Geist, Geist_Mono, Sora } from 'next/font/google'
 import './globals.css'
 import { ServiceWorker } from '@/components/ServiceWorker'
 
@@ -7,28 +7,14 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 /**
- * Display face.
+ * Display face, site-wide.
  *
- * A high-contrast serif against Geist's neutral grotesque. The pairing is the
- * point: the previous system set the whole site in one grotesque at three
- * sizes, which is why every section read at identical volume. One face for
- * voice, one for work.
- */
-const instrument = Instrument_Serif({
-  variable: '--font-instrument',
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-})
-
-/**
- * Marketing face.
- *
- * The landing page rebuild moved away from the serif/grotesque pairing on
- * purpose — sharper and more confident than Geist alone, without the
- * editorial weight Instrument Serif carries. Scoped to the marketing page;
- * the app shell keeps the serif pairing above.
+ * Started as the marketing page's own face, sharper and more confident than
+ * Geist alone; the app shell used a serif pairing (Instrument Serif) instead
+ * for a while, which meant the landing page and the signed-in app spoke in
+ * two different voices. Sora now carries every headline and display moment
+ * everywhere — Geist stays for body copy and UI text, where a display-
+ * leaning grotesque would read too heavy at length.
  */
 const sora = Sora({
   variable: '--font-sora',
@@ -78,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable} ${sora.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sora.variable}`}
     >
       <body>
         {children}
