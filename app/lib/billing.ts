@@ -129,8 +129,12 @@ export async function hydratePlanFromCloud(): Promise<void> {
   window.dispatchEvent(new Event('ewin-plan'))
 }
 
+/** Voice includes everything Pro has (see PLANS.voice's own feature list),
+ *  so a Voice subscriber must pass every Pro gate too — not just the new
+ *  voice-specific one. */
 export function isPro(): boolean {
-  return getLocalPlan().plan === 'pro'
+  const plan = getLocalPlan().plan
+  return plan === 'pro' || plan === 'voice'
 }
 
 /** Feature gates used across the app */
