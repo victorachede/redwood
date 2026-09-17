@@ -711,7 +711,15 @@ button.press:focus-visible {
 
 .lp-board-row { display: flex; align-items: center; justify-content: center; gap: 44px; flex-wrap: wrap; }
 
-.lp-close-stage { position: relative; height: 480px; margin-top: 50px; }
+/* z-index:1 here isn't decorative — it's what actually contains this
+   element's children. `position:relative` alone, without a z-index, does
+   NOT create a stacking context, so the photo slot inside (z-index:3)
+   was escaping upward and competing directly with the text block above
+   (also z-index:3) rather than staying scoped under it — same z-index,
+   later in the DOM, so it won the tie and painted over the button. Giving
+   the stage its own z-index makes it a real boundary: everything inside
+   is capped below the copy, whatever z-index its children ask for. */
+.lp-close-stage { position: relative; z-index: 1; height: 480px; margin-top: 50px; }
 .lp-close-blob { position: absolute; width: 820px; height: 560px; left: 50%; transform: translateX(-50%); bottom: -40px; }
 .lp-shape { position: absolute; background: var(--ink); z-index: 2; }
 .lp-shape-a { width: 70px; height: 70px; left: calc(50% - 220px); top: 120px; }
