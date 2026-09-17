@@ -21,6 +21,10 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
   const [email, setEmail] = useState('')
+  /** Voice includes everything Pro has, so a Voice subscriber has already
+   *  satisfied the Pro card too — it should read as included, not as an
+   *  active upgrade prompt they haven't taken yet. */
+  const hasPro = plan === 'pro' || plan === 'voice'
 
 
   async function confirmPayment(reference: string | null) {
@@ -254,7 +258,7 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              {plan !== 'pro' && (
+              {!hasPro && (
                 <label className="mt-6 block">
                   <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
                     Paystack email
@@ -271,12 +275,16 @@ export default function PricingPage() {
 
               <button
                 type="button"
-                disabled={loading || plan === 'pro'}
+                disabled={loading || hasPro}
                 onClick={upgrade}
                 className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-[14px] font-semibold text-on-primary shadow-[var(--shadow-md)] transition-transform duration-200 hover:scale-[1.01] active:scale-100 disabled:opacity-60 disabled:hover:scale-100"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                {plan === 'pro' ? 'You are on Pro' : PLANS.pro.cta}
+                {plan === 'pro'
+                  ? 'You are on Pro'
+                  : plan === 'voice'
+                    ? 'Included in Voice'
+                    : PLANS.pro.cta}
               </button>
 
               <p className="mt-3.5 text-center text-[11.5px] text-ink-muted">
@@ -287,7 +295,11 @@ export default function PricingPage() {
 
           {/* ── Voice ────────────────────────────────────────────────── */}
 
-            <div className="relative h-full rounded-2xl border border-line bg-surface p-7 shadow-[var(--shadow-sm)] sm:p-8">
+            <div
+              className={`relative h-full rounded-2xl bg-surface p-7 shadow-[var(--shadow-sm)] sm:p-8 ${
+                plan === 'voice' ? 'border-2 border-primary' : 'border border-line'
+              }`}
+            >
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 Voice
               </p>
@@ -313,10 +325,12 @@ export default function PricingPage() {
                 disabled
                 className="mt-8 w-full cursor-not-allowed rounded-xl border border-line py-3 text-[14px] font-medium text-ink-faint"
               >
-                {PLANS.voice.cta}
+                {plan === 'voice' ? 'You are on Voice' : PLANS.voice.cta}
               </button>
               <p className="mt-3.5 text-center text-[11.5px] text-ink-muted">
-                In development — we&rsquo;ll let you know when it&rsquo;s ready.
+                {plan === 'voice'
+                  ? 'The call screen is built — the connection is still being wired up.'
+                  : "In development — we'll let you know when it's ready."}
               </p>
             </div>
 
