@@ -23,8 +23,20 @@ import { AppHeader } from '@/components/ui/AppHeader'
 import { MilestonePopup, useMilestoneCheck } from '@/components/MilestonePopup'
 import { Diagram } from '@/components/Diagram'
 import { canAccessTimedMocks, canAccessUnlimitedPractice, isPro } from '@/app/lib/billing'
+import { getSession } from '@/app/lib/auth'
 
 type Phase = 'idle' | 'active' | 'done'
+
+/** A single-board default filter from the onboarding/settings exam-focus
+ *  string. "WAEC & JAMB" has no honest single-board answer, so it — and
+ *  anything unset or unrecognised — falls back to 'ALL' rather than
+ *  guessing one board over the other. */
+function defaultExamFromFocus(focus: string | undefined): ExamBoard {
+  if (focus === 'WAEC only') return 'WAEC'
+  if (focus === 'JAMB only') return 'JAMB'
+  if (focus === 'NECO') return 'NECO'
+  return 'ALL'
+}
 
 /** Fisher-Yates. A fresh order each round so the seed bank never leads. */
 function shuffle<T>(list: T[]): T[] {
@@ -42,7 +54,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   const subjectLabel = meta?.name ?? subject
   const accent = meta?.accent ?? '#0e1b3a'
 
-  const [exam, setExam] = useState<ExamBoard>('ALL')
+  const [exam, setExam] = useState<ExamBoard>(() => defaultExamFromFocus(getSession()?.examFocus))
   const [timed, setTimed] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(0)
 

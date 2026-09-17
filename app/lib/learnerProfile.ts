@@ -32,6 +32,7 @@ export type ProfileSubject = {
 
 export type LearnerProfile = {
   name?: string
+  examFocus?: string
   streakDays: number
   dueCards: number
   subjects: ProfileSubject[]
@@ -80,8 +81,11 @@ export function buildLearnerProfile(subjectId?: string): LearnerProfile | null {
         }
       : undefined
 
+    const session = getSession()
+
     return {
-      name: getSession()?.displayName,
+      name: session?.displayName,
+      examFocus: session?.examFocus,
       streakDays: getStreak(),
       dueCards: dueCards().length,
       subjects,
@@ -109,6 +113,7 @@ export function renderProfile(p: LearnerProfile | null | undefined): string {
   const lines: string[] = []
 
   if (p.name) lines.push(`Student: ${p.name}.`)
+  if (p.examFocus) lines.push(`Sitting: ${p.examFocus}.`)
   if (p.streakDays > 1) lines.push(`On a ${p.streakDays}-day study streak.`)
 
   if (p.lastTopic) {
