@@ -158,7 +158,13 @@ export default function TodayPage() {
       {milestone && <MilestonePopup milestone={milestone} onDismiss={dismissMilestone} />}
       <AppHeader
         title="Today"
-        action={user ? <Avatar name={user.displayName} size={32} /> : undefined}
+        action={
+          user ? (
+            <Link href="/settings" aria-label="Your profile" className="press rounded-full">
+              <Avatar name={user.displayName} size={32} />
+            </Link>
+          ) : undefined
+        }
       />
 
       <div className="mx-auto max-w-3xl px-4 pb-5 pt-6">
