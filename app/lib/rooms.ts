@@ -1,11 +1,25 @@
 /**
- * Study rooms: presence and reactions over Supabase Realtime.
+ * Study rooms: presence, chat and reactions over Supabase Realtime.
  *
- * Deliberately nothing is written to Postgres here. A room's roster lives
- * only in the Realtime server's in-memory presence state, and a reaction is
- * a fire-once broadcast — neither is ever stored. That is the point: there
- * is no chat log to moderate, no message to report, no history to retain or
- * delete later, because none of it exists past the moment it happens.
+ * Presence and broadcast (reactions, chat) are never written to Postgres —
+ * a room's roster and its messages live only in the Realtime server's
+ * in-memory state, gone the moment they scroll past or the room empties.
+ * That is deliberate: it is what makes this "ephemeral" true rather than a
+ * marketing word for a chat log with a short retention window.
+ *
+ * Ephemeral is not the same as unmoderated, though — a message nobody can
+ * ever read back is also a message nobody can act on if it crosses a line.
+ * So chat gets three real guards, each covering what the others can't:
+ *   1. `checkMessage` — rejects contact-info patterns and profanity before
+ *      a message ever sends. Client-side, so it stops accidents and casual
+ *      attempts, not a determined bad actor editing their own JS.
+ *   2. A per-tab rate limiter — stops flooding.
+ *   3. `reportUser` — the one thing that IS written to Postgres, and the
+ *      only durable record in this whole file (see the room_reports
+ *      migration). Insert-only, unreadable through the anon key by anyone
+ *      including the reporter: durable enough for a human to act on later,
+ *      but not a browsable log for the ordinary case.
+ * Plus a purely local block list — instant, private, needs no round trip.
  *
  * The shared timer piggybacks on presence rather than its own broadcast
  * event, on purpose: broadcast messages are never replayed to a client that
@@ -17,10 +31,12 @@
  * room's running timer by looking at who is currently present.
  */
 
+import { Filter } from 'bad-words'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { createBrowserClient, isSupabaseConfigured } from '@/app/lib/supabase'
 import { getSession } from '@/app/lib/auth'
 import { loadAvatar, colorForName } from '@/app/lib/avatar'
+import { db, push } from '@/app/lib/sync'
 
 export type RoomPresence = {
   userId: string
@@ -37,6 +53,111 @@ export type RoomReaction = {
   label: string
   from: string
   at: number
+}
+
+export type RoomChatMessage = {
+  id: string
+  fromId: string
+  from: string
+  color: string
+  text: string
+  at: number
+}
+
+const MAX_MESSAGE_LEN = 240
+
+/**
+ * Contact-info patterns are the highest-value thing to catch here: "let's
+ * move this off-platform" is the actual mechanism behind most real harm in
+ * a stranger chat, far more than any single bad word. Tolerant of spacing
+ * and separators in phone numbers on purpose — "080 123 456 78" is exactly
+ * as much a phone number as "08012345678".
+ */
+const CONTACT_PATTERNS: RegExp[] = [
+  /(?:\d[\s.-]?){7,}\d/,
+  /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i,
+  /\b(whatsapp|wa\.me|instagram|insta|snapchat|snap|tiktok|telegram|discord|facebook)\b/i,
+  /\b(dm|inbox|text|add|follow)\s+me\b/i,
+  /@\w{3,}/,
+]
+
+const profanity = new Filter()
+
+/**
+ * Rejects outright rather than silently editing, so what a student sees
+ * sent is exactly what they typed, or nothing — never a quietly-redacted
+ * version that could look like something else went through.
+ */
+export function checkMessage(raw: string): { ok: true; text: string } | { ok: false; reason: string } {
+  const text = raw.trim()
+  if (!text) return { ok: false, reason: 'Say something first.' }
+  if (text.length > MAX_MESSAGE_LEN) return { ok: false, reason: `Keep it under ${MAX_MESSAGE_LEN} characters.` }
+  if (CONTACT_PATTERNS.some((p) => p.test(text))) {
+    return { ok: false, reason: "Messages can't include contact info here." }
+  }
+  if (profanity.isProfane(text)) {
+    return { ok: false, reason: "That message isn't allowed here." }
+  }
+  return { ok: true, text }
+}
+
+function rateLimiter(max: number, windowMs: number) {
+  const sent: number[] = []
+  return () => {
+    const now = Date.now()
+    while (sent.length && now - sent[0] > windowMs) sent.shift()
+    if (sent.length >= max) return false
+    sent.push(now)
+    return true
+  }
+}
+
+const BLOCK_KEY = 'ewin-room-blocked-v1'
+
+/** Purely local and instant — needs no round trip, and nobody is told. */
+export function blockedIds(): Set<string> {
+  if (typeof window === 'undefined') return new Set()
+  try {
+    return new Set(JSON.parse(localStorage.getItem(BLOCK_KEY) || '[]') as string[])
+  } catch {
+    return new Set()
+  }
+}
+
+export function blockUser(userId: string) {
+  if (typeof window === 'undefined') return
+  const ids = blockedIds()
+  ids.add(userId)
+  localStorage.setItem(BLOCK_KEY, JSON.stringify([...ids]))
+}
+
+export function unblockUser(userId: string) {
+  if (typeof window === 'undefined') return
+  const ids = blockedIds()
+  ids.delete(userId)
+  localStorage.setItem(BLOCK_KEY, JSON.stringify([...ids]))
+}
+
+/** The one durable record in this file — see the module docstring. */
+export function reportUser(input: {
+  reportedId: string
+  reportedName: string
+  subjectId: string
+  messageText: string
+  reason?: string
+}) {
+  const reporter = getSession()
+  if (!reporter) return
+  push('room report', () =>
+    db()!.from('room_reports').insert({
+      reporter_id: reporter.id,
+      reported_id: input.reportedId,
+      reported_name: input.reportedName,
+      subject_id: input.subjectId,
+      message_text: input.messageText,
+      reason: input.reason ?? null,
+    }),
+  )
 }
 
 /** A small fixed set, not freeform text — see the module docstring. */
@@ -72,6 +193,8 @@ export function activeTimer(people: RoomPresence[]): RoomPresence | null {
 export type RoomHandle = {
   startTimer: (minutes: number) => void
   sendReaction: (emoji: string, label: string) => void
+  /** Runs `checkMessage` and the rate limiter before ever sending. */
+  sendChat: (text: string) => { ok: true } | { ok: false; reason: string }
   leave: () => void
 }
 
@@ -85,6 +208,7 @@ export function joinRoom(
   handlers: {
     onPresence: (people: RoomPresence[]) => void
     onReaction: (reaction: RoomReaction) => void
+    onChat: (message: RoomChatMessage) => void
   },
 ): RoomHandle | null {
   const sb = createBrowserClient()
@@ -103,6 +227,10 @@ export function joinRoom(
     config: { presence: { key: session.id } },
   })
 
+  // 8 messages per 15 seconds — generous for real conversation, tight
+  // enough that a flood attempt caps out fast.
+  const allowSend = rateLimiter(8, 15000)
+
   channel
     .on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState<RoomPresence>()
@@ -114,6 +242,9 @@ export function joinRoom(
     })
     .on('broadcast', { event: 'reaction' }, ({ payload }) => {
       handlers.onReaction(payload as RoomReaction)
+    })
+    .on('broadcast', { event: 'chat' }, ({ payload }) => {
+      handlers.onChat(payload as RoomChatMessage)
     })
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') void channel.track(me)
@@ -127,6 +258,22 @@ export function joinRoom(
     sendReaction: (emoji: string, label: string) => {
       const reaction: RoomReaction = { emoji, label, from: me.name, at: Date.now() }
       void channel.send({ type: 'broadcast', event: 'reaction', payload: reaction })
+    },
+    sendChat: (raw: string) => {
+      const checked = checkMessage(raw)
+      if (!checked.ok) return checked
+      if (!allowSend()) return { ok: false, reason: 'Slow down a little.' }
+      const message: RoomChatMessage = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        fromId: me.userId,
+        from: me.name,
+        color: me.color,
+        text: checked.text,
+        at: Date.now(),
+      }
+      void channel.send({ type: 'broadcast', event: 'chat', payload: message })
+      handlers.onChat(message)
+      return { ok: true }
     },
     leave: () => {
       void sb.removeChannel(channel)

@@ -8,17 +8,24 @@ import { getSubject } from '@/app/lib/subjects'
 import { getSession } from '@/app/lib/auth'
 import {
   activeTimer,
+  blockedIds,
+  blockUser,
   canJoinRoom,
   joinRoom,
+  reportUser,
+  unblockUser,
   watchRoomCount,
   REACTIONS,
   TIMER_MINUTES,
+  type RoomChatMessage,
   type RoomHandle,
   type RoomPresence,
   type RoomReaction,
 } from '@/app/lib/rooms'
 
 type Bubble = RoomReaction & { id: string }
+
+const REPORT_REASONS = ['Asked for contact info', 'Inappropriate language', 'Something else']
 
 function mmss(ms: number) {
   const s = Math.max(0, Math.ceil(ms / 1000))
@@ -33,10 +40,18 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
 
   const [people, setPeople] = useState<RoomPresence[]>([])
   const [bubbles, setBubbles] = useState<Bubble[]>([])
+  const [messages, setMessages] = useState<RoomChatMessage[]>([])
+  const [draft, setDraft] = useState('')
+  const [chatError, setChatError] = useState<string | null>(null)
+  const [blocked, setBlocked] = useState<Set<string>>(() => blockedIds())
+  const [menuFor, setMenuFor] = useState<string | null>(null)
+  const [reportTarget, setReportTarget] = useState<RoomChatMessage | null>(null)
+  const [reported, setReported] = useState(false)
   const [joinable, setJoinable] = useState(true)
   const [ready, setReady] = useState(false)
   const [now, setNow] = useState(() => Date.now())
   const handleRef = useRef<RoomHandle | null>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
   const meId = getSession()?.id
 
   useEffect(() => {
@@ -59,6 +74,7 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
         setBubbles((prev) => [...prev, bubble])
         setTimeout(() => setBubbles((prev) => prev.filter((b) => b.id !== bubble.id)), 3200)
       },
+      onChat: (m) => setMessages((prev) => [...prev.slice(-99), m]),
     })
     handleRef.current = handle
     return () => {
@@ -71,6 +87,48 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
     const t = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(t)
   }, [])
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ block: 'end' })
+  }, [messages.length])
+
+  function send(e: React.FormEvent) {
+    e.preventDefault()
+    if (!handleRef.current) return
+    const res = handleRef.current.sendChat(draft)
+    if (!res.ok) {
+      setChatError(res.reason)
+      setTimeout(() => setChatError(null), 3000)
+      return
+    }
+    setDraft('')
+  }
+
+  function doBlock(userId: string) {
+    blockUser(userId)
+    setBlocked(blockedIds())
+    setMenuFor(null)
+  }
+
+  function doUnblock(userId: string) {
+    unblockUser(userId)
+    setBlocked(blockedIds())
+  }
+
+  function submitReport(reason: string) {
+    if (!reportTarget || !subject) return
+    reportUser({
+      reportedId: reportTarget.fromId,
+      reportedName: reportTarget.from,
+      subjectId: subject.id,
+      messageText: reportTarget.text,
+      reason,
+    })
+    setReportTarget(null)
+    setMenuFor(null)
+    setReported(true)
+    setTimeout(() => setReported(false), 2500)
+  }
 
   if (!subject) {
     return (
@@ -88,10 +146,20 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
 
   const timer = activeTimer(people)
   const remaining = timer ? mmss((timer.timerEndsAt ?? 0) - now) : null
-  const alone = joinable && ready && people.length <= 1
+  const visiblePeople = people.filter((p) => !blocked.has(p.userId))
+  const visibleMessages = messages.filter((m) => !blocked.has(m.fromId))
+  const alone = joinable && ready && visiblePeople.length <= 1
 
   return (
     <main className="bg-paper text-ink">
+      {reported && (
+        <div
+          role="status"
+          className="rise fixed bottom-8 left-1/2 z-[100] -translate-x-1/2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-on-dark shadow-[var(--shadow-lg)]"
+        >
+          Reported — thanks for flagging it.
+        </div>
+      )}
       <AppHeader title={`${subject.name} room`} subtitle={ready ? undefined : 'Connecting…'} back="/rooms" />
 
       <div className="mx-auto max-w-2xl px-4 pb-8 pt-6">
@@ -102,15 +170,15 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
         >
           <p className="margin-label">
             {ready
-              ? people.length === 0
+              ? visiblePeople.length === 0
                 ? 'Nobody here yet'
-                : people.length === 1
+                : visiblePeople.length === 1
                   ? '1 person here'
-                  : `${people.length} people here`
+                  : `${visiblePeople.length} people here`
               : 'Loading'}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {people.map((p) => (
+            {visiblePeople.map((p) => (
               <div key={p.userId} className="flex items-center gap-2 rounded-full bg-surface py-1 pl-1 pr-3 shadow-[var(--shadow-sm)]">
                 <Avatar name={p.name} size={26} color={p.userId === meId ? undefined : p.color} />
                 <span className="text-[12.5px] font-medium text-ink">
@@ -162,8 +230,8 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
             <>
               <p className="text-[14.5px] font-medium text-ink">Sign in to join this room</p>
               <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">
-                A room needs a real identity, so a session and a reaction can only come from
-                someone actually there. You can still watch the headcount without one.
+                A room needs a real identity, so a session, a message or a reaction can only come
+                from someone actually there. You can still watch the headcount without one.
               </p>
               <Link
                 href="/signup"
@@ -210,10 +278,150 @@ export default function RoomPage({ params }: { params: Promise<{ subjectId: stri
           </div>
         )}
 
+        {/* ── Chat ─────────────────────────────────────────────────────── */}
+        {joinable && (
+          <section className="mt-4 rounded-2xl border border-line bg-surface">
+            <div className="max-h-[340px] min-h-[120px] overflow-y-auto px-4 py-3">
+              {visibleMessages.length === 0 ? (
+                <p className="py-6 text-center text-[13px] text-ink-muted">
+                  No messages yet — say hello.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  {visibleMessages.map((m) => {
+                    const mine = m.fromId === meId
+                    return (
+                      <div key={m.id} className={`flex flex-col ${mine ? 'items-end' : 'items-start'}`}>
+                        {!mine && (
+                          <button
+                            type="button"
+                            onClick={() => setMenuFor(menuFor === m.id ? null : m.id)}
+                            className="mb-0.5 px-1 text-[11px] font-semibold"
+                            style={{ color: m.color }}
+                          >
+                            {m.from.split(' ')[0]}
+                          </button>
+                        )}
+                        <span
+                          className="max-w-[80%] rounded-2xl px-3.5 py-2 text-[13.5px] leading-snug"
+                          style={
+                            mine
+                              ? { background: 'var(--primary)', color: 'var(--on-primary)' }
+                              : { background: 'var(--sunken)', color: 'var(--ink)' }
+                          }
+                        >
+                          {m.text}
+                        </span>
+                        {!mine && menuFor === m.id && (
+                          <div className="mt-1 flex gap-2 px-1">
+                            <button
+                              type="button"
+                              onClick={() => doBlock(m.fromId)}
+                              className="text-[11px] font-semibold text-ink-muted"
+                            >
+                              Block {m.from.split(' ')[0]}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setReportTarget(m)}
+                              className="text-[11px] font-semibold text-wrong"
+                            >
+                              Report
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                  <div ref={chatEndRef} />
+                </div>
+              )}
+            </div>
+            <form onSubmit={send} className="flex items-center gap-2 border-t border-line p-2.5">
+              <input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Say something…"
+                maxLength={240}
+                className="min-w-0 flex-1 rounded-full border border-line bg-paper px-4 py-2.5 text-[13.5px] text-ink outline-none focus:border-primary"
+              />
+              <button
+                type="submit"
+                disabled={!draft.trim()}
+                className="press shrink-0 rounded-full bg-primary px-4 py-2.5 text-[13px] font-semibold text-on-primary disabled:opacity-40"
+              >
+                Send
+              </button>
+            </form>
+            {chatError && (
+              <p className="px-4 pb-2.5 text-[12px] font-medium text-wrong">{chatError}</p>
+            )}
+          </section>
+        )}
+
+        {blocked.size > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5 px-1 text-[11.5px] text-ink-faint">
+            <span>Blocked here:</span>
+            {[...blocked].map((id) => {
+              const p = people.find((x) => x.userId === id)
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => doUnblock(id)}
+                  className="rounded-full bg-sunken px-2 py-0.5 font-medium text-ink-muted"
+                >
+                  {p?.name.split(' ')[0] ?? 'Someone'} ✕
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         <p className="mt-6 text-center text-[12px] leading-relaxed text-ink-faint">
           Nothing said or done here is saved — the room only exists while you&rsquo;re in it.
+          Reporting someone is the one exception: that goes to us, not the other person.
         </p>
       </div>
+
+      {/* ── Report confirm ───────────────────────────────────────────── */}
+      {reportTarget && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/45 sm:items-center"
+          onClick={() => setReportTarget(null)}
+        >
+          <div
+            className="pop w-full max-w-sm rounded-t-3xl bg-surface p-6 sm:rounded-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-display text-[19px] text-ink">Report {reportTarget.from.split(' ')[0]}?</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">
+              This goes to Ewin, not back to them. Pick what happened.
+            </p>
+            <div className="mt-4 flex flex-col gap-2">
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  onClick={() => submitReport(reason)}
+                  className="press rounded-xl border border-line px-4 py-3 text-left text-[13.5px] font-medium text-ink hover:border-wrong"
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setReportTarget(null)}
+              className="press mt-3 w-full rounded-xl px-4 py-2.5 text-[13px] font-medium text-ink-muted"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
