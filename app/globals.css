@@ -682,6 +682,7 @@ button.press:focus-visible {
   height: 34px;
   border-radius: 10px;
   background: var(--primary);
+  color: var(--on-dark);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -700,7 +701,7 @@ button.press:focus-visible {
    deliberate one-off exception, same reasoning as the ink-black CTAs
    above. */
 .lp-feature { display: flex; gap: 16px; background: #f5f5f5; border-radius: var(--r-lg); padding: 20px 22px; }
-.lp-f-icon { width: 38px; height: 38px; border-radius: 11px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lp-f-icon { width: 38px; height: 38px; border-radius: 11px; background: var(--primary); color: var(--on-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 .lp-subj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
 .lp-subj-photo { width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; }

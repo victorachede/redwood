@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { SUBJECTS, type SubjectId } from '@/app/lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
@@ -87,7 +88,11 @@ const NOTS = [
   'Sit the exam for you — that part is yours',
 ]
 
-const BOARDS = ['WAEC', 'NECO', 'JAMB']
+const BOARDS = [
+  { id: 'WAEC', logo: '/marketing/boards/waec.png' },
+  { id: 'NECO', logo: '/marketing/boards/neco.png' },
+  { id: 'JAMB', logo: '/marketing/boards/jamb.png' },
+]
 
 export default function Home() {
   const heroCta = useAuthCta('/signup')
@@ -147,7 +152,12 @@ export default function Home() {
               <div className="lp-float-card lp-card-board">
                 <div className="mb-2 flex gap-[7px]">
                   {BOARDS.map((b) => (
-                    <span key={b} className="h-5 w-5 rounded-md bg-sunken" aria-hidden />
+                    <span
+                      key={b.id}
+                      className="relative h-5 w-5 overflow-hidden rounded-md bg-white"
+                    >
+                      <Image src={b.logo} alt={`${b.id} logo`} fill className="object-contain p-px" />
+                    </span>
                   ))}
                 </div>
                 <p className="text-[11.5px] font-bold text-ink">WAEC · NECO · JAMB</p>
@@ -235,7 +245,7 @@ export default function Home() {
                       stays a pure swap target for a real photo, with
                       nothing else depending on its internals. */}
                   <span
-                    className="absolute left-1/2 top-1/2 flex h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[10px]"
+                    className="absolute left-1/2 top-1/2 flex h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[10px] text-on-dark"
                     style={{ background: s.accent }}
                     aria-hidden
                   >
@@ -299,9 +309,14 @@ export default function Home() {
           </p>
           <div className="lp-board-row mt-5">
             {BOARDS.map((b) => (
-              <div key={b} className="flex items-center gap-2.5 text-[14px] font-semibold text-ink-muted">
-                <span className="h-[26px] w-[26px] rounded-[7px] bg-sunken" aria-hidden />
-                {b}
+              <div
+                key={b.id}
+                className="flex items-center gap-2.5 text-[14px] font-semibold text-ink-muted"
+              >
+                <span className="relative h-[26px] w-[26px] overflow-hidden rounded-[7px] bg-white">
+                  <Image src={b.logo} alt={`${b.id} logo`} fill className="object-contain p-px" />
+                </span>
+                {b.id}
               </div>
             ))}
           </div>
