@@ -23,9 +23,13 @@ import {
   type LocalUser,
 } from '@/app/lib/auth'
 import { clearStudyData, getUsageStats, type UsageStats } from '@/app/lib/progress'
+import { dueCards } from '@/app/lib/cards'
 import { PasswordField } from '@/components/PasswordField'
 import { AvatarPicker } from '@/components/ui/AvatarPicker'
 import { AppHeader } from '@/components/ui/AppHeader'
+import { Blob } from '@/components/Blob'
+import { BarsIcon, BellIcon, LayersIcon, PencilIcon, TickIcon } from '@/components/icons'
+import { loadNotifPrefs, setNotifPref, type NotifKey, type NotifPrefs } from '@/app/lib/notifPrefs'
 
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => {
@@ -45,15 +49,18 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 
 function Group({
   title,
+  icon,
   children,
 }: {
   title?: string
+  icon?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
     <div className="mb-6">
       {title && (
-        <p className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+        <p className="mb-2 flex items-center gap-1.5 px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+          {icon}
           {title}
         </p>
       )}
@@ -98,6 +105,75 @@ function Field({
 const inputClass =
   'w-full rounded-xl border border-line bg-paper px-3.5 py-3 text-[15px] text-ink outline-none transition-colors focus:border-primary'
 
+function Toggle({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={onChange}
+      className="press relative h-[22px] w-[38px] shrink-0 rounded-full transition-colors"
+      style={{ background: on ? 'var(--primary)' : 'var(--line-strong)' }}
+    >
+      <span
+        className="absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-[var(--shadow-sm)] transition-[left]"
+        style={{ left: on ? '18px' : '2px' }}
+      />
+    </button>
+  )
+}
+
+const NOTIF_ROWS: {
+  key: NotifKey
+  title: string
+  sub: string
+  icon: (props: { size?: number; className?: string }) => React.ReactElement
+  bg: string
+  fg: string
+}[] = [
+  {
+    key: 'streak',
+    title: 'Streak reminders',
+    sub: 'A nudge if you haven’t studied yet today',
+    icon: (p) => <Flame {...p} />,
+    bg: 'var(--streak-soft)',
+    fg: 'var(--streak)',
+  },
+  {
+    key: 'work',
+    title: 'New work assigned',
+    sub: 'When Ewin sets classwork or homework',
+    icon: (p) => <PencilIcon {...p} />,
+    bg: 'var(--primary-soft)',
+    fg: 'var(--primary)',
+  },
+  {
+    key: 'cards',
+    title: 'Cards due for review',
+    sub: 'Once a day, only if cards are waiting',
+    icon: (p) => <LayersIcon {...p} />,
+    bg: 'var(--correct-soft)',
+    fg: 'var(--correct)',
+  },
+  {
+    key: 'leaderboard',
+    title: 'Leaderboard changes',
+    sub: 'When your weekly rank moves',
+    icon: (p) => <BarsIcon {...p} />,
+    bg: 'var(--sunken)',
+    fg: 'var(--ink-muted)',
+  },
+  {
+    key: 'weekly',
+    title: 'Weekly report',
+    sub: 'A summary every Sunday evening',
+    icon: (p) => <TickIcon {...p} />,
+    bg: 'var(--sunken)',
+    fg: 'var(--ink-muted)',
+  },
+]
+
 export default function SettingsPage() {
   const router = useRouter()
   const [user, setUser] = useState<LocalUser | null>(null)
@@ -120,6 +196,9 @@ export default function SettingsPage() {
   const [delErr, setDelErr] = useState<string | null>(null)
   const [clearStep, setClearStep] = useState(0)
 
+  const [due, setDue] = useState(0)
+  const [notif, setNotif] = useState<NotifPrefs | null>(null)
+
   function refresh() {
     const u = getSession()
     setUser(u)
@@ -129,13 +208,22 @@ export default function SettingsPage() {
       setExamFocus(u.examFocus || 'WAEC & JAMB')
     }
     setStats(getUsageStats())
+    setDue(dueCards().length)
   }
 
   useEffect(() => {
     refresh()
+    setNotif(loadNotifPrefs())
     setHydrated(true)
     return subscribeToAuth(refresh)
   }, [])
+
+  function toggleNotif(key: NotifKey) {
+    setNotif((prev) => {
+      const on = !(prev?.[key] ?? true)
+      return setNotifPref(key, on)
+    })
+  }
 
   function saveProfile(e: React.FormEvent) {
     e.preventDefault()
@@ -207,6 +295,7 @@ export default function SettingsPage() {
       label: 'Accuracy',
       value: stats?.accuracyPct != null ? `${stats.accuracyPct}%` : '—',
     },
+    { icon: LayersIcon, label: 'Cards due', value: due },
   ]
 
 
@@ -249,8 +338,16 @@ export default function SettingsPage() {
 
         {/* Identity card */}
         <Group>
-          <div className="border-b border-line px-4 py-5">
-            <AvatarPicker name={user?.displayName || 'You'} onDone={(m) => setToast(m)} />
+          <div className="relative overflow-hidden border-b border-line px-4 py-5">
+            <Blob
+              id="settings-identity-blob"
+              from="var(--primary)"
+              to="var(--paper)"
+              className="pointer-events-none absolute -top-16 right-0 h-[180px] w-[170px] opacity-[0.07]"
+            />
+            <div className="relative">
+              <AvatarPicker name={user?.displayName || 'You'} onDone={(m) => setToast(m)} />
+            </div>
             <div className="mt-4">
               <p className="font-display text-[19px] leading-tight text-ink">
                 {user?.displayName || 'Guest'}
@@ -288,7 +385,7 @@ export default function SettingsPage() {
         {/* Activity — calm, not dashboard clutter */}
         <Group title="Activity">
           <Row last>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               {metrics.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-xl bg-paper px-2.5 py-3 text-center">
                   <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-primary" />
@@ -304,6 +401,30 @@ export default function SettingsPage() {
 
         {user && (
           <>
+            <Group title="Notifications" icon={<BellIcon size={12} />}>
+              {NOTIF_ROWS.map((r, i) => (
+                <Row key={r.key} last={i === NOTIF_ROWS.length - 1}>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px]"
+                      style={{ background: r.bg, color: r.fg }}
+                    >
+                      {r.icon({ size: 15, className: '' })}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13.5px] font-medium text-ink">{r.title}</span>
+                      <span className="block text-[11.5px] text-ink-muted">{r.sub}</span>
+                    </span>
+                    <Toggle
+                      on={notif?.[r.key] ?? true}
+                      onChange={() => toggleNotif(r.key)}
+                      label={r.title}
+                    />
+                  </div>
+                </Row>
+              ))}
+            </Group>
+
             <Group title="Profile">
               <form onSubmit={saveProfile}>
                 <Row>

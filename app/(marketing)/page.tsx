@@ -3,7 +3,7 @@ import { SUBJECTS, type SubjectId } from '@/app/lib/subjects'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { Motion } from '@/components/marketing/Motion'
-import { Blob } from '@/components/marketing/Blob'
+import { Blob } from '@/components/Blob'
 import { PhotoSlot } from '@/components/marketing/PhotoSlot'
 import {
   ArrowIcon,
@@ -18,7 +18,7 @@ import {
   SigmaIcon,
   TickIcon,
   TrendIcon,
-} from '@/components/marketing/icons'
+} from '@/components/icons'
 
 /**
  * The landing page — third full rebuild.

@@ -1,12 +1,15 @@
 /**
- * The wavy background blob behind the hero and the closing CTA.
+ * The wavy background blob behind dark accent cards.
  *
  * An SVG path rather than a CSS border-radius trick — border-radius can
  * fake "organic" with four corner values, but it cannot fake a genuinely
- * undulating edge, and that was specifically the note this replaced a
- * plainer shape for. One path, reused at two sizes and two gradients, so
- * the two blob moments on the page read as one device rather than two
- * different decorations.
+ * undulating edge. One path, reused at several sizes and gradients across
+ * the landing page and the signed-in app, so every blob moment on the site
+ * reads as one device rather than a pile of different decorations.
+ *
+ * Started as marketing-only, then the dashboard and settings rebuild
+ * needed the same accent — moved here once it stopped being
+ * marketing-specific, same as `components/icons.tsx`.
  */
 export function Blob({
   id,
