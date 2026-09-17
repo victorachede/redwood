@@ -60,6 +60,18 @@ export const viewport: Viewport = {
 }
 
 
+/** Site-wide identity — every page is part of the same EducationalOrganization,
+ *  so this lives in the root layout rather than being repeated per page. */
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'EducationalOrganization',
+  name: 'Ewin',
+  url: 'https://redwood-sand.vercel.app',
+  logo: 'https://redwood-sand.vercel.app/icon-512.png',
+  description:
+    'An AI tutor that teaches one idea, then checks you got it. Built for Nigerian secondary students preparing for WAEC, NECO and JAMB.',
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -69,6 +81,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <ServiceWorker />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
       </body>
     </html>
   )

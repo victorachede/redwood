@@ -94,11 +94,34 @@ const BOARDS = [
   { id: 'JAMB', logo: '/marketing/boards/jamb.png' },
 ]
 
+/** The subject grid is a real course catalog — WAEC/JAMB syllabus per
+ *  subject, already modelled in subjects.ts — so it earns Course markup
+ *  rather than being decorative. Built from the same data the grid
+ *  renders, not a separate copy that could drift out of sync. */
+const courseListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: SUBJECTS.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Course',
+      name: `${s.name} — ${s.exam}`,
+      description: s.blurb,
+      provider: { '@type': 'EducationalOrganization', name: 'Ewin', url: 'https://redwood-sand.vercel.app' },
+    },
+  })),
+}
+
 export default function Home() {
   const heroCta = useAuthCta('/signup')
 
   return (
     <main className="bg-white font-marketing text-ink">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseListSchema) }}
+      />
       <Motion />
       <SiteHeader />
 
