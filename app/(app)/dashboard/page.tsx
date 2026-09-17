@@ -142,6 +142,21 @@ export default function TodayPage() {
     [practice],
   )
 
+  /** Subjects picked at onboarding surface first — real preference, not a
+   *  filter. Every subject still shows; this only changes the order. */
+  const orderedSubjects = useMemo(() => {
+    const focus = user?.focusSubjects ?? []
+    if (focus.length === 0) return SUBJECTS
+    return [...SUBJECTS].sort((a, b) => {
+      const ai = focus.indexOf(a.id)
+      const bi = focus.indexOf(b.id)
+      if (ai === -1 && bi === -1) return 0
+      if (ai === -1) return 1
+      if (bi === -1) return -1
+      return ai - bi
+    })
+  }, [user])
+
   const todaysSession = sessions.find((s) => dayKey(new Date(s.at)) === dayKey(new Date()))
 
   /** One clear next action, chosen for them. */
@@ -357,7 +372,7 @@ export default function TodayPage() {
             <span className="text-[12.5px] font-semibold text-primary">All {SUBJECTS.length}</span>
           </div>
           <div className="mt-2.5 flex flex-col gap-2.5">
-            {SUBJECTS.map((s) => {
+            {orderedSubjects.map((s) => {
               const topicsStarted = new Set(
                 sessions.filter((x) => x.subjectId === s.id).map((x) => x.topic),
               ).size

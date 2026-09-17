@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { getSession, refreshSession, signUp, subscribeToAuth } from '@/app/lib/auth'
 import {
   AuthShell,
@@ -21,12 +21,18 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // A fresh signUp() fires the same auth-change event the listener below
+  // reacts to, which would race it to /dashboard before the explicit
+  // post-signup push to /onboarding lands. This flag tells the listener
+  // to sit out while a signup submit is in flight.
+  const submittingRef = useRef(false)
 
   useEffect(() => {
     void refreshSession().then((u) => {
       if (u || getSession()) router.replace('/dashboard')
     })
     return subscribeToAuth(() => {
+      if (submittingRef.current) return
       if (getSession()) router.replace('/dashboard')
     })
   }, [router])
@@ -35,13 +41,15 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+    submittingRef.current = true
     const res = await signUp({ email, password, displayName })
     setLoading(false)
     if (!res.ok) {
+      submittingRef.current = false
       setError(res.error)
       return
     }
-    router.push('/dashboard')
+    router.push('/onboarding')
   }
 
   return (
@@ -58,7 +66,7 @@ export default function SignupPage() {
       }
     >
       <div className="mt-8 space-y-4">
-        <GoogleButton label="Sign up with Google" />
+        <GoogleButton label="Sign up with Google" redirectPath="/onboarding" />
         <AuthDivider />
       </div>
 

@@ -12,7 +12,10 @@ export type LocalUser = {
   createdAt: number
   school?: string
   examFocus?: string
-  plan?: 'free' | 'pro'
+  /** Subjects picked during onboarding — real signal, used to order the
+   *  dashboard's subject list, not just stored for show. */
+  focusSubjects?: string[]
+  plan?: 'free' | 'pro' | 'voice'
 }
 
 type Store = {
@@ -100,18 +103,20 @@ async function profileFromAuthUser(
   let displayName =
     (typeof meta?.display_name === 'string' && meta.display_name) ||
     (email ? email.split('@')[0] : 'Student')
-  let plan: 'free' | 'pro' = 'free'
+  let plan: 'free' | 'pro' | 'voice' = 'free'
   let examFocus = 'WAEC & JAMB'
   let school: string | undefined
+  let focusSubjects: string[] | undefined
   let createdAt = Date.now()
 
   if (sb) {
     const { data } = await sb.from('profiles').select('*').eq('id', id).maybeSingle()
     if (data) {
       displayName = data.display_name || displayName
-      plan = data.plan === 'pro' ? 'pro' : 'free'
+      plan = data.plan === 'pro' ? 'pro' : data.plan === 'voice' ? 'voice' : 'free'
       examFocus = data.exam_focus || examFocus
       school = data.school || undefined
+      focusSubjects = Array.isArray(data.focus_subjects) ? (data.focus_subjects as string[]) : undefined
       createdAt = data.created_at ? new Date(data.created_at).getTime() : createdAt
     }
   }
@@ -123,6 +128,7 @@ async function profileFromAuthUser(
     createdAt,
     examFocus,
     school,
+    focusSubjects,
     plan,
   }
 }
@@ -223,7 +229,9 @@ export async function signIn(input: {
  * back with a provider error rather than failing silently, which is why the
  * message is surfaced rather than swallowed.
  */
-export async function signInWithGoogle(): Promise<{ ok: false; error: string } | void> {
+export async function signInWithGoogle(
+  redirectPath = '/dashboard',
+): Promise<{ ok: false; error: string } | void> {
   if (!isSupabaseConfigured) {
     return { ok: false, error: 'Google sign-in is not set up yet.' }
   }
@@ -233,7 +241,7 @@ export async function signInWithGoogle(): Promise<{ ok: false; error: string } |
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/dashboard`,
+      redirectTo: `${window.location.origin}${redirectPath}`,
       // Always show the chooser: students share devices, and silently
       // reusing whoever signed in last is how work lands in a sibling's
       // account.
@@ -267,7 +275,7 @@ export async function signOutAndGoHome(): Promise<void> {
 }
 
 export function updateProfile(
-  patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus'>>,
+  patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus' | 'focusSubjects'>>,
 ): { ok: true; user: LocalUser } | { ok: false; error: string } {
   const current = getSession()
   if (!current) return { ok: false, error: 'Not signed in.' }
@@ -281,6 +289,7 @@ export function updateProfile(
           display_name: patch.displayName ?? current.displayName,
           school: patch.school ?? current.school ?? null,
           exam_focus: patch.examFocus ?? current.examFocus ?? null,
+          focus_subjects: patch.focusSubjects ?? current.focusSubjects ?? [],
           updated_at: new Date().toISOString(),
         })
         .eq('id', current.id)
@@ -298,6 +307,7 @@ export function updateProfile(
     displayName: patch.displayName ?? s.users[idx].displayName,
     school: patch.school ?? s.users[idx].school,
     examFocus: patch.examFocus ?? s.users[idx].examFocus,
+    focusSubjects: patch.focusSubjects ?? s.users[idx].focusSubjects,
   }
   write(s)
   const pub = toPublic(s.users[idx])

@@ -210,7 +210,15 @@ export function AuthSubmit({
 }
 
 /** Google, drawn inline rather than pulled from a CDN for one logo. */
-export function GoogleButton({ label = 'Continue with Google' }: { label?: string }) {
+export function GoogleButton({
+  label = 'Continue with Google',
+  redirectPath,
+}: {
+  label?: string
+  /** Where Google sends the browser back to. Signup passes /onboarding so a
+   *  new Google account gets the same first-run flow email/password does. */
+  redirectPath?: string
+}) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -222,7 +230,7 @@ export function GoogleButton({ label = 'Continue with Google' }: { label?: strin
         onClick={async () => {
           setError('')
           setBusy(true)
-          const res = await signInWithGoogle()
+          const res = await signInWithGoogle(redirectPath)
           // Only returns on failure; on success the browser is already leaving.
           if (res && !res.ok) {
             setError(res.error)

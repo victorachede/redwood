@@ -151,6 +151,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           exam_focus: string | null
+          focus_subjects: Json
           id: string
           leaderboard_opt_in: boolean
           paystack_customer_code: string | null
@@ -170,6 +171,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           exam_focus?: string | null
+          focus_subjects?: Json
           id: string
           leaderboard_opt_in?: boolean
           paystack_customer_code?: string | null
