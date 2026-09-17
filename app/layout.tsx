@@ -39,9 +39,8 @@ export const metadata: Metadata = {
     siteName: 'Ewin',
     title: 'Ewin — learn one idea, then prove it',
     description: 'Free AI tutor for WAEC, NECO and JAMB.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Ewin' }],
   },
-  twitter: { card: 'summary_large_image', images: ['/og.png'] },
+  twitter: { card: 'summary_large_image' },
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
