@@ -20,6 +20,7 @@ import {
 import { ExamBadge } from '@/components/ExamBadges'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { AppHeader } from '@/components/ui/AppHeader'
+import { MilestonePopup, useMilestoneCheck } from '@/components/MilestonePopup'
 import { Diagram } from '@/components/Diagram'
 import { canAccessTimedMocks, canAccessUnlimitedPractice, isPro } from '@/app/lib/billing'
 
@@ -118,6 +119,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
   }
 
   const [phase, setPhase] = useState<Phase>('idle')
+  const { current: milestone, dismiss: dismissMilestone } = useMilestoneCheck(phase)
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState<string | null>(null)
   const [correctCount, setCorrectCount] = useState(0)
@@ -372,6 +374,7 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
 
     return (
       <main className="bg-paper text-ink">
+        {milestone && <MilestonePopup milestone={milestone} onDismiss={dismissMilestone} />}
         <AppHeader title="Results" subtitle={subjectLabel} back="/dashboard" />
 
         <div className="mx-auto max-w-2xl px-4 py-8">

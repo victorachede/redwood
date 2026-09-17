@@ -25,6 +25,7 @@ import { openAssignments, type Assignment } from '@/app/lib/assignments'
 import { reopenWork } from '@/app/lib/workGate'
 import { cachedBoard, isOptedIn } from '@/app/lib/leaderboard'
 import { onSync } from '@/app/lib/sync'
+import { MilestonePopup, useMilestoneCheck } from '@/components/MilestonePopup'
 
 /** "Tuesday, 3 September" — the date a student would write in the margin. */
 function todayLabel() {
@@ -150,8 +151,11 @@ export default function TodayPage() {
 
   const hasTasks = work.length > 0 || due > 0 || !!todaysSession
 
+  const { current: milestone, dismiss: dismissMilestone } = useMilestoneCheck(`${ready}-${streak}`)
+
   return (
     <main className="bg-paper text-ink">
+      {milestone && <MilestonePopup milestone={milestone} onDismiss={dismissMilestone} />}
       <AppHeader
         title="Today"
         action={user ? <Avatar name={user.displayName} size={32} /> : undefined}

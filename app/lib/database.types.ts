@@ -185,6 +185,30 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
         Relationships: []
       }
+      room_reports: {
+        Row: {
+          created_at: string
+          id: string
+          message_text: string
+          reason: string | null
+          reported_id: string
+          reported_name: string
+          reporter_id: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_text: string
+          reason?: string | null
+          reported_id: string
+          reported_name: string
+          reporter_id: string
+          subject_id: string
+        }
+        Update: Partial<Database['public']['Tables']['room_reports']['Insert']>
+        Relationships: []
+      }
       study_cards: {
         Row: {
           back: string
