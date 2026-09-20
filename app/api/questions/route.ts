@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { createServiceClient } from '@/app/lib/supabase'
 import { getSubject } from '@/app/lib/subjects'
 import {
@@ -39,6 +39,12 @@ export const maxDuration = 120
    3. Generation happens server-side with the service role. Students read the
       bank and can never write to it: a practice bank anyone can insert into
       is a practice bank that teaches wrong answers.
+
+   4. A topic with ANY verified questions serves instantly — a live model
+      call only ever blocks a genuinely cold topic (0 rows). A thin bank
+      tops itself up in the background via `after()`, after the response
+      has already gone out, so depth improves under load without anyone
+      waiting on it.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const MODEL = 'claude-sonnet-4-5'
@@ -79,34 +85,64 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Question bank is not configured.' }, { status: 503 })
   }
 
-  // Already deep enough? Serve what exists rather than paying to generate.
   const existing = await readBank(sb, body.subjectId, topic, exam)
-  if (existing.length >= ENOUGH || !key) {
-    if (!key && existing.length === 0) {
-      return NextResponse.json(
-        { error: 'Question generation is not set up yet.' },
-        { status: 503 },
+
+  // Once a topic has ANY verified questions, never make a student wait on a
+  // live generation again — serve instantly and top the bank up in the
+  // background if it's thin. Only a genuinely cold topic (0 rows) blocks.
+  if (existing.length > 0) {
+    if (existing.length < ENOUGH && key) {
+      const client = new Anthropic({ apiKey: key })
+      after(() =>
+        generateAndStore(client, sb, body.subjectId, subject.name, topic, exam, existing.map((q) => q.question)),
       )
     }
     return NextResponse.json({ questions: existing, generated: 0 })
   }
 
+  if (!key) {
+    return NextResponse.json(
+      { error: 'Question generation is not set up yet.' },
+      { status: 503 },
+    )
+  }
+
   const client = new Anthropic({ apiKey: key })
-
   try {
-    const drafted = await draft(client, subject.name, topic, exam, existing.map((q) => q.question))
-    if (!drafted.length) {
-      return NextResponse.json({ questions: existing, generated: 0 })
-    }
+    const { generated } = await generateAndStore(client, sb, body.subjectId, subject.name, topic, exam, [])
+    const fresh = await readBank(sb, body.subjectId, topic, exam)
+    return NextResponse.json({ questions: fresh, generated, topic })
+  } catch (err) {
+    console.error('[questions] generation failed', err)
+    // A generation failure must never break practice — the seed bank still works.
+    return NextResponse.json({ questions: existing, generated: 0 })
+  }
+}
 
-    const kept = await verify(client, subject.name, drafted)
+/** Drafts a batch, verifies it blind, and stores whatever survives. Shared by
+ *  the cold-start path (awaited, nothing else to serve) and the background
+ *  top-up (fire-and-forget via `after()`, response has already gone out). */
+async function generateAndStore(
+  client: Anthropic,
+  sb: NonNullable<ReturnType<typeof createServiceClient>>,
+  subjectId: string,
+  subjectName: string,
+  topic: string,
+  exam: ExamBoard,
+  avoid: string[],
+): Promise<{ generated: number; rejected: number }> {
+  try {
+    const drafted = await draft(client, subjectName, topic, exam, avoid)
+    if (!drafted.length) return { generated: 0, rejected: 0 }
+
+    const kept = await verify(client, subjectName, drafted)
 
     if (kept.length) {
-      // Ignore duplicates rather than failing the batch: two students hitting
+      // Ignore duplicates rather than failing the batch: two requests hitting
       // the same thin topic at once is normal, not an error.
       await sb.from('generated_questions').upsert(
         kept.map((q) => ({
-          subject_id: body.subjectId,
+          subject_id: subjectId,
           topic,
           exam,
           question: q.question,
@@ -120,18 +156,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const fresh = await readBank(sb, body.subjectId, topic, exam)
-    return NextResponse.json({
-      questions: fresh.length ? fresh : existing,
-      generated: kept.length,
-      rejected: drafted.length - kept.length,
-      topic,
-    })
+    return { generated: kept.length, rejected: drafted.length - kept.length }
   } catch (err) {
-    console.error('[questions] generation failed', err)
-    // A generation failure must never break practice — the seed bank and
-    // whatever is already generated still work.
-    return NextResponse.json({ questions: existing, generated: 0 })
+    console.error('[questions] background generation failed', err)
+    return { generated: 0, rejected: 0 }
   }
 }
 
