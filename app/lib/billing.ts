@@ -1,4 +1,9 @@
-/** Billing + plans. Paystack-ready; works offline with local plan until keys are set. */
+/** Billing + plans. Paystack-ready. The profile row in Postgres is the only
+ *  place a plan lives — gating reads the session cache, which refreshSession()
+ *  keeps in sync with that row, never a separate local plan cache. */
+
+import { getSession, setSessionPlan } from '@/app/lib/auth'
+import { db, isCloud } from '@/app/lib/sync'
 
 export type PlanId = 'free' | 'pro' | 'voice'
 
@@ -59,81 +64,43 @@ export const PLANS: Record<PlanId, Plan> = {
   },
 }
 
-const PLAN_KEY = 'ewin-plan-v1'
-
-export type LocalPlanState = {
+export type PlanUpdate = {
   plan: PlanId
   interval: 'monthly' | 'yearly'
-  /** Paystack reference when paid */
-  reference?: string
-  updatedAt: number
 }
 
-export function getLocalPlan(): LocalPlanState {
-  if (typeof window === 'undefined') {
-    return { plan: 'free', interval: 'monthly', updatedAt: 0 }
-  }
-  try {
-    const raw = localStorage.getItem(PLAN_KEY)
-    if (!raw) return { plan: 'free', interval: 'monthly', updatedAt: 0 }
-    return JSON.parse(raw) as LocalPlanState
-  } catch {
-    return { plan: 'free', interval: 'monthly', updatedAt: 0 }
-  }
-}
-
-export function setLocalPlan(state: LocalPlanState) {
+/**
+ * Writes a plan change to the profile row and patches the cached session
+ * immediately, so isPro() reflects it without waiting for the next full
+ * session refresh. Used for the demo/no-Paystack-keys flow and for
+ * downgrading to Free — real payments are granted server-side (see
+ * app/lib/grantPro.ts) and reach the client the same way, through the
+ * session cache.
+ */
+export function setPlan(update: PlanUpdate) {
   if (typeof window === 'undefined') return
-  localStorage.setItem(PLAN_KEY, JSON.stringify(state))
-  window.dispatchEvent(new Event('ewin-plan'))
-
-  // The profile row is the real record of what someone paid for. The local
-  // copy is a cache so gating does not wait on a round trip.
-  void (async () => {
-    const { getSession } = await import('@/app/lib/auth')
-    const { db, isCloud } = await import('@/app/lib/sync')
-    if (!isCloud()) return
-    const uid = getSession()!.id
-    const { error } = await db()!
-      .from('profiles')
-      .update({
-        plan: state.plan,
-        plan_interval: state.interval,
-        plan_updated_at: new Date(state.updatedAt || Date.now()).toISOString(),
-      })
-      .eq('id', uid)
-    if (error) console.warn('[sync] plan failed', error)
-  })()
-}
-
-/** Reads the authoritative plan from the profile on load. */
-export async function hydratePlanFromCloud(): Promise<void> {
-  if (typeof window === 'undefined') return
-  const { getSession } = await import('@/app/lib/auth')
-  const { db, isCloud } = await import('@/app/lib/sync')
+  setSessionPlan(update.plan)
   if (!isCloud()) return
-
-  const { data } = await db()!
+  const uid = getSession()!.id
+  void db()!
     .from('profiles')
-    .select('plan, plan_interval, plan_updated_at')
-    .eq('id', getSession()!.id)
-    .maybeSingle()
-  if (!data) return
-
-  const next: LocalPlanState = {
-    plan: (data.plan as PlanId) || 'free',
-    interval: (data.plan_interval as 'monthly' | 'yearly') || 'monthly',
-    updatedAt: data.plan_updated_at ? new Date(data.plan_updated_at).getTime() : Date.now(),
-  }
-  localStorage.setItem(PLAN_KEY, JSON.stringify(next))
-  window.dispatchEvent(new Event('ewin-plan'))
+    .update({
+      plan: update.plan,
+      plan_interval: update.interval,
+      plan_updated_at: new Date().toISOString(),
+    })
+    .eq('id', uid)
+    .then(({ error }: { error: unknown }) => {
+      if (error) console.warn('[sync] plan failed', error)
+    })
 }
 
 /** Voice includes everything Pro has (see PLANS.voice's own feature list),
  *  so a Voice subscriber must pass every Pro gate too — not just the new
- *  voice-specific one. */
+ *  voice-specific one. Reads the session cache, which refreshSession() keeps
+ *  in sync with Postgres on every load and auth change. */
 export function isPro(): boolean {
-  const plan = getLocalPlan().plan
+  const plan = getSession()?.plan ?? 'free'
   return plan === 'pro' || plan === 'voice'
 }
 

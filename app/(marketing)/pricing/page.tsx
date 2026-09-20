@@ -5,14 +5,8 @@ import Link from 'next/link'
 import { Check, Loader2 } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { ExamBadgeRow } from '@/components/ExamBadges'
-import {
-  PLANS,
-  formatNgn,
-  getLocalPlan,
-  setLocalPlan,
-  type PlanId,
-} from '@/app/lib/billing'
-import { getSession } from '@/app/lib/auth'
+import { PLANS, formatNgn, setPlan as savePlan, type PlanId } from '@/app/lib/billing'
+import { getSession, refreshSession } from '@/app/lib/auth'
 import { SiteFooter } from '@/components/SiteFooter'
 
 export default function PricingPage() {
@@ -30,7 +24,7 @@ export default function PricingPage() {
   async function confirmPayment(reference: string | null) {
     if (!reference) {
       // demo success without ref
-      setLocalPlan({ plan: 'pro', interval, updatedAt: Date.now(), reference: 'demo_local' })
+      savePlan({ plan: 'pro', interval })
       setPlan('pro')
       setMsg('Pro activated (demo). Add Paystack keys to take real payments.')
       return
@@ -42,12 +36,7 @@ export default function PricingPage() {
       const res = await fetch(`/api/paystack/verify?${q.toString()}`)
       const data = await res.json()
       if (data.ok || data.status === 'success') {
-        setLocalPlan({
-          plan: 'pro',
-          interval: data.interval === 'yearly' ? 'yearly' : 'monthly',
-          reference,
-          updatedAt: Date.now(),
-        })
+        savePlan({ plan: 'pro', interval: data.interval === 'yearly' ? 'yearly' : 'monthly' })
         setPlan('pro')
         setMsg(data.demo ? 'Pro activated in demo mode.' : 'Payment confirmed. Welcome to Pro.')
       } else {
@@ -59,9 +48,15 @@ export default function PricingPage() {
   }
 
   useEffect(() => {
-    setPlan(getLocalPlan().plan)
+    setPlan(getSession()?.plan ?? 'free')
     const u = getSession()
     if (u?.email) setEmail(u.email)
+    // Landing here directly (not through the app shell, which keeps the
+    // session fresh via CloudSync) can mean the cached plan predates a
+    // change made elsewhere — pull the real value from Postgres.
+    void refreshSession().then((fresh) => {
+      if (fresh) setPlan(fresh.plan ?? 'free')
+    })
 
     const params = new URLSearchParams(window.location.search)
     const ref = params.get('reference') || params.get('trxref')
@@ -103,12 +98,7 @@ export default function PricingPage() {
       }
       // Demo mode — no Paystack keys yet
       if (data.demo) {
-        setLocalPlan({
-          plan: 'pro',
-          interval,
-          reference: data.reference,
-          updatedAt: Date.now(),
-        })
+        savePlan({ plan: 'pro', interval })
         setPlan('pro')
         if (userEmail) {
           void fetch(
@@ -126,7 +116,7 @@ export default function PricingPage() {
   }
 
   function stayFree() {
-    setLocalPlan({ plan: 'free', interval: 'monthly', updatedAt: Date.now() })
+    savePlan({ plan: 'free', interval: 'monthly' })
     setPlan('free')
     setMsg('You are on the Free plan.')
   }

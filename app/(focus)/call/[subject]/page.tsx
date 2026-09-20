@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { X, Mic, MicOff, PhoneOff, Radio } from 'lucide-react'
 import { getSubject } from '@/app/lib/subjects'
-import { getLocalPlan } from '@/app/lib/billing'
+import { getSession } from '@/app/lib/auth'
 import { Mark } from '@/components/Mark'
 import { Diagram } from '@/components/Diagram'
 import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
@@ -31,7 +31,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    if (getLocalPlan().plan !== 'voice') {
+    if (getSession()?.plan !== 'voice') {
       setState('not-voice-plan')
       return
     }
