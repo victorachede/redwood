@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EWIN</string>
+    <string name="title_activity_main">EWIN</string>
+    <string name="package_name">com.ewin.app</string>
+    <string name="custom_url_scheme">com.ewin.app</string>
+</resources>
