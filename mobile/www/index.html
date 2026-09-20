@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>EWIN</title>
+    <style>
+      html, body { height: 100%; margin: 0; background: #fbf8f2; }
+      body { display: flex; align-items: center; justify-content: center; font-family: -apple-system, system-ui, sans-serif; color: #6b6355; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Never actually shown. capacitor.config.ts points server.url at the
+      live deployment, so the WebView loads that instead of this file — but
+      `cap add`/`cap sync` require webDir to contain real content regardless,
+      and this is also what would render, briefly, if a device ever had no
+      network on first cold launch before the WebView can reach the server.
+    -->
+    <p>Loading EWIN…</p>
+  </body>
+</html>

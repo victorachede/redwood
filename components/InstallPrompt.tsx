@@ -30,27 +30,41 @@ export function InstallPrompt() {
     if (alreadyInstalled) return
     if (localStorage.getItem(DISMISSED_KEY)) return
 
-    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    let cancelled = false
+    let removeListener: (() => void) | undefined
+    let t: ReturnType<typeof setTimeout> | undefined
 
-    const onPrompt = (e: Event) => {
-      e.preventDefault()
-      setDeferred(e as BeforeInstallPromptEvent)
-      setDismissed(false)
-    }
-    window.addEventListener('beforeinstallprompt', onPrompt)
+    void import('@capacitor/core').then(({ Capacitor }) => {
+      if (cancelled) return
+      // Someone running the real native wrapper (see capacitor.config.ts)
+      // has already "installed" the app in the way that matters — offering
+      // the PWA install banner on top of that is just confusing.
+      if (Capacitor.isNativePlatform()) return
 
-    // Chrome fires beforeinstallprompt asynchronously (or not at all if the
-    // install criteria already failed); iOS never fires it. Either way,
-    // decide what to show once we've given Chrome a moment to speak up.
-    const t = setTimeout(() => {
-      if (isIos) {
-        setIosHint(true)
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+
+      const onPrompt = (e: Event) => {
+        e.preventDefault()
+        setDeferred(e as BeforeInstallPromptEvent)
         setDismissed(false)
       }
-    }, 1200)
+      window.addEventListener('beforeinstallprompt', onPrompt)
+      removeListener = () => window.removeEventListener('beforeinstallprompt', onPrompt)
+
+      // Chrome fires beforeinstallprompt asynchronously (or not at all if
+      // the install criteria already failed); iOS never fires it. Either
+      // way, decide what to show once we've given Chrome a moment to speak.
+      t = setTimeout(() => {
+        if (isIos) {
+          setIosHint(true)
+          setDismissed(false)
+        }
+      }, 1200)
+    })
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
+      cancelled = true
+      removeListener?.()
       clearTimeout(t)
     }
   }, [])
