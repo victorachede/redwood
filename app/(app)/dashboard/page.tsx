@@ -26,6 +26,7 @@ import { reopenWork } from '@/app/lib/workGate'
 import { cachedBoard, isOptedIn } from '@/app/lib/leaderboard'
 import { onSync } from '@/app/lib/sync'
 import { MilestonePopup, useMilestoneCheck } from '@/components/MilestonePopup'
+import { InstallPrompt } from '@/components/InstallPrompt'
 
 /** "Tuesday, 3 September" — the date a student would write in the margin. */
 function todayLabel() {
@@ -198,6 +199,8 @@ export default function TodayPage() {
             )}
           </h2>
         </header>
+
+        <InstallPrompt />
 
         {/* ── The one thing to do next ─────────────────────────────────── */}
         <Link
