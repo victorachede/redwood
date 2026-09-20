@@ -274,6 +274,17 @@ export async function signOutAndGoHome(): Promise<void> {
   if (typeof window !== 'undefined') window.location.href = '/'
 }
 
+/**
+ * Patches only the plan on the cached session — an instant local reflection
+ * of a plan change (Paystack confirm, downgrade) so gating sees it before
+ * the next full refreshSession() round trip to Postgres.
+ */
+export function setSessionPlan(plan: 'free' | 'pro' | 'voice') {
+  const current = getSession()
+  if (!current) return
+  cacheSession({ ...current, plan })
+}
+
 export function updateProfile(
   patch: Partial<Pick<LocalUser, 'displayName' | 'school' | 'examFocus' | 'focusSubjects'>>,
 ): { ok: true; user: LocalUser } | { ok: false; error: string } {

@@ -4,11 +4,10 @@ import { useEffect } from 'react'
 import { hydrateProgressFromCloud } from '@/app/lib/progress'
 import { hydrateCardsFromCloud } from '@/app/lib/cards'
 import { hydrateAvatarFromCloud } from '@/app/lib/avatar'
-import { hydratePlanFromCloud } from '@/app/lib/billing'
 import { hydrateAssignmentsFromCloud } from '@/app/lib/assignments'
 import { hydrateOptInFromCloud } from '@/app/lib/leaderboard'
 import { isCloud } from '@/app/lib/sync'
-import { subscribeToAuth } from '@/app/lib/auth'
+import { refreshSession, subscribeToAuth } from '@/app/lib/auth'
 
 /**
  * Pulls the signed-in student's data down once per app load, and again
@@ -23,10 +22,13 @@ export function CloudSync() {
     const pull = () => {
       if (!isCloud()) return
       void Promise.allSettled([
+        // The profile row — display name, plan, exam focus, subjects — so a
+        // change made elsewhere (another device, a direct DB edit, a
+        // Paystack webhook) shows up on refocus, not just on next sign-in.
+        refreshSession(),
         hydrateProgressFromCloud(),
         hydrateCardsFromCloud(),
         hydrateAvatarFromCloud(),
-        hydratePlanFromCloud(),
         hydrateAssignmentsFromCloud(),
         hydrateOptInFromCloud(),
       ])
