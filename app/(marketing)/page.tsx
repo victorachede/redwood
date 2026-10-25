@@ -8,6 +8,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { Motion } from '@/components/marketing/Motion'
 import { Blob } from '@/components/Blob'
 import { PhotoSlot } from '@/components/marketing/PhotoSlot'
+import { Hero } from '@/components/marketing/Hero'
 import { useAuthCta } from '@/components/useAuthCta'
 import {
   ArrowIcon,
@@ -125,84 +126,7 @@ export default function Home() {
       <Motion />
       <SiteHeader />
 
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-paper">
-        <div className="relative mx-auto max-w-[1240px] px-5 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
-          <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-6">
-            <div className="max-w-[460px]">
-              <p data-hero-item className="lp-eyebrow">
-                Free · WAEC · NECO · JAMB
-              </p>
-
-              <h1
-                data-hero-item
-                className="mt-6 font-marketing text-[38px] font-bold leading-[1.12] tracking-tight text-ink lg:text-[46px]"
-              >
-                You don&rsquo;t need more hours. You need it to stick.
-              </h1>
-
-              <p data-hero-item className="mt-5 text-[16px] leading-relaxed text-ink-muted">
-                EWIN teaches one thing, makes you prove you got it, then tells you exactly which
-                step you fumbled.
-              </p>
-
-              <div data-hero-item className="mt-8">
-                <Link href={heroCta.href} className="lp-cta press no-underline">
-                  {heroCta.signedIn ? 'Continue learning' : 'Start learning — free'}
-                  <ArrowIcon className="text-on-dark" />
-                </Link>
-              </div>
-
-              <p data-hero-item className="mt-4 text-[12.5px] font-medium text-ink-faint">
-                Free forever — no card, ever.
-              </p>
-            </div>
-
-            <div data-hero-cast className="lp-stage">
-              <Blob id="hero-blob" from="#7ea3e0" to="#2f5a9e" className="lp-blob" />
-
-              <div className="lp-float-card lp-card-subject">
-                <div className="lp-swatch">
-                  <TickIcon />
-                </div>
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-ink-faint">
-                  Mathematics
-                </p>
-                <p className="mt-1 text-[15px] font-bold text-ink">Algebraic processes</p>
-                <p className="mt-0.5 text-[12px] text-ink-faint">5 topics</p>
-              </div>
-
-              <div className="lp-float-card lp-card-board">
-                <div className="mb-2 flex gap-[7px]">
-                  {BOARDS.map((b) => (
-                    <span
-                      key={b.id}
-                      className="relative h-5 w-5 overflow-hidden rounded-md bg-white"
-                    >
-                      <Image src={b.logo} alt={`${b.id} logo`} fill className="object-contain p-px" />
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[11.5px] font-bold text-ink">WAEC · NECO · JAMB</p>
-                <p className="mt-0.5 text-[10px] text-ink-faint">Written for all three</p>
-              </div>
-
-              <PhotoSlot
-                className="lp-photo-slot"
-                src="/marketing/hero.jpg"
-                alt="A student studying at home, notebook in hand, laptop open beside them"
-              />
-
-              <div className="lp-float-card lp-card-mark">
-                <p className="text-[26px] font-bold leading-none text-ink">7/10</p>
-                <p className="mt-1.5 text-[11.5px] leading-snug text-ink-faint">
-                  Marked instantly, with the step that broke.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
 
       {/* ── How a session goes ───────────────────────────────────────── */}
       <section id="how-it-works" className="lp-section bg-sunken">
