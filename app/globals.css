@@ -642,52 +642,114 @@ button.press:focus-visible {
   border: none;
 }
 
-.lp-stage {
-  position: relative;
-  height: 580px;
-}
-
-.lp-blob {
-  position: absolute;
-  width: 760px;
-  height: 620px;
-  right: -160px;
-  top: -10px;
-}
-
-.lp-photo-slot {
-  position: absolute;
-  left: 96px;
-  bottom: 0;
-  width: 290px;
-  height: 450px;
-  border-radius: var(--r-xl) var(--r-xl) 0 0;
-}
-
-.lp-float-card {
-  position: absolute;
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 16px 18px;
-  z-index: 4;
-  font-family: var(--font-marketing), sans-serif;
-}
-.lp-card-subject { top: 36px; left: 0; width: 186px; }
-.lp-card-board { top: 8px; right: 8px; width: 158px; }
-.lp-card-mark { bottom: 64px; right: -10px; width: 168px; }
-
-.lp-swatch {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--primary);
-  color: var(--on-dark);
-  margin-bottom: 10px;
+/* ── Hero (see components/marketing/Hero.tsx) ─────────────────────────── */
+.hx {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-height: calc(100svh - 64px);
+  background: var(--paper);
 }
+.hx-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px;
+}
+.hx-art { display: flex; justify-content: center; }
+.hx-stage { position: relative; width: 520px; height: 460px; flex-shrink: 0; }
+.hx-tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  transform: rotate(var(--tilt, 0deg));
+  animation: hx-bob 5.2s ease-in-out infinite;
+}
+@keyframes hx-bob {
+  0%, 100% { transform: rotate(var(--tilt, 0deg)) translateY(0); }
+  50% { transform: rotate(var(--tilt, 0deg)) translateY(-7px); }
+}
+.hx-bubble {
+  position: absolute;
+  left: 150px;
+  top: 18px;
+  z-index: 5;
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-bottom: 5px solid var(--line-strong);
+  border-radius: 16px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--wrong);
+}
+.hx-bubble::after {
+  content: '';
+  position: absolute;
+  left: 26px;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  background: var(--surface);
+  border-right: 2px solid var(--line-strong);
+  border-bottom: 2px solid var(--line-strong);
+  transform: rotate(45deg);
+}
+.hx-copy { max-width: 380px; margin: 0 auto; text-align: center; }
+.hx-title {
+  margin: 0 0 26px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 800;
+  font-size: 34px;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.hx-actions { display: grid; gap: 12px; }
+.hx-btn {
+  display: block;
+  padding: 15px 20px;
+  border-radius: 16px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.hx-btn-primary { background: var(--primary); color: var(--on-primary); border-bottom: 5px solid #162f59; }
+.hx-btn-ghost { background: var(--surface); color: var(--primary); border: 2px solid var(--line); border-bottom: 5px solid var(--line-strong); }
+.hx-btn:active { transform: translateY(3px); border-bottom-width: 2px; }
+.hx-note { margin: 16px 0 0; font-size: 13px; color: var(--ink-faint); }
+.hx-strip {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 20px;
+  border-top: 2px solid var(--line);
+}
+.hx-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-family: var(--font-marketing), sans-serif;
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.hx-sub:hover { background: var(--sunken); }
+.hx-sub-dot { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; }
 
 /* ── Section rhythm ─────────────────────────────────────────────────── */
 .lp-section { max-width: 1240px; margin: 0 auto; padding: 90px 32px; }
@@ -738,20 +800,19 @@ button.press:focus-visible {
 }
 
 @media (max-width: 900px) {
+  .hx { min-height: 0; }
+  .hx-grid { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 12px 20px 36px; }
+  /* The stage is drawn at 520 x 460. On a phone it is scaled down around its top centre. Scaling does not shrink
+     the box it takes in the layout, so it is taken out of the flow (absolute) and centred, and the art area
+     holds the scaled height itself. Without that the 520px box widens the whole page. */
+  .hx-art { position: relative; display: block; height: 310px; }
+  .hx-stage { position: absolute; left: 50%; top: 0; margin-left: -260px; transform: scale(0.66); transform-origin: top center; }
+  .hx-title { font-size: 28px; }
+  .hx-strip { gap: 4px; padding: 12px 14px; }
+  .hx-sub { padding: 6px 10px; font-size: 11.5px; }
   .lp-section { padding: 60px 20px; }
   .lp-head h2 { font-size: 26px; }
 
-  .lp-stage { height: 600px; margin-top: 34px; }
-  /* The blob is a raw SVG width/height attribute, not a CSS size — those
-     do not respond to a media query on their own. This class is what
-     actually shrinks it; without it the blob stays full desktop size and
-     floats up into whatever copy sits above the stage on a narrow screen,
-     which is exactly the bug this page shipped once already in mockup. */
-  .lp-blob { width: 280px; height: 340px; right: -10px; top: 0; }
-  .lp-photo-slot { left: 50%; transform: translateX(-50%); width: 190px; height: 300px; }
-  .lp-card-subject { left: 6px; top: 60px; width: 150px; padding: 13px 14px; }
-  .lp-card-board { right: 6px; top: 10px; width: 130px; padding: 13px 14px; }
-  .lp-card-mark { right: 6px; bottom: 30px; width: 150px; padding: 13px 14px; }
 
   .lp-how-grid { grid-template-columns: 1fr; gap: 16px; }
   .lp-how-photo { height: 260px; }
