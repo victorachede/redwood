@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw } from '@/components/icons'
 
 export default function Error({
   error,

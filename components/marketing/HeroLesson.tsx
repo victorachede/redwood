@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
-import { Check } from 'lucide-react'
+import { Check } from '@/components/icons'
 import { Mark } from '@/components/Mark'
 
 /**

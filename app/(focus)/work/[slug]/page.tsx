@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Camera, Lock, Reply, Send, X } from 'lucide-react'
+import { ArrowLeft, Camera, Lock, Reply, Send, X } from '@/components/icons'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import { ChatMessage, DateDivider, type ReplySnapshot } from '@/components/ChatMessage'
 import { addCard } from '@/app/lib/cards'

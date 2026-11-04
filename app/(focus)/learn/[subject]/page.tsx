@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Camera, FileText, Plus, Reply, X, BookOpen } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, FileText, Plus, Reply, X, BookOpen } from '@/components/icons'
 import { getSubject } from '@/app/lib/subjects'
 import {
   saveSession,

@@ -3,15 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import {
-  ArrowLeft,
-  Check,
-  ChevronRight,
-  Flame,
-  LogOut,
-  BookOpen,
-  Target,
-} from 'lucide-react'
+import { ArrowLeft, BarsIcon, BellIcon, BookOpen, Check, ChevronRight, Flame, LayersIcon, LogOut, PencilIcon, Target, TickIcon } from '@/components/icons'
 import { EwinAvatar } from '@/components/EwinAvatar'
 import {
   changePassword,
@@ -28,7 +20,6 @@ import { PasswordField } from '@/components/PasswordField'
 import { AvatarPicker } from '@/components/ui/AvatarPicker'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { Blob } from '@/components/Blob'
-import { BarsIcon, BellIcon, LayersIcon, PencilIcon, TickIcon } from '@/components/icons'
 import { loadNotifPrefs, setNotifPref, type NotifKey, type NotifPrefs } from '@/app/lib/notifPrefs'
 
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Reply } from 'lucide-react'
+import { Reply } from '@/components/icons'
 import { Avatar } from '@/components/ui/Avatar'
 import { EwinAvatar } from '@/components/EwinAvatar'
 

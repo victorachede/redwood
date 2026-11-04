@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check } from 'lucide-react'
+import { Check } from '@/components/icons'
 import { updateProfile } from '@/app/lib/auth'
 import { SUBJECTS } from '@/app/lib/subjects'
 import { SubjectIcon } from '@/components/SubjectIcon'

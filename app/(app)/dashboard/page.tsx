@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, ClipboardList, Flame, Users } from 'lucide-react'
+import { ArrowRight, BarsIcon, ClipboardList, Flame, LayersIcon, RingDotIcon, TickIcon, Users } from '@/components/icons'
 import { SUBJECTS, getSubject } from '@/app/lib/subjects'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
 import { Blob } from '@/components/Blob'
-import { BarsIcon, LayersIcon, RingDotIcon, TickIcon } from '@/components/icons'
 import {
   getStreakInfo,
   loadPractice,

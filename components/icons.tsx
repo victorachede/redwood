@@ -201,3 +201,81 @@ export function BellIcon({ size = 17, className = '' }: IconProps) {
     </svg>
   )
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Interface icons — Hugeicons, under the names the app already calls them.
+
+   The glyphs above are Ewin's own and stay that way: the subject marks, the
+   tick and the CTA arrow are brand drawings, and a stock set has no Σ or
+   three-orbit atom that reads right at 15px. Everything below is the generic
+   interface furniture — chevrons, spinners, a bin — which has no reason to be
+   hand-drawn and was coming from Lucide.
+
+   They keep their Lucide names so call sites did not have to be rewritten
+   twice, and because `<Check/>` says what it does at the point of use better
+   than `<Tick02Icon/>` does. Sizing stays on className (`h-4 w-4`) exactly as
+   before: a CSS width beats the width attribute these render with.
+   ───────────────────────────────────────────────────────────────────────── */
+
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Add01Icon, AiMagicIcon, ArrowLeft01Icon, ArrowLeft02Icon, ArrowReloadHorizontalIcon,
+  ArrowRight01Icon, ArrowRight02Icon, ArrowTurnBackwardIcon, BookOpen01Icon, CallEnd01Icon,
+  Camera01Icon, Cancel01Icon, Clock01Icon, Copy01Icon, Delete02Icon, Download01Icon,
+  File01Icon, FireIcon, Home01Icon, Image01Icon, InternetAntenna01Icon, Layers01Icon,
+  LoaderCircleIcon, LockPasswordIcon, Logout01Icon, Mic01Icon, MicOff01Icon, SentIcon,
+  Share01Icon, Share08Icon, Target01Icon, Task01Icon, Tick02Icon, UserGroupIcon, UserIcon,
+  ViewIcon, ViewOffSlashIcon,
+} from '@hugeicons/core-free-icons'
+
+type HugeIconData = Parameters<typeof HugeiconsIcon>[0]['icon']
+type UiIconProps = Omit<React.ComponentProps<typeof HugeiconsIcon>, 'icon'> & { strokeWidth?: number }
+
+/** Hugeicons draws heavier than Lucide at the same number, so a Lucide
+ *  strokeWidth is scaled rather than passed through — 2 (Lucide's default,
+ *  and what the call sites were drawn against) lands on 1.5 here. */
+function make(icon: HugeIconData, name: string) {
+  function Icon({ strokeWidth = 2, ...rest }: UiIconProps) {
+    return <HugeiconsIcon icon={icon} strokeWidth={strokeWidth * 0.75} {...rest} />
+  }
+  Icon.displayName = name
+  return Icon
+}
+
+export const ArrowLeft = make(ArrowLeft02Icon, 'ArrowLeft')
+export const ArrowRight = make(ArrowRight02Icon, 'ArrowRight')
+export const BookOpen = make(BookOpen01Icon, 'BookOpen')
+export const Camera = make(Camera01Icon, 'Camera')
+export const Check = make(Tick02Icon, 'Check')
+export const ChevronLeft = make(ArrowLeft01Icon, 'ChevronLeft')
+export const ChevronRight = make(ArrowRight01Icon, 'ChevronRight')
+export const ClipboardList = make(Task01Icon, 'ClipboardList')
+export const Clock = make(Clock01Icon, 'Clock')
+export const Copy = make(Copy01Icon, 'Copy')
+export const Download = make(Download01Icon, 'Download')
+export const Eye = make(ViewIcon, 'Eye')
+export const EyeOff = make(ViewOffSlashIcon, 'EyeOff')
+export const FileText = make(File01Icon, 'FileText')
+export const Flame = make(FireIcon, 'Flame')
+export const Home = make(Home01Icon, 'Home')
+export const ImageIcon = make(Image01Icon, 'ImageIcon')
+export const Layers = make(Layers01Icon, 'Layers')
+export const Loader2 = make(LoaderCircleIcon, 'Loader2')
+export const Lock = make(LockPasswordIcon, 'Lock')
+export const LogOut = make(Logout01Icon, 'LogOut')
+export const Mic = make(Mic01Icon, 'Mic')
+export const MicOff = make(MicOff01Icon, 'MicOff')
+export const PhoneOff = make(CallEnd01Icon, 'PhoneOff')
+export const Plus = make(Add01Icon, 'Plus')
+export const Radio = make(InternetAntenna01Icon, 'Radio')
+export const RefreshCw = make(ArrowReloadHorizontalIcon, 'RefreshCw')
+export const Reply = make(ArrowTurnBackwardIcon, 'Reply')
+export const Send = make(SentIcon, 'Send')
+export const Share = make(Share01Icon, 'Share')
+export const Share2 = make(Share08Icon, 'Share2')
+export const Sparkles = make(AiMagicIcon, 'Sparkles')
+export const Target = make(Target01Icon, 'Target')
+export const Trash2 = make(Delete02Icon, 'Trash2')
+export const User = make(UserIcon, 'User')
+export const Users = make(UserGroupIcon, 'Users')
+export const X = make(Cancel01Icon, 'X')

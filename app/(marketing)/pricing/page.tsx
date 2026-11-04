@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, Loader2 } from '@/components/icons'
 import { SiteHeader } from '@/components/SiteHeader'
 import { ExamBadgeRow } from '@/components/ExamBadges'
 import { PLANS, formatNgn, setPlan as savePlan, type PlanId } from '@/app/lib/billing'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Share2, Copy, Check } from 'lucide-react'
+import { Share2, Copy, Check } from '@/components/icons'
 import { getStreak } from '@/app/lib/progress'
 import { getSession } from '@/app/lib/auth'
 import { EwinAvatar } from '@/components/EwinAvatar'

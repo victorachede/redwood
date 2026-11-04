@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/components/icons'
 import { getSession, refreshSession, subscribeToAuth } from '@/app/lib/auth'
 import { Wordmark } from '@/components/Mark'
 

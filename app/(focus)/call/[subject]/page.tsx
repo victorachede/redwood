@@ -2,7 +2,7 @@
 
 import { use, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { X, Mic, MicOff, PhoneOff, Radio } from 'lucide-react'
+import { X, Mic, MicOff, PhoneOff, Radio } from '@/components/icons'
 import { getSubject } from '@/app/lib/subjects'
 import { getSession } from '@/app/lib/auth'
 import { Mark } from '@/components/Mark'

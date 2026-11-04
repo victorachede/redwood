@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Download, Share, X } from 'lucide-react'
+import { Download, Share, X } from '@/components/icons'
 
 const DISMISSED_KEY = 'ewin-install-dismissed'
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from '@/components/icons'
 import { Wordmark } from '@/components/Mark'
 import { Ayo, type AyoPose } from '@/components/mascots/Mascots'
 import { Blob } from '@/components/Blob'

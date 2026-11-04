@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Mark } from '@/components/Mark'
 import { usePathname } from 'next/navigation'
-import { BookOpen, Home, Layers, Target, User } from 'lucide-react'
+import { BookOpen, Home, Layers, Target, User } from '@/components/icons'
 
 const TABS = [
   { href: '/dashboard', label: 'Today', Icon: Home },

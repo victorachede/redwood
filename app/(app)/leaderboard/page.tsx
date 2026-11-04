@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Flame, Lock } from 'lucide-react'
+import { BarsIcon, Flame, Lock } from '@/components/icons'
 import { AppHeader } from '@/components/ui/AppHeader'
 import { Avatar } from '@/components/ui/Avatar'
-import { BarsIcon } from '@/components/icons'
 import { colorForName } from '@/app/lib/avatar'
 import {
   cachedBoard,

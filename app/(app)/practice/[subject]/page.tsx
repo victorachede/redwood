@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Check, Clock, Sparkles, X } from 'lucide-react'
+import { ArrowLeft, Check, Clock, Sparkles, X } from '@/components/icons'
 import { getSubject } from '@/app/lib/subjects'
 import {
   questionsForExam,

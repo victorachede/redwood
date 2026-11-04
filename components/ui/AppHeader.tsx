@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft } from '@/components/icons'
 
 /** Page header inside the app shell. Title is display-face; actions sit right. */
 export function AppHeader({

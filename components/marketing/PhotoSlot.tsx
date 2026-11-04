@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ImageIcon } from 'lucide-react'
+import { ImageIcon } from '@/components/icons'
 
 /**
  * Everywhere a real photograph belongs on this page and doesn't exist yet.

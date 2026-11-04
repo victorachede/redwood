@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Trash2 } from 'lucide-react'
+import { Camera, Trash2 } from '@/components/icons'
 import {
   AVATAR_COLORS,
   colorForName,
