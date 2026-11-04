@@ -8,6 +8,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { Motion } from '@/components/marketing/Motion'
 import { Blob } from '@/components/Blob'
 import { PhotoSlot } from '@/components/marketing/PhotoSlot'
+import { SubjectArt } from '@/components/marketing/SubjectArt'
 import { Hero } from '@/components/marketing/Hero'
 import { useAuthCta } from '@/components/useAuthCta'
 import {
@@ -186,11 +187,10 @@ export default function Home() {
                 className="card card-interactive block overflow-hidden no-underline"
               >
                 <div className="relative">
-                  <PhotoSlot className="lp-subj-photo" label="" />
-                  {/* Subject accent sits over the placeholder as its own
-                      element, not passed into PhotoSlot — that component
-                      stays a pure swap target for a real photo, with
-                      nothing else depending on its internals. */}
+                  <SubjectArt subject={s} className="lp-subj-photo" />
+                  {/* Subject accent sits over the art as its own element,
+                      so SubjectArt stays a pure drawing with nothing else
+                      depending on its internals. */}
                   <span
                     className="absolute left-1/2 top-1/2 flex h-[36px] w-[36px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[10px] text-on-dark"
                     style={{ background: s.accent }}
