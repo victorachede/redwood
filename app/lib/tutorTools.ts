@@ -141,3 +141,78 @@ export const WORK_TOOL_NAMES = new Set(['save_study_card', 'record_mastery', 'sh
 export const WORK_TOOLS: Anthropic.Tool[] = TUTOR_TOOLS.filter((t) =>
   WORK_TOOL_NAMES.has(t.name),
 )
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Voice call tools
+
+   On a call the tutor works at a whiteboard while it talks. These four tools
+   are the board; app/lib/callBoard.ts says what each one does to it. The
+   call also keeps the tools that save what was learned, so a call ends the
+   way a chat does: mastery recorded, homework set, a card saved.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const BOARD_TOOLS: Anthropic.Tool[] = [
+  {
+    name: 'write_step',
+    description:
+      "Write one line on the whiteboard as you say it: a rule, a step of working, the question you are setting, or the student's spoken answer copied up so you can mark it. Short lines, one step each, written the way a student would write them in an exam booklet.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Your own short id for the line, so you can mark it later. Reusing an id rewrites that line.' },
+        text: { type: 'string', description: 'The line itself, at most 80 characters. Use the real minus sign − and × for times.' },
+        by: {
+          type: 'string',
+          enum: ['ewin', 'student', 'question'],
+          description: "ewin for your own steps, student for the student's answer, question for the problem you set.",
+        },
+      },
+      required: ['id', 'text'],
+    },
+  },
+  {
+    name: 'mark_step',
+    description:
+      'Mark a line already on the board, the way a teacher marks a script: tick a right line, cross a wrong one, circle the exact part that broke, add a two- or three-word note, or strike a line out once it has been corrected. Circle the smallest piece that is wrong, never the whole line.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'The id of the line to mark.' },
+        mark: { type: 'string', enum: ['tick', 'cross'] },
+        circle: { type: 'string', description: 'Text to circle. Must appear exactly as written in that line.' },
+        note: { type: 'string', description: 'A short pen note beside the line, like "sign?"' },
+        strike: { type: 'boolean', description: 'Strike the line out after it has been corrected.' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'clear_board',
+    description: 'Wipe the board before a new part of the lesson, optionally with a new heading.',
+    input_schema: {
+      type: 'object',
+      properties: { title: { type: 'string', description: 'Heading for the fresh board, a few words.' } },
+    },
+  },
+  {
+    name: 'set_phase',
+    description:
+      'Move the lesson to its next part. Every call runs warm_up, teach, your_turn, check, recap in that order; the student sees where they are. On recap, pass the one rule to remember.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        phase: { type: 'string', enum: ['warm_up', 'teach', 'your_turn', 'check', 'recap'] },
+        recap: { type: 'string', description: 'Only with recap: the one rule from today, in a sentence.' },
+      },
+      required: ['phase'],
+    },
+  },
+]
+
+const CALL_KEEPS = new Set(['show_diagram', 'record_mastery', 'assign_work', 'save_study_card'])
+
+/** Everything the tutor can use on a voice call. */
+export const CALL_TOOLS: Anthropic.Tool[] = [
+  ...BOARD_TOOLS,
+  ...TUTOR_TOOLS.filter((t) => CALL_KEEPS.has(t.name)),
+]

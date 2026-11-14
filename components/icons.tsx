@@ -219,7 +219,7 @@ export function BellIcon({ size = 17, className = '' }: IconProps) {
 
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Add01Icon, AiMagicIcon, ArrowLeft01Icon, ArrowLeft02Icon, ArrowReloadHorizontalIcon,
+  Add01Icon, AiMagicIcon, Alert02Icon, Calendar03Icon, HandIcon, Note01Icon, ArrowLeft01Icon, ArrowLeft02Icon, ArrowReloadHorizontalIcon,
   ArrowRight01Icon, ArrowRight02Icon, ArrowTurnBackwardIcon, BookOpen01Icon, CallEnd01Icon,
   Camera01Icon, Cancel01Icon, Clock01Icon, Copy01Icon, Delete02Icon, Download01Icon,
   File01Icon, FireIcon, Home01Icon, Image01Icon, InternetAntenna01Icon, Layers01Icon,
@@ -242,9 +242,11 @@ function make(icon: HugeIconData, name: string) {
   return Icon
 }
 
+export const AlertTriangle = make(Alert02Icon, 'AlertTriangle')
 export const ArrowLeft = make(ArrowLeft02Icon, 'ArrowLeft')
 export const ArrowRight = make(ArrowRight02Icon, 'ArrowRight')
 export const BookOpen = make(BookOpen01Icon, 'BookOpen')
+export const Calendar = make(Calendar03Icon, 'Calendar')
 export const Camera = make(Camera01Icon, 'Camera')
 export const Check = make(Tick02Icon, 'Check')
 export const ChevronLeft = make(ArrowLeft01Icon, 'ChevronLeft')
@@ -257,6 +259,7 @@ export const Eye = make(ViewIcon, 'Eye')
 export const EyeOff = make(ViewOffSlashIcon, 'EyeOff')
 export const FileText = make(File01Icon, 'FileText')
 export const Flame = make(FireIcon, 'Flame')
+export const Hand = make(HandIcon, 'Hand')
 export const Home = make(Home01Icon, 'Home')
 export const ImageIcon = make(Image01Icon, 'ImageIcon')
 export const Layers = make(Layers01Icon, 'Layers')
@@ -267,6 +270,7 @@ export const Mic = make(Mic01Icon, 'Mic')
 export const MicOff = make(MicOff01Icon, 'MicOff')
 export const PhoneOff = make(CallEnd01Icon, 'PhoneOff')
 export const Plus = make(Add01Icon, 'Plus')
+export const StickyNote = make(Note01Icon, 'StickyNote')
 export const Radio = make(InternetAntenna01Icon, 'Radio')
 export const RefreshCw = make(ArrowReloadHorizontalIcon, 'RefreshCw')
 export const Reply = make(ArrowTurnBackwardIcon, 'Reply')

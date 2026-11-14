@@ -7,8 +7,11 @@ import { NextResponse } from 'next/server'
  * feature as unavailable instead of pretending a call can start.
  *
  * Once the key exists, this is where the actual Deepgram session request
- * goes — Claude as the `think` provider (ANTHROPIC_API_KEY, BYOM), the same
- * tool schemas as tutorTools.ts, and the learner profile for context.
+ * goes — Claude as the `think` provider (ANTHROPIC_API_KEY, BYOM),
+ * buildCallPrompt() from app/lib/callPrompt.ts as its instructions, CALL_TOOLS
+ * from tutorTools.ts (the whiteboard tools plus mastery, homework and study
+ * cards), and the learner profile for context. The browser side that consumes
+ * it is connectLiveSession() in app/lib/callSession.ts.
  */
 export async function POST() {
   if (!process.env.DEEPGRAM_API_KEY) {
@@ -19,8 +22,9 @@ export async function POST() {
   }
 
   // TODO once DEEPGRAM_API_KEY is set: request a Deepgram Voice Agent
-  // session token, configured with Claude (BYOM) as the think provider and
-  // the tutorTools.ts tool schemas, and return it to the client.
+  // session token, configured with Claude (BYOM) as the think provider,
+  // buildCallPrompt() as its prompt and CALL_TOOLS as its functions, and
+  // return it to the client.
   return NextResponse.json(
     { error: 'not_implemented', message: 'Voice session wiring is not finished yet.' },
     { status: 501 },

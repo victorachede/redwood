@@ -10,12 +10,18 @@
  * Newline-delimited JSON lets prose and structure travel together.
  */
 
+import type { ClearBoardInput, MarkStepInput, SetPhaseInput, WriteStepInput } from '@/app/lib/callBoard'
+
 export type ToolName =
   | 'assign_work'
   | 'save_study_card'
   | 'record_mastery'
   | 'ask_clarifying'
   | 'show_diagram'
+  | 'write_step'
+  | 'mark_step'
+  | 'clear_board'
+  | 'set_phase'
 
 export type AssignWorkInput = {
   kind: 'classwork' | 'homework'
@@ -53,6 +59,10 @@ export type ToolInputMap = {
   record_mastery: RecordMasteryInput
   ask_clarifying: AskClarifyingInput
   show_diagram: ShowDiagramInput
+  write_step: WriteStepInput
+  mark_step: MarkStepInput
+  clear_board: ClearBoardInput
+  set_phase: SetPhaseInput
 }
 
 /** One line of the response stream. */

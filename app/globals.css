@@ -62,6 +62,11 @@
   --streak-soft: #fdf3e6;
 
   /* Primary call-to-action surface */
+  /* Voice call: the student's own ink on the whiteboard, and the red pen */
+  --learner: #0f6b63;
+  --learner-soft: #e4f2f0;
+  --pen: #c0392b;
+
   --hero: #22457f;
   --on-hero: #ffffff;
   --on-hero-dim: rgba(255, 255, 255, 0.72);
@@ -838,4 +843,121 @@ button.press:focus-visible {
     border-right-width: 22px;
     border-bottom-width: 38px;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Voice call (see app/(focus)/call/[subject]/page.tsx)
+   A lesson at a whiteboard: the board fills the screen, the tutor sits in a
+   tile in its corner, captions run underneath, controls sit at the bottom.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vc { position: relative; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; background: var(--paper); color: var(--ink); max-width: 640px; margin: 0 auto; }
+.vc-bar { display: flex; align-items: center; gap: 10px; padding: max(14px, env(safe-area-inset-top)) 16px 10px; }
+.vc-icon-btn { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 50%; color: var(--ink-muted); }
+.vc-icon-btn:hover { background: var(--sunken); }
+.vc-timer { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--ink-muted); }
+.vc-timer i { width: 6px; height: 6px; border-radius: 50%; background: var(--wrong); animation: vc-rec 1.6s infinite; }
+@keyframes vc-rec { 50% { opacity: 0.25; } }
+
+.vc-plan { padding: 0 16px 12px; }
+.vc-segs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.vc-segs i { height: 3px; border-radius: 2px; background: var(--line-strong); transition: background var(--base) var(--ease); }
+.vc-segs i.vc-done { background: var(--primary); }
+.vc-segs i.vc-now { background: var(--streak); }
+.vc-plan-label { display: flex; justify-content: space-between; margin-top: 7px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+.vc-plan-label b { color: var(--ink); font-weight: 600; }
+
+.vc-board-wrap { display: flex; flex: 1; min-height: 0; padding: 0 12px; }
+.vc-board {
+  position: relative; flex: 1; min-height: 0; overflow: hidden;
+  padding: 16px 18px;
+  background-color: var(--surface);
+  background-image: linear-gradient(var(--paper) 1px, transparent 1px), linear-gradient(90deg, var(--paper) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1px solid var(--line); border-radius: 18px;
+}
+.vc-board-title { min-height: 14px; margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+.vc-lines { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.vc-line { position: relative; display: flex; align-items: baseline; gap: 10px; white-space: nowrap; font-family: var(--font-math), 'Cambria Math', 'Times New Roman', serif; font-size: 23px; font-weight: 500; line-height: 1.35; color: var(--primary); animation: vc-write 650ms var(--ease) both; }
+.vc-line em { font-style: italic; }
+.vc-by-student { color: var(--learner); }
+.vc-by-question { color: var(--ink); }
+.vc-struck { opacity: 0.4; text-decoration: line-through; text-decoration-color: var(--pen); text-decoration-thickness: 1.5px; }
+.vc-you { align-self: center; padding: 2px 6px; border-radius: 4px; background: var(--learner-soft); color: var(--learner); font-family: var(--font-sora), system-ui, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.vc-mark { font-family: var(--font-sora), system-ui, sans-serif; font-size: 18px; font-weight: 700; animation: vc-pop 280ms var(--ease) both; }
+.vc-tick { color: var(--correct); }
+.vc-cross { color: var(--pen); }
+.vc-note { font-family: var(--font-pen), 'Bradley Hand', cursive; font-size: 22px; color: var(--pen); transform: rotate(-4deg); animation: vc-pop 280ms var(--ease) both; }
+.vc-circled { position: relative; display: inline-block; }
+.vc-circled svg { position: absolute; left: -8px; top: -2px; width: calc(100% + 16px); height: calc(100% + 4px); overflow: visible; pointer-events: none; }
+.vc-circled path { fill: none; stroke: var(--pen); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 240; animation: vc-draw 650ms var(--ease) both; }
+.vc-recap { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--correct); border-radius: 0 10px 10px 0; background: var(--correct-soft); font-family: var(--font-math), 'Times New Roman', serif; font-size: 18px; line-height: 1.4; color: var(--ink); animation: vc-write 650ms var(--ease) both; }
+.vc-recap small { display: block; margin-bottom: 4px; font-family: var(--font-sora), system-ui, sans-serif; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--correct); }
+.vc-diagram { margin-top: 12px; max-width: 420px; }
+@keyframes vc-write { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes vc-draw { from { stroke-dashoffset: 240; } to { stroke-dashoffset: 0; } }
+@keyframes vc-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; } }
+
+/* The tutor's tile. The mouth sits inside an SVG <use>, where ancestor
+   selectors cannot reach, so the animation is handed down as an inherited
+   custom property instead. */
+.vc-tile { position: absolute; right: 12px; bottom: 12px; width: 104px; overflow: hidden; border-radius: 14px; box-shadow: var(--shadow-lg); outline: 2px solid transparent; transition: outline-color var(--base) var(--ease); }
+.vc-speaking .vc-tile { outline-color: var(--streak); --vc-talk: vc-talk 240ms ease-in-out infinite alternate; }
+.vc-mouth { transform-box: fill-box; transform-origin: center; animation: var(--vc-talk, none); }
+@keyframes vc-talk { from { transform: scaleY(0.4); } to { transform: scaleY(1.25); } }
+.vc-tile-name { position: absolute; left: 6px; bottom: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; background: rgba(23, 25, 31, 0.72); color: #fff; font-size: 10px; font-weight: 600; }
+.vc-bars { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 8px; }
+.vc-bars i { width: 2px; height: 3px; border-radius: 1px; background: #fff; }
+.vc-speaking .vc-bars i { animation: vc-bar 520ms ease-in-out infinite alternate; }
+.vc-bars i:nth-child(2) { animation-delay: -0.2s; }
+.vc-bars i:nth-child(3) { animation-delay: -0.35s; }
+@keyframes vc-bar { to { height: 8px; } }
+
+.vc-cap { min-height: 96px; padding: 14px 20px 6px; }
+.vc-cap-who { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); }
+.vc-cap-you { color: var(--learner); }
+.vc-cap-text { margin-top: 5px; font-size: 16px; font-weight: 500; line-height: 1.5; color: var(--line-strong); }
+.vc-cap-text .vc-said { color: var(--ink); transition: color var(--fast) var(--ease); }
+
+.vc-answers { display: grid; gap: 6px; padding: 4px 14px 10px; }
+.vc-answers-label { padding-left: 2px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+.vc-say { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; text-align: left; }
+.vc-say svg { color: var(--learner); }
+.vc-say:hover { border-color: var(--learner); background: var(--learner-soft); }
+
+.vc-dock { display: flex; align-items: center; gap: 12px; padding-top: 12px; padding-left: 18px; padding-right: 18px; border-top: 1px solid var(--line); background: var(--surface); }
+.vc-wave { display: flex; align-items: center; gap: 3px; height: 16px; margin-top: 4px; }
+.vc-wave i { width: 3px; height: 4px; border-radius: 2px; background: var(--learner); animation: vc-wave 700ms ease-in-out infinite alternate; }
+.vc-wave i:nth-child(2) { animation-delay: -0.2s; }
+.vc-wave i:nth-child(3) { animation-delay: -0.45s; }
+.vc-wave i:nth-child(4) { animation-delay: -0.1s; }
+.vc-wave i:nth-child(5) { animation-delay: -0.6s; }
+@keyframes vc-wave { to { height: 16px; } }
+.vc-round { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--ink); }
+.vc-round:hover:not(:disabled) { background: var(--paper); }
+.vc-round:disabled { opacity: 0.35; cursor: default; }
+.vc-round[aria-pressed='true'] { border-color: var(--ink); background: var(--ink); color: var(--on-dark); }
+.vc-hand[aria-pressed='true'] { border-color: var(--streak); background: var(--streak); color: var(--ink); }
+.vc-end { border-color: var(--wrong); background: var(--wrong); color: var(--on-primary); }
+.vc-end:hover:not(:disabled) { background: #a92b23; }
+
+.vc-sheet { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: flex-end; background: rgba(23, 25, 31, 0.32); }
+.vc-sheet-card { max-height: 100%; overflow-y: auto; padding: 20px 20px max(24px, env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: var(--surface); animation: vc-up 380ms var(--ease) both; }
+@keyframes vc-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+.vc-prep { margin: 14px 0 18px; padding: 12px 14px; border-radius: 12px; background: var(--primary-soft); color: var(--ink); font-size: 13px; line-height: 1.55; }
+.vc-prep b { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); }
+.vc-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 12px; background: var(--primary); color: var(--on-primary); font-size: 15px; font-weight: 600; }
+.vc-btn:hover:not(:disabled) { background: var(--primary-hover); }
+.vc-btn:disabled { opacity: 0.6; }
+.vc-btn-quiet { margin-top: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--primary); }
+.vc-btn-quiet:hover:not(:disabled) { background: var(--paper); }
+.vc-sum { display: grid; margin: 14px 0 18px; padding: 0; border-top: 1px solid var(--line); list-style: none; }
+.vc-sum li { display: flex; align-items: flex-start; gap: 12px; padding: 11px 2px; border-bottom: 1px solid var(--line); font-size: 13.5px; line-height: 1.45; color: var(--ink-muted); }
+.vc-sum li b { font-weight: 600; color: var(--ink); }
+.vc-sum li i { display: grid; place-items: center; width: 22px; height: 22px; flex: none; margin-top: 1px; border-radius: 50%; color: var(--on-primary); }
+.vc-bg-learner { background: var(--learner); }
+
+@media (max-width: 380px) {
+  .vc-line { font-size: 20px; }
+  .vc-tile { width: 84px; }
 }
