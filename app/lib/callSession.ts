@@ -243,18 +243,23 @@ export function createDemoSession(onEvent: (e: CallEvent) => void, name = 'there
  * says so honestly instead of pretending a call has started.
  *
  * Once /api/voice/token returns a Deepgram Voice Agent session (Claude as the
- * thinking model, buildCallPrompt() as its instructions, CALL_TOOLS as its
+ * thinking model, buildCallPrompt() with the chosen teacher as its
+ * instructions, CALL_TOOLS as its
  * tools), this is where the browser opens that session, streams the mic in,
  * plays the voice back, and turns its messages into CallEvents: transcript
  * text into 'say' and 'heard', turn changes into 'turn', and function calls
  * into 'tool'.
  */
-export async function connectLiveSession(subjectId: string, onEvent: (e: CallEvent) => void): Promise<CallSession> {
+export async function connectLiveSession(
+  subjectId: string,
+  teacherId: string,
+  onEvent: (e: CallEvent) => void,
+): Promise<CallSession> {
   void onEvent
   const res = await fetch('/api/voice/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ subject: subjectId }),
+    body: JSON.stringify({ subject: subjectId, teacher: teacherId }),
   })
   if (!res.ok) throw new Error('voice_unavailable')
   throw new Error('voice_client_not_built')

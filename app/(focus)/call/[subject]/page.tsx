@@ -43,7 +43,9 @@ import {
   type CallTurn,
 } from '@/app/lib/callSession'
 import { Whiteboard } from '@/components/call/Whiteboard'
-import { CallArtDefs, EndScene, StartScene, TutorTile } from '@/components/call/CallArt'
+import { CallArtDefs, EndScene, StartScene } from '@/components/call/CallArt'
+import { Portrait } from '@/components/cast/Portrait'
+import { defaultTeacher, teacherFor, type Character } from '@/app/lib/cast'
 
 /**
  * The voice call.
@@ -100,6 +102,9 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
   const [handUp, setHandUp] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [summary, setSummary] = useState<CallSummary>(EMPTY_SUMMARY)
+  // The default teacher on the server and first render; the student's own
+  // pick is read from storage once mounted.
+  const [teacher, setTeacher] = useState<Character>(() => defaultTeacher(subject))
 
   const session = useRef<CallSession | null>(null)
   const tick = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -113,6 +118,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDemo(wantsDemo)
     setPlan(planFor(subject, subjectLabel))
+    setTeacher(teacherFor(subject))
     setScreen(wantsDemo || getSession()?.plan === 'voice' ? 'ready' : 'not-voice-plan')
     return () => {
       session.current?.end()
@@ -219,7 +225,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
         session.current = createDemoSession(onEvent, first)
       } else {
         persist.current = true
-        session.current = await connectLiveSession(subject, onEvent)
+        session.current = await connectLiveSession(subject, teacher.id, onEvent)
       }
     } catch {
       setScreen('not-configured')
@@ -295,7 +301,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
   const live = screen === 'live'
   const turnLabel =
     !live ? (screen === 'connecting' ? 'Connecting…' : screen === 'ended' ? 'Call ended' : 'Ready')
-    : turn === 'speaking' ? 'EWIN is explaining'
+    : turn === 'speaking' ? `${teacher.name} is explaining`
     : turn === 'listening' ? (choices?.label ? 'EWIN paused for you' : 'Your turn')
     : 'Thinking…'
 
@@ -309,7 +315,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
         </button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14.5px] font-semibold leading-tight text-ink">{subjectLabel}</p>
-          <p className="truncate text-[12px] leading-tight text-ink-muted">{board.title || 'Live call with EWIN'}</p>
+          <p className="truncate text-[12px] leading-tight text-ink-muted">{board.title || `Live call with ${teacher.name}`}</p>
         </div>
         {live && (
           <span className="vc-timer tnum" aria-label={`Call time ${formatElapsed(elapsed)}`}>
@@ -334,10 +340,10 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
       <div className="vc-board-wrap">
         <Whiteboard board={board}>
           <div className="vc-tile" aria-hidden>
-            <TutorTile />
+            <Portrait character={teacher} talking={live && turn === 'speaking'} className="vc-tile-portrait" />
             <span className="vc-tile-name">
               <span className="vc-bars"><i /><i /><i /></span>
-              EWIN
+              {teacher.name}
             </span>
           </div>
         </Whiteboard>
@@ -346,7 +352,7 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
       <div className="vc-cap" aria-live="polite">
         {caption && (
           <>
-            <p className={`vc-cap-who ${caption.who === 'you' ? 'vc-cap-you' : ''}`}>{caption.who === 'you' ? 'You' : 'EWIN'}</p>
+            <p className={`vc-cap-who ${caption.who === 'you' ? 'vc-cap-you' : ''}`}>{caption.who === 'you' ? 'You' : teacher.name}</p>
             <p className="vc-cap-text">
               {caption.words.map((w, i) => (
                 <span key={i} className={i < caption.shown ? 'vc-said' : undefined}>
@@ -394,9 +400,12 @@ export default function CallPage({ params }: { params: Promise<{ subject: string
       {(screen === 'ready' || screen === 'connecting') && (
         <div className="vc-sheet">
           <div className="vc-sheet-card">
-            <StartScene />
-            <h1 className="mt-4 text-[20px] font-semibold text-ink">Call EWIN about {subjectLabel}</h1>
-            <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">About ten minutes. Talk out loud and follow the whiteboard.</p>
+            <StartScene teacher={teacher.look} />
+            <h1 className="mt-4 text-[20px] font-semibold text-ink">Call {teacher.name} about {subjectLabel}</h1>
+            <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">
+              About ten minutes. Talk out loud and follow the whiteboard.{' '}
+              <Link href={`/cast?subject=${subject}`} className="font-semibold text-primary no-underline">Change teacher</Link>
+            </p>
             <div className="vc-prep">
               <b><Calendar className="h-3.5 w-3.5" />Today&rsquo;s plan</b>
               {plan}

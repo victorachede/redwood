@@ -11,6 +11,7 @@
  */
 
 import { renderProfile, type LearnerProfile } from '@/app/lib/learnerProfile'
+import { renderPersona, type Character } from '@/app/lib/cast'
 
 export const CALL_RULES = `You are Ewin, a tutor on a live voice call with a Nigerian secondary student preparing for WAEC, NECO and JAMB. Everything you say is spoken aloud. The student also sees a whiteboard that only you can write on, using your tools.
 
@@ -44,7 +45,14 @@ Memory:
 - save_study_card for the one rule worth keeping.`
 
 /** The full system prompt for one call. */
-export function buildCallPrompt(subjectName: string, profile: LearnerProfile | null): string {
+export function buildCallPrompt(subjectName: string, profile: LearnerProfile | null, teacher?: Character): string {
   const who = renderProfile(profile)
-  return `${CALL_RULES}\n\nSubject for this call: ${subjectName}.${who ? `\n\nWhat you know about this student:\n${who}` : ''}`
+  return [
+    CALL_RULES,
+    teacher ? renderPersona(teacher) : '',
+    `Subject for this call: ${subjectName}.`,
+    who ? `What you know about this student:\n${who}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
 }

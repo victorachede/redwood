@@ -50,7 +50,7 @@ const SEED_SESSION = () => {
   } catch {}
 }
 
-const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/support', '/rooms', '/rooms/mathematics']
+const ROUTES = ['/', '/pricing', '/dashboard', '/leaderboard', '/cards', '/settings', '/login', '/support', '/rooms', '/rooms/mathematics', '/cast']
 
 const PROBE = () => {
   const parse = (c) => {

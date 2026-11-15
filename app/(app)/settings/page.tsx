@@ -522,6 +522,19 @@ export default function SettingsPage() {
           </>
         )}
 
+        <Group title="Your teachers">
+          <Link
+            href="/cast"
+            className="flex w-full items-center justify-between px-4 py-3.5 text-left text-[14px] font-medium text-ink no-underline hover:bg-paper/80"
+          >
+            <span className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-ink-muted" />
+              Meet the cast and pick who teaches you
+            </span>
+            <ChevronRight className="h-4 w-4 text-ink-muted" />
+          </Link>
+        </Group>
+
         <Group title="Data">
           <Row>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

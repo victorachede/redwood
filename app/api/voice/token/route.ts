@@ -8,7 +8,8 @@ import { NextResponse } from 'next/server'
  *
  * Once the key exists, this is where the actual Deepgram session request
  * goes — Claude as the `think` provider (ANTHROPIC_API_KEY, BYOM),
- * buildCallPrompt() from app/lib/callPrompt.ts as its instructions, CALL_TOOLS
+ * buildCallPrompt() from app/lib/callPrompt.ts as its instructions (with the
+ * teacher the student chose, sent in the request body as `teacher`), CALL_TOOLS
  * from tutorTools.ts (the whiteboard tools plus mastery, homework and study
  * cards), and the learner profile for context. The browser side that consumes
  * it is connectLiveSession() in app/lib/callSession.ts.
