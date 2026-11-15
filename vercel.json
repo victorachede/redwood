@@ -1,4 +1,5 @@
 {
   "installCommand": "npm install --registry=https://registry.npmjs.org/ --no-audit --no-fund",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "crons": [{ "path": "/api/keepalive", "schedule": "23 6 * * *" }]
 }
