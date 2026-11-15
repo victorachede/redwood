@@ -222,7 +222,7 @@ export default function TodayPage() {
         title="Today"
         action={
           user ? (
-            <Link href="/settings" aria-label="Your profile" className="press rounded-full">
+            <Link href="/settings" aria-label="Your profile" className="press -m-1.5 rounded-full p-1.5">
               <Avatar name={user.displayName} size={32} />
             </Link>
           ) : undefined
@@ -248,7 +248,7 @@ export default function TodayPage() {
 
         {/* ── Up next: the lesson, and the teacher who takes it ─────────── */}
         <section className="dash-next" aria-label="Up next">
-          <div className="relative z-[1] min-w-0 flex-1 p-5 sm:p-6">
+          <div className="dash-next-text">
             <p className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-on-hero-dim">
               Up next · {nextSubject.name}
             </p>
@@ -260,7 +260,8 @@ export default function TodayPage() {
                 ? `Last studied ${ago(last.at)}. ${nextTeacher.name} picks up where you stopped.`
                 : `${nextTeacher.name} teaches one idea at a time, then checks you’ve got it.`}
             </p>
-            <div className="mt-5 flex flex-wrap gap-2">
+          </div>
+          <div className="dash-next-actions">
               <Link href={`/learn/${nextSubjectId}`} className="dash-btn dash-btn-light press no-underline">
                 {last ? 'Continue lesson' : 'Start lesson'}
                 <ArrowRight className="h-4 w-4" />
@@ -269,7 +270,6 @@ export default function TodayPage() {
                 <Mic className="h-4 w-4" />
                 Call {nextTeacher.name}
               </Link>
-            </div>
           </div>
           <Portrait character={nextTeacher} className="dash-next-portrait" />
         </section>
@@ -376,9 +376,9 @@ export default function TodayPage() {
             <section className="order-4 lg:order-none" aria-labelledby="subj-h">
               <div className="flex items-baseline justify-between">
                 <h2 id="subj-h" className="margin-label">Your subjects</h2>
-                <Link href="/cast" className="text-[12.5px] font-semibold text-primary no-underline">Change teachers</Link>
+                <Link href="/cast" className="-my-3 inline-flex min-h-[44px] items-center text-[12.5px] font-semibold text-primary no-underline">Change teachers</Link>
               </div>
-              <ul className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+              <ul className="mt-2.5 grid grid-cols-2 gap-2.5">
                 {orderedSubjects.map((s) => {
                   const started = new Set(sessions.filter((x) => x.subjectId === s.id).map((x) => x.topic)).size
                   const pr = practiceBySubject.find((x) => x.subject.id === s.id)
@@ -386,23 +386,21 @@ export default function TodayPage() {
                   const pct = Math.round((started / s.topics.length) * 100)
                   return (
                     <li key={s.id}>
-                      <Link href={`/learn/${s.id}`} className="dash-card press flex h-full flex-col gap-3 p-3.5 no-underline hover:border-line-strong">
-                        <span className="flex items-center gap-3">
-                          <SubjectIcon icon={s.icon} accent={s.accent} size={38} tone="solid" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[14.5px] font-semibold text-ink">{s.name}</span>
-                            <span className="block truncate text-[12px] text-ink-muted">with {t?.name}</span>
-                          </span>
+                      <Link href={`/learn/${s.id}`} className="dash-card press flex h-full flex-col p-3.5 no-underline hover:border-line-strong">
+                        <span className="flex items-start justify-between gap-2">
+                          <SubjectIcon icon={s.icon} accent={s.accent} size={36} tone="solid" />
                           {pr?.pct != null && (
                             <span className="text-right">
-                              <span className="tnum block text-[15px] font-semibold text-ink">{pr.pct}%</span>
+                              <span className="tnum block text-[15px] font-semibold leading-tight text-ink">{pr.pct}%</span>
                               <span className="block text-[10.5px] text-ink-faint">accuracy</span>
                             </span>
                           )}
                         </span>
-                        <span>
-                          <span className="flex justify-between text-[11.5px] text-ink-muted">
-                            <span>{started ? `${started} of ${s.topics.length} topics studied` : 'No lessons yet'}</span>
+                        <span className="mt-2.5 block truncate text-[14.5px] font-semibold text-ink">{s.name}</span>
+                        <span className="block truncate text-[12px] text-ink-muted">with {t?.name}</span>
+                        <span className="mt-auto block pt-3">
+                          <span className="block truncate text-[11.5px] text-ink-muted">
+                            {started ? `${started} of ${s.topics.length} topics studied` : 'No lessons yet'}
                           </span>
                           <span className="mt-1.5 block h-[5px] overflow-hidden rounded-full bg-sunken" aria-hidden>
                             <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: s.accent }} />

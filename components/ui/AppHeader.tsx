@@ -20,7 +20,7 @@ export function AppHeader({
         {back && (
           <Link
             href={back}
-            className="press -ml-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted no-underline hover:bg-sunken hover:text-ink"
+            className="press -ml-2.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-muted no-underline hover:bg-sunken hover:text-ink"
             aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />

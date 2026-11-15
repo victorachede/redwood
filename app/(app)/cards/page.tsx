@@ -218,7 +218,7 @@ export default function CardsPage() {
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`rounded-lg px-4 py-2 text-[13px] font-semibold ${tab === t ? 'bg-primary text-on-primary' : 'text-ink-muted hover:text-ink'}`}
+              className={`min-h-[44px] rounded-lg px-4 py-2 text-[13px] font-semibold ${tab === t ? 'bg-primary text-on-primary' : 'text-ink-muted hover:text-ink'}`}
             >
               {t === 'review' ? 'Review' : `All cards${ready ? ` (${cards.length})` : ''}`}
             </button>
@@ -352,7 +352,7 @@ function DeckChip({ label, count, active, onClick, icon }: { label: string; coun
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`press inline-flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-2 pr-3 text-[12.5px] font-semibold ${active ? 'border-primary bg-primary-soft text-primary' : 'border-line bg-surface text-ink-muted'}`}
+      className={`press inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-full border py-1.5 pl-2.5 pr-3.5 text-[13px] font-semibold ${active ? 'border-primary bg-primary-soft text-primary' : 'border-line bg-surface text-ink-muted'}`}
     >
       {icon}
       {label}
