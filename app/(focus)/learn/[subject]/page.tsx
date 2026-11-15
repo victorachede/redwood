@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Camera, FileText, Plus, Reply, X, BookOpen } from '@/components/icons'
+import { ArrowLeft, ArrowRight, Camera, FileText, Mic, Plus, Reply, X, BookOpen } from '@/components/icons'
 import { getSubject } from '@/app/lib/subjects'
 import {
   saveSession,
@@ -27,6 +27,8 @@ import type { ShowDiagramInput } from '@/app/lib/tutorProtocol'
 import { ChatMessage, DateDivider, type ReplySnapshot } from '@/components/ChatMessage'
 import { SubjectIcon } from '@/components/SubjectIcon'
 import { Avatar } from '@/components/ui/Avatar'
+import { Portrait } from '@/components/cast/Portrait'
+import { defaultTeacher, teacherFor, type Character } from '@/app/lib/cast'
 
 /** The transcript shape is owned by the data layer — see progress.ts. */
 type Message = TutorMessage
@@ -154,6 +156,8 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   const accent = meta?.accent ?? 'var(--primary)'
 
   const [topic, setTopic] = useState<string | null>(null)
+  // The subject's default teacher until the student's own pick is read from storage.
+  const [teacher, setTeacher] = useState<Character>(() => defaultTeacher(subject))
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -175,6 +179,12 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  useEffect(() => {
+    // The choice of teacher lives in browser storage.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTeacher(teacherFor(subject))
+  }, [subject])
 
   useEffect(() => {
     const topics = meta?.topics ?? ['General foundations']
@@ -475,6 +485,22 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">{meta.blurb}</p>
           )}
 
+          <div className="dash-card mt-5 flex items-center gap-3 p-3.5">
+            <Portrait character={teacher} className="dash-face dash-face-lg" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-faint">Your teacher</p>
+              <p className="text-[15px] font-semibold text-ink">{teacher.name}</p>
+              <p className="truncate text-[12.5px] italic text-ink-muted">&ldquo;{teacher.catch}&rdquo;</p>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1.5">
+              <Link href={`/call/${subject}`} className="press inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[12.5px] font-semibold text-on-primary no-underline">
+                <Mic className="h-3.5 w-3.5" />
+                Call
+              </Link>
+              <Link href={`/cast?subject=${subject}`} className="text-[12px] font-semibold text-primary no-underline">Change</Link>
+            </div>
+          </div>
+
           {focus && (
             <div
               className="mt-4 rounded-xl px-3.5 py-3"
@@ -576,16 +602,23 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
             <ArrowLeft className="h-5 w-5" />
           </button>
 
-          {meta && <SubjectIcon icon={meta.icon} accent={accent} size={32} />}
+          <Portrait character={teacher} className="chat-face" />
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-[14.5px] font-semibold leading-tight text-ink">
               {subjectLabel}
             </p>
-            {topic && (
-              <p className="truncate text-[12px] leading-tight text-ink-muted">{topic}</p>
-            )}
+            <p className="truncate text-[12px] leading-tight text-ink-muted">
+              {topic ? `${topic} · ` : ''}with {teacher.name}
+            </p>
           </div>
+          <Link
+            href={`/call/${subject}`}
+            className="press flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted no-underline hover:bg-sunken"
+            aria-label={`Call ${teacher.name}`}
+          >
+            <Mic className="h-5 w-5" />
+          </Link>
         </div>
       </header>
 
@@ -604,12 +637,13 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
                 {showDivider && m.at && <DateDivider at={m.at} />}
                 <ChatMessage
                   isStudent={isStudent}
+                  tutor={teacher}
                   grouped={grouped}
                   at={m.at}
                   replyTo={m.replyTo}
                   onReply={() =>
                     setReplyingTo({
-                      label: isStudent ? 'You' : 'EWIN',
+                      label: isStudent ? 'You' : teacher.name,
                       snippet: m.content.slice(0, 120),
                     })
                   }
@@ -660,7 +694,7 @@ export default function LearnPage({ params }: { params: Promise<{ subject: strin
           })}
 
           {loading && messages[messages.length - 1]?.role !== 'tutor' && (
-            <ChatMessage isStudent={false} grouped={false}>
+            <ChatMessage isStudent={false} tutor={teacher} grouped={false}>
               <Thinking />
             </ChatMessage>
           )}

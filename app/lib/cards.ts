@@ -3,6 +3,8 @@
 import { getSession } from '@/app/lib/auth'
 import { createBrowserClient, isSupabaseConfigured } from '@/app/lib/supabase'
 import { db, push } from '@/app/lib/sync'
+import { SUBJECTS } from '@/app/lib/subjects'
+import { schedule, type Grade } from '@/app/lib/cardSchedule'
 
 export type StudyCard = {
   id: string
@@ -14,6 +16,8 @@ export type StudyCard = {
   interval: number
   due: number
   createdAt: number
+  /** When it was last graded. Lets a sync tell a fresher copy from an older one. */
+  reviewedAt?: number
 }
 
 const KEY = 'ewin-cards-v1'
@@ -27,8 +31,22 @@ function read(): StudyCard[] {
   }
 }
 
+/** Generous, but bounded: localStorage is a few megabytes at most. */
+const MAX_CARDS = 1000
+
 function write(cards: StudyCard[]) {
-  localStorage.setItem(KEY, JSON.stringify(cards.slice(0, 200)))
+  localStorage.setItem(KEY, JSON.stringify(cards.slice(0, MAX_CARDS)))
+}
+
+/**
+ * The subject a card belongs to. Cards record a loose label (a lesson's
+ * subject name, a subject id from a call, a work item's title), so this
+ * accepts either an id or a name and returns the id, or undefined.
+ */
+export function subjectIdOf(label?: string): string | undefined {
+  if (!label) return undefined
+  const norm = label.trim().toLowerCase()
+  return SUBJECTS.find((s) => s.id === norm || s.name.toLowerCase() === norm)?.id
 }
 
 function userId(): string | null {
@@ -93,27 +111,50 @@ function pushCard(c: StudyCard) {
   )
 }
 
-/** grade: 1 again, 3 hard, 4 good, 5 easy */
-export function gradeCard(id: string, grade: 1 | 3 | 4 | 5) {
+/**
+ * Grades a card (1 again, 3 hard, 4 good, 5 easy) and returns both the
+ * card as it was, so the grade can be undone, and as it is now.
+ */
+export function gradeCard(id: string, grade: Grade): { before: StudyCard; after: StudyCard } | null {
   const cards = read()
   const i = cards.findIndex((c) => c.id === id)
-  if (i < 0) return
-  const c = { ...cards[i] }
-  if (grade === 1) {
-    c.interval = 0
-    c.due = Date.now() + 10 * 60 * 1000
-    c.ease = Math.max(1.3, c.ease - 0.2)
-  } else {
-    const mult = grade === 3 ? 1.2 : grade === 4 ? 1.8 : 2.5
-    c.interval = c.interval === 0 ? 1 : Math.max(1, Math.round(c.interval * c.ease * mult * 0.5))
-    c.due = Date.now() + c.interval * 24 * 60 * 60 * 1000
-    c.ease = Math.min(3.0, c.ease + (grade === 5 ? 0.15 : grade === 4 ? 0.05 : -0.05))
-  }
-  cards[i] = c
+  if (i < 0) return null
+  const before = cards[i]
+  const now = Date.now()
+  const after: StudyCard = { ...before, ...schedule(before, grade, now), reviewedAt: now }
+  cards[i] = after
   write(cards)
-  // Review state used to be local-only, so a student's queue reset entirely
-  // on a new device. It now follows them.
-  pushCard(c)
+  // Review state follows the student to any device they sign in on.
+  pushCard(after)
+  return { before, after }
+}
+
+/** Puts a card back exactly as it was: the undo for a grade. */
+export function restoreCard(card: StudyCard) {
+  const cards = read()
+  const i = cards.findIndex((c) => c.id === card.id)
+  if (i < 0) return
+  cards[i] = card
+  write(cards)
+  pushCard(card)
+}
+
+/** Deletes a card here and from the student's account. */
+export function deleteCard(id: string) {
+  const cards = read()
+  const card = cards.find((c) => c.id === id)
+  if (!card) return
+  write(cards.filter((c) => c.id !== id))
+  const uid = userId()
+  if (!uid) return
+  push('card-delete', () => db()!.from('study_cards').delete().eq('user_id', uid).eq('front', card.front))
+}
+
+/** How many cards were graded today, for the "reviewed today" count. */
+export function reviewedToday(now = new Date()): number {
+  const start = new Date(now)
+  start.setHours(0, 0, 0, 0)
+  return read().filter((c) => (c.reviewedAt ?? 0) >= start.getTime()).length
 }
 
 export function parseTutorCards(text: string): { front: string; back: string }[] {
@@ -144,7 +185,7 @@ export async function hydrateCardsFromCloud(): Promise<void> {
     .select('id, front, back, subject, source, ease, interval_days, due, created_at, updated_at')
     .eq('user_id', uid)
     .order('created_at', { ascending: false })
-    .limit(200)
+    .limit(MAX_CARDS)
 
   if (!data?.length) return
 
@@ -162,14 +203,17 @@ export async function hydrateCardsFromCloud(): Promise<void> {
       interval: row.interval_days ?? 0,
       due: row.due ? new Date(row.due).getTime() : Date.now(),
       createdAt: new Date(row.created_at).getTime(),
+      reviewedAt: row.updated_at ? new Date(row.updated_at).getTime() : undefined,
     }
     const mine = byFront.get(row.front)
     // Last write wins on the schedule, so grading on a phone is not undone
-    // by an older copy sitting in a laptop's cache.
-    if (!mine || (row.updated_at && new Date(row.updated_at).getTime() >= mine.due - mine.interval * 86400000)) {
-      byFront.set(row.front, remote)
+    // by an older copy sitting in a laptop's cache. The local id is kept so
+    // an undo in progress still finds its card.
+    const mineAt = mine ? (mine.reviewedAt ?? mine.createdAt) : 0
+    if (!mine || (remote.reviewedAt ?? 0) > mineAt) {
+      byFront.set(row.front, mine ? { ...remote, id: mine.id } : remote)
     }
   }
 
-  write([...byFront.values()].sort((a, b) => b.createdAt - a.createdAt).slice(0, 200))
+  write([...byFront.values()].sort((a, b) => b.createdAt - a.createdAt))
 }

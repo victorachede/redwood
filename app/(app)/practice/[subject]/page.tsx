@@ -24,6 +24,10 @@ import { MilestonePopup, useMilestoneCheck } from '@/components/MilestonePopup'
 import { Diagram } from '@/components/Diagram'
 import { canAccessTimedMocks, canAccessUnlimitedPractice, isPro } from '@/app/lib/billing'
 import { getSession } from '@/app/lib/auth'
+import { Portrait } from '@/components/cast/Portrait'
+import { getCharacter } from '@/app/lib/cast'
+
+const ZAINAB = getCharacter('zainab')
 
 type Phase = 'idle' | 'active' | 'done'
 
@@ -417,13 +421,18 @@ export default function PracticePage({ params }: { params: Promise<{ subject: st
               </div>
             </div>
 
-            <p className="mt-4 text-center text-[15px] text-ink">
-              {pct >= 70
-                ? 'Strong. Keep the streak going.'
-                : pct >= 50
-                  ? 'Halfway there. The misses below are the gap.'
-                  : 'Rough one — that is useful information. Go over the misses.'}
-            </p>
+            {/* Zainab, the cast's quiz challenger, reacts to the score. */}
+            <div className="dash-card mt-5 flex w-full max-w-md items-center gap-3 p-3.5">
+              {ZAINAB && <Portrait character={ZAINAB} className="dash-face dash-face-lg" />}
+              <p className="min-w-0 flex-1 text-[14px] leading-snug text-ink-muted">
+                <span className="font-semibold text-ink">Zainab: </span>
+                {pct >= 70
+                  ? 'Okay, okay. That was strong. Rematch tomorrow?'
+                  : pct >= 50
+                    ? 'Halfway there. The misses below are exactly where the marks are.'
+                    : 'Tough round. Go over the misses below, then come back and beat me.'}
+              </p>
+            </div>
           </div>
 
           {misses.length > 0 && (

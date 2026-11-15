@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { Reply } from '@/components/icons'
 import { Avatar } from '@/components/ui/Avatar'
 import { EwinAvatar } from '@/components/EwinAvatar'
+import { Portrait } from '@/components/cast/Portrait'
+import type { Character } from '@/app/lib/cast'
 
 /**
  * One row in a tutor conversation — flat, grouped by speaker, no bubbles.
@@ -42,9 +44,12 @@ export function ChatMessage({
   at,
   replyTo,
   onReply,
+  tutor,
   children,
 }: {
   isStudent: boolean
+  /** The cast teacher taking this lesson. Without one the tutor shows as EWIN. */
+  tutor?: Character
   /** True when the previous row was the same speaker — hides the
    *  avatar/name so a run of messages reads as one turn. */
   grouped: boolean
@@ -64,7 +69,8 @@ export function ChatMessage({
       }`}
     >
       <div className="w-8 shrink-0">
-        {!grouped && (isStudent ? <Avatar size={32} /> : <EwinAvatar size={32} />)}
+        {!grouped &&
+          (isStudent ? <Avatar size={32} /> : tutor ? <Portrait character={tutor} className="chat-face" /> : <EwinAvatar size={32} />)}
       </div>
       <div className="min-w-0 flex-1">
         {replyTo && (
@@ -75,7 +81,7 @@ export function ChatMessage({
         )}
         {!grouped && (
           <p className="flex items-baseline gap-2">
-            <span className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : 'EWIN'}</span>
+            <span className="text-[13.5px] font-bold text-ink">{isStudent ? 'You' : (tutor?.name ?? 'EWIN')}</span>
             {at && <span className="text-[11px] text-ink-faint">{formatTime(at)}</span>}
           </p>
         )}
