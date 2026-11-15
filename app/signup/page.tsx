@@ -10,8 +10,6 @@ import {
   AuthPassword,
   AuthSubmit,
   AuthError,
-  GoogleButton,
-  AuthDivider,
 } from '@/components/AuthShell'
 
 export default function SignupPage() {
@@ -65,12 +63,8 @@ export default function SignupPage() {
         </>
       }
     >
-      <div className="mt-8 space-y-4">
-        <GoogleButton label="Sign up with Google" redirectPath="/onboarding" />
-        <AuthDivider />
-      </div>
 
-      <form onSubmit={onSubmit} className="mt-4 space-y-4">
+      <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <AuthField
           label="Name"
           autoComplete="name"

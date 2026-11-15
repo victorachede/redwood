@@ -10,8 +10,6 @@ import {
   AuthPassword,
   AuthSubmit,
   AuthError,
-  GoogleButton,
-  AuthDivider,
 } from '@/components/AuthShell'
 
 function safeNext(raw: string | null): string {
@@ -65,12 +63,8 @@ export default function LoginPage() {
         </>
       }
     >
-      <div className="mt-8 space-y-4">
-        <GoogleButton label="Sign in with Google" />
-        <AuthDivider />
-      </div>
 
-      <form onSubmit={onSubmit} className="mt-4 space-y-4">
+      <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <AuthField
           label="Email"
           type="email"

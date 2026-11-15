@@ -209,7 +209,10 @@ export function AuthSubmit({
   )
 }
 
-/** Google, drawn inline rather than pulled from a CDN for one logo. */
+/** Google, drawn inline rather than pulled from a CDN for one logo.
+ *  Not shown anywhere for now: Google sign-in is switched off until it is
+ *  set up on the new Supabase project. To bring it back, put
+ *  <GoogleButton /> and <AuthDivider /> above the form on login and signup. */
 export function GoogleButton({
   label = 'Continue with Google',
   redirectPath,
