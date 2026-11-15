@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: 'EWIN', statusBarStyle: 'default' },
   keywords: ['WAEC', 'JAMB', 'NECO', 'AI tutor', 'Nigeria', 'exam prep', 'EWIN'],
   authors: [{ name: 'EWIN Academy' }],
-  metadataBase: new URL('https://redwood-sand.vercel.app'),
+  metadataBase: new URL('https://ewin.academy'),
   openGraph: {
     type: 'website',
     locale: 'en_NG',
@@ -66,8 +66,8 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'EducationalOrganization',
   name: 'EWIN',
-  url: 'https://redwood-sand.vercel.app',
-  logo: 'https://redwood-sand.vercel.app/icon-512.png',
+  url: 'https://ewin.academy',
+  logo: 'https://ewin.academy/icon-512.png',
   description:
     'An AI tutor that teaches one idea, then checks you got it. Built for Nigerian secondary students preparing for WAEC, NECO and JAMB.',
 }

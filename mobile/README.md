@@ -2,7 +2,7 @@
 
 Capacitor wraps the live web app in a native shell. It does **not** bundle a
 static copy — `capacitor.config.ts` points the WebView straight at
-`https://redwood-sand.vercel.app`, so a deploy ships to every install
+`https://ewin.academy`, so a deploy ships to every install
 immediately, no store review needed for anything except native shell code
 itself (icons, splash, plugins).
 

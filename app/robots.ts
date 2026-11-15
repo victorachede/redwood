@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = 'https://redwood-sand.vercel.app'
+const SITE_URL = 'https://ewin.academy'
 
 /**
  * The app-shell routes (dashboard, cards, practice, rooms, settings, the
@@ -23,6 +23,8 @@ export default function robots(): MetadataRoute.Robots {
         '/rooms',
         '/rooms/',
         '/settings',
+        '/cast',
+        '/call/',
         '/learn/',
         '/work/',
         '/forgot-password',

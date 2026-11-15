@@ -22,7 +22,7 @@ const CONFETTI = [
   { x: '72%', y: '86%', size: 6, delay: 60, shape: 'square' },
 ] as const
 
-const SHARE_URL = 'https://redwood-sand.vercel.app'
+const SHARE_URL = 'https://ewin.academy'
 
 function shareText(m: Milestone) {
   return `${m.emoji} ${m.title} on EWIN — learning one idea at a time for WAEC, NECO and JAMB.`

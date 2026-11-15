@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = 'https://redwood-sand.vercel.app'
+const SITE_URL = 'https://ewin.academy'
 
 /**
  * Only the genuinely public, static-content routes belong here — the same

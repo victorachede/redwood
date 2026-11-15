@@ -12,7 +12,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
  * anything that isn't native shell code.
  *
  * TODO once a custom domain exists: swap server.url below (and everywhere
- * else redwood-sand.vercel.app is hardcoded — see app/layout.tsx's
+ * else ewin.academy is hardcoded — see app/layout.tsx's
  * metadataBase) to the real domain before submitting to either store.
  */
 const config: CapacitorConfig = {
@@ -20,7 +20,7 @@ const config: CapacitorConfig = {
   appName: 'EWIN',
   webDir: 'mobile/www',
   server: {
-    url: 'https://redwood-sand.vercel.app',
+    url: 'https://ewin.academy',
     androidScheme: 'https',
     iosScheme: 'https',
     // Domains the WebView is allowed to navigate to without Capacitor

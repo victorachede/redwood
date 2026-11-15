@@ -110,7 +110,7 @@ const courseListSchema = {
       '@type': 'Course',
       name: `${s.name} — ${s.exam}`,
       description: s.blurb,
-      provider: { '@type': 'EducationalOrganization', name: 'EWIN', url: 'https://redwood-sand.vercel.app' },
+      provider: { '@type': 'EducationalOrganization', name: 'EWIN', url: 'https://ewin.academy' },
     },
   })),
 }
